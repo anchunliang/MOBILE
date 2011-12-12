@@ -1,4 +1,4 @@
-package com.parse.starter;
+package edu.ntu.mobile.smallelephant.ader;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -63,10 +64,12 @@ public class ParseStarterProjectActivity extends Activity {
 		Parse.initialize(this, "L6Qx3IQVB2zNv3bHrUzTwNbak0MF1xHQHqE2BVCc",
 				"ksAA2JMvQVhQwnWLV8ZanZIChJlpsGIRUfKo3GIX");
 	}
-	private void setVisibilities(){
+
+	private void setVisibilities() {
 		btnClear.setVisibility(View.GONE);
 		btnInvite.setVisibility(View.GONE);
 	}
+
 	private void findViews() {
 		loginout = (Button) findViewById(R.id.loginout);
 		mainTitle = (TextView) findViewById(R.id.mainTitle);
@@ -105,11 +108,14 @@ public class ParseStarterProjectActivity extends Activity {
 										.runOnUiThread(new Runnable() {
 											public void run() {
 												mainTitle.setText("朋友清單");
-//												//Parse.initialize(ParseStarterProjectActivity.this, "L6Qx3IQVB2zNv3bHrUzTwNbak0MF1xHQHqE2BVCc",
-//														"ksAA2JMvQVhQwnWLV8ZanZIChJlpsGIRUfKo3GIX");
-												listViewFriends.setVisibility(View.VISIBLE);
+												// //Parse.initialize(ParseStarterProjectActivity.this,
+												// "L6Qx3IQVB2zNv3bHrUzTwNbak0MF1xHQHqE2BVCc",
+												// "ksAA2JMvQVhQwnWLV8ZanZIChJlpsGIRUfKo3GIX");
+												listViewFriends
+														.setVisibility(View.VISIBLE);
 												btnClear.setVisibility(View.VISIBLE);
-												btnInvite.setVisibility(View.VISIBLE);
+												btnInvite
+														.setVisibility(View.VISIBLE);
 											}
 										});
 								fbAsyncRunner.request("me", myProfileListener);
@@ -122,36 +128,50 @@ public class ParseStarterProjectActivity extends Activity {
 									public void onClick(View v) {
 										// TODO Auto-generated method stub
 										Toast.makeText(getApplicationContext(),
-												"Clear button clicked!", Toast.LENGTH_SHORT);
+												"Clear button clicked!",
+												Toast.LENGTH_SHORT);
 										clearSelections();
 									}
 								});
-								btnInvite.setOnClickListener(new OnClickListener() {
-									
-									@Override
-									public void onClick(View v) {
-										// TODO Auto-generated method stub
-										try {
-											int count = listViewFriends.getAdapter().getCount();
-											long[] invited = listViewFriends.getCheckedItemIds();
-//											Intent intent = new Intent(ParseStarterProjectActivity.this,XXX.class);
-											Bundle bundle = new Bundle();
-											bundle.putString("accessToken", facebook.getAccessToken());
-											bundle.putString("myId", myId);
-											bundle.putString("myName", myName);
-											bundle.putString("numSelectedFriends", ""+invited.length);
-											for( int i = 0; i < invited.length; i++){
-												bundle.putString( "friend"+i, FBfriendsId[ (int)invited[i]]);
+								btnInvite
+										.setOnClickListener(new OnClickListener() {
+
+											@Override
+											public void onClick(View v) {
+												// TODO Auto-generated method
+												// stub
+												try {
+													long[] invited = listViewFriends
+															.getCheckedItemIds();
+													Intent intent = new Intent(
+															ParseStarterProjectActivity.this,
+															ChoosingPhoto.class);
+													Bundle bundle = new Bundle();
+													bundle.putString(
+															"accessToken",
+															facebook.getAccessToken());
+													bundle.putString("myId",
+															myId);
+													bundle.putString("myName",
+															myName);
+													bundle.putString(
+															"numSelectedFriends",
+															"" + invited.length);
+													for (int i = 0; i < invited.length; i++) {
+														bundle.putString(
+																"friend" + i,
+																FBfriendsId[(int) invited[i]]);
+													}
+													intent.putExtras(bundle);
+													startActivity(intent);
+												} catch (Exception e) {
+													// TODO: handle exception
+													Log.d("debug",
+															e.getMessage());
+												}
+
 											}
-//											intent.putExtras(bundle);
-//									        startActivityForResult(intent,1);
-										} catch (Exception e) {
-											// TODO: handle exception
-											Log.d("debug", e.getMessage());
-										}
-										
-									}
-								});
+										});
 							}
 
 							@Override
@@ -200,6 +220,38 @@ public class ParseStarterProjectActivity extends Activity {
 				myProfile = new JSONObject(response);
 				myId = myProfile.getString("id");
 				myName = myProfile.getString("name");
+
+				final String queryId = myId;
+				final String queryName = myName;
+				ParseStarterProjectActivity.this.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						ParseQuery query = new ParseQuery("User");
+						query.whereEqualTo("idNumber", queryId);
+						query.countInBackground(new CountCallback() {
+							public void done(int count, ParseException e) {
+								if (e == null) {
+									// The count request succeeded. Log the
+									// count
+									Log.d("score", "Sean has played " + count
+											+ " games");
+									if (count == 0) {
+										ParseObject myPost = new ParseObject(
+												"User");
+										myPost.put("idNumber", queryId);
+										myPost.put("name", queryName);
+										myPost.saveInBackground();
+									}
+								} else {
+									// The request failed
+								}
+							}
+						});
+
+					}
+				});
+
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -241,36 +293,6 @@ public class ParseStarterProjectActivity extends Activity {
 			try {
 				friend = new JSONObject(response);
 				friendlist = friend.getJSONArray("data");
-				final String queryId = myId;
-				final String queryName = myName;
-				ParseStarterProjectActivity.this.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						// TODO Auto-generated method stub
-						ParseQuery query = new ParseQuery("User");
-						query.whereEqualTo("idNumber", queryId);
-						query.countInBackground(new CountCallback() {
-							public void done(int count, ParseException e) {
-								if (e == null) {
-									// The count request succeeded. Log the
-									// count
-									Log.d("score", "Sean has played " + count
-											+ " games");
-									if (count == 0) {
-										ParseObject myPost = new ParseObject(
-												"User");
-										myPost.put("idNumber", queryId);
-										myPost.put("name", queryName);
-										myPost.saveInBackground();
-									}
-								} else {
-									// The request failed
-								}
-							}
-						});
-
-					}
-				});
 				FBfriendsId = new String[friendlist.length()];
 				for (int i = 0; i < friendlist.length(); i++) {
 					FBfriendsId[i] = friendlist.getJSONObject(i)

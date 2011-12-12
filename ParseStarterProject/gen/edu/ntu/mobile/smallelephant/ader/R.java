@@ -5,7 +5,7 @@
  * should not be modified by hand.
  */
 
-package com.parse.starter;
+package edu.ntu.mobile.smallelephant.ader;
 
 public final class R {
     public static final class attr {
@@ -26,7 +26,8 @@ public final class R {
         public static final int scrollView1=0x7f050005;
     }
     public static final class layout {
-        public static final int login=0x7f030000;
+        public static final int gallery=0x7f030000;
+        public static final int login=0x7f030001;
     }
     public static final class string {
         public static final int app_name=0x7f040001;
