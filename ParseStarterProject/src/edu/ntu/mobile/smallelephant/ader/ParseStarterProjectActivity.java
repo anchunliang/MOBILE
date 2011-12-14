@@ -85,101 +85,54 @@ public class ParseStarterProjectActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				facebook.authorize(ParseStarterProjectActivity.this,
-						new String[] { "read_friendlists" },
-						new DialogListener() {
+				if (!facebook.isSessionValid()) {
+					facebook.authorize(ParseStarterProjectActivity.this,
+							new String[] { "read_friendlists" },
+							Facebook.FORCE_DIALOG_AUTH,
+							new DialogListener() {
 
-							@Override
-							public void onFacebookError(FacebookError e) {
-								// TODO Auto-generated method stub
+								@Override
+								public void onFacebookError(
+										final FacebookError e) {
+									// TODO Auto-generated method stub
+									Toast.makeText(getApplicationContext(),
+											e.getMessage(), Toast.LENGTH_SHORT);
+								}
 
-							}
+								@Override
+								public void onError(final DialogError e) {
+									// TODO Auto-generated method stub
+									Toast.makeText(getApplicationContext(),
+											e.getMessage(), Toast.LENGTH_SHORT);
+								}
 
-							@Override
-							public void onError(DialogError e) {
-								// TODO Auto-generated method stub
+								@Override
+								public void onComplete(Bundle values) {
+									// TODO Auto-generated method stub
 
-							}
-
-							@Override
-							public void onComplete(Bundle values) {
-								// TODO Auto-generated method stub
-								ParseStarterProjectActivity.this
-										.runOnUiThread(new Runnable() {
-											public void run() {
-												mainTitle.setText("朋友清單");
-												// //Parse.initialize(ParseStarterProjectActivity.this,
-												// "L6Qx3IQVB2zNv3bHrUzTwNbak0MF1xHQHqE2BVCc",
-												// "ksAA2JMvQVhQwnWLV8ZanZIChJlpsGIRUfKo3GIX");
-												listViewFriends
-														.setVisibility(View.VISIBLE);
-												btnClear.setVisibility(View.VISIBLE);
-												btnInvite
-														.setVisibility(View.VISIBLE);
-											}
-										});
-								fbAsyncRunner.request("me", myProfileListener);
-								fbAsyncRunner.request("me/friends",
-										friendsRequestListener);
-								loginout.setText("logout");
-								btnClear.setOnClickListener(new OnClickListener() {
-
-									@Override
-									public void onClick(View v) {
-										// TODO Auto-generated method stub
-										Toast.makeText(getApplicationContext(),
-												"Clear button clicked!",
-												Toast.LENGTH_SHORT);
-										clearSelections();
-									}
-								});
-								btnInvite
-										.setOnClickListener(new OnClickListener() {
-
-											@Override
-											public void onClick(View v) {
-												// TODO Auto-generated method
-												// stub
-												try {
-													long[] invited = listViewFriends
-															.getCheckedItemIds();
-													Intent intent = new Intent(
-															ParseStarterProjectActivity.this,
-															ChoosingPhoto.class);
-													Bundle bundle = new Bundle();
-													bundle.putString(
-															"accessToken",
-															facebook.getAccessToken());
-													bundle.putString("myId",
-															myId);
-													bundle.putString("myName",
-															myName);
-													bundle.putString(
-															"numSelectedFriends",
-															"" + invited.length);
-													for (int i = 0; i < invited.length; i++) {
-														bundle.putString(
-																"friend" + i,
-																FBfriendsId[(int) invited[i]]);
-													}
-													intent.putExtras(bundle);
-													startActivity(intent);
-												} catch (Exception e) {
-													// TODO: handle exception
-													Log.d("debug",
-															e.getMessage());
+									ParseStarterProjectActivity.this
+											.runOnUiThread(new Runnable() {
+												public void run() {
+													changeToFriendSelectPage();
 												}
+											});
+									
+								}
 
-											}
-										});
-							}
+								@Override
+								public void onCancel() {
+									// TODO Auto-generated method stub
+									Toast.makeText(getApplicationContext(),
+											"cancelled?", Toast.LENGTH_SHORT);
 
-							@Override
-							public void onCancel() {
-								// TODO Auto-generated method stub
-
-							}
-						});
+								}
+							});
+				}
+				else{
+					mainTitle
+					.setText("session Valid!");
+					changeToFriendSelectPage();
+				}
 			}
 		});
 	}
@@ -303,45 +256,7 @@ public class ParseStarterProjectActivity extends Activity {
 					@Override
 					public void run() {
 						// TODO Auto-generated method stub
-						ParseQuery query = new ParseQuery("User");
-						query.whereContainedIn("idNumber",
-								Arrays.asList(queryFriendsId));
-						query.findInBackground(new FindCallback() {
-							public void done(List<ParseObject> friendList,
-									ParseException e) {
-								if (e == null) {
-									friendsName = new String[friendList.size()];
-									friendsId = new String[friendList.size()];
-									Log.d("friends",
-											"Retrieved " + friendList.size()
-													+ " scores");
-									int i = 0;
-									for (ParseObject friend : friendList) {
-										friendsName[i] = friend
-												.getString("name");
-										friendsId[i] = friend.getString("id");
-										i++;
-									}
-									final String[] friendsFinal = friendsName;
-									if (friendsName.length > 0) {
-										ParseStarterProjectActivity.this
-												.runOnUiThread(new Runnable() {
-													public void run() {
-														listViewFriends
-																.setAdapter(new ArrayAdapter<String>(
-																		ParseStarterProjectActivity.this,
-																		android.R.layout.simple_list_item_multiple_choice,
-																		friendsFinal));
-													}
-												});
-									}
-
-								} else {
-									Log.d("score", "Error: " + e.getMessage());
-								}
-							}
-						});
-
+						setUserList( queryFriendsId);
 					}
 				});
 			} catch (JSONException e) {
@@ -408,6 +323,124 @@ public class ParseStarterProjectActivity extends Activity {
 			this.listViewFriends.setItemChecked(i, false);
 		}
 
+	}
+	private void changeToFriendSelectPage(){
+		Toast.makeText(
+				getApplicationContext(),
+				"complete!",
+				Toast.LENGTH_SHORT);
+		mainTitle
+				.setText("朋友名單");
+		// //Parse.initialize(ParseStarterProjectActivity.this,
+		// "L6Qx3IQVB2zNv3bHrUzTwNbak0MF1xHQHqE2BVCc",
+		// "ksAA2JMvQVhQwnWLV8ZanZIChJlpsGIRUfKo3GIX");
+		listViewFriends
+				.setVisibility(View.VISIBLE);
+		btnClear.setVisibility(View.VISIBLE);
+		btnInvite
+				.setVisibility(View.VISIBLE);
+		fbAsyncRunner.request("me",
+				myProfileListener);
+		fbAsyncRunner.request("me/friends",
+				friendsRequestListener);
+		loginout.setText("logout");
+		btnClear.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Toast.makeText(
+						getApplicationContext(),
+						"Clear button clicked!",
+						Toast.LENGTH_SHORT);
+				clearSelections();
+			}
+		});
+		btnInvite
+				.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated
+						// method
+						// stub
+						try {
+							long[] invited = listViewFriends
+									.getCheckedItemIds();
+							Intent intent = new Intent(
+									ParseStarterProjectActivity.this,
+									ChoosingPhoto.class);
+							Bundle bundle = new Bundle();
+							bundle.putString(
+									"accessToken",
+									facebook.getAccessToken());
+							bundle.putString(
+									"myId", myId);
+							bundle.putString(
+									"myName",
+									myName);
+							bundle.putString(
+									"numSelectedFriends",
+									""
+											+ invited.length);
+							for (int i = 0; i < invited.length; i++) {
+								bundle.putString(
+										"friend"
+												+ i,
+										FBfriendsId[(int) invited[i]]);
+							}
+							intent.putExtras(bundle);
+							startActivity(intent);
+						} catch (Exception e) {
+							// TODO: handle
+							// exception
+							Log.d("debug",
+									e.getMessage());
+						}
+
+					}
+				});
+	}
+	private void setUserList(final String[] queryFriendsId){
+		ParseQuery query = new ParseQuery("User");
+		query.whereContainedIn("idNumber",
+				Arrays.asList(queryFriendsId));
+		query.findInBackground(new FindCallback() {
+			public void done(List<ParseObject> friendList,
+					ParseException e) {
+				if (e == null) {
+					friendsName = new String[friendList.size()];
+					friendsId = new String[friendList.size()];
+					Log.d("friends",
+							"Retrieved " + friendList.size()
+									+ " scores");
+					int i = 0;
+					for (ParseObject friend : friendList) {
+						friendsName[i] = friend
+								.getString("name");
+						friendsId[i] = friend.getString("id");
+						i++;
+					}
+					final String[] friendsFinal = friendsName;
+					if (friendsName.length > 0) {
+						ParseStarterProjectActivity.this
+								.runOnUiThread(new Runnable() {
+									public void run() {
+										listViewFriends
+												.setAdapter(new ArrayAdapter<String>(
+														ParseStarterProjectActivity.this,
+														android.R.layout.simple_list_item_multiple_choice,
+														friendsFinal));
+									}
+								});
+					}
+
+				} else {
+					Log.d("score", "Error: " + e.getMessage());
+				}
+			}
+		});
+		
 	}
 
 }
