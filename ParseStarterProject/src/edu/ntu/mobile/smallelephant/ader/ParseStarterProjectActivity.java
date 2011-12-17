@@ -51,7 +51,7 @@ public class ParseStarterProjectActivity extends Activity {
 	private String[] friendsId;
 	private String[] friendsName;
 
-	@Override
+	 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
@@ -82,7 +82,7 @@ public class ParseStarterProjectActivity extends Activity {
 	private void setListener() {
 		loginout.setOnClickListener(new OnClickListener() {
 
-			@Override
+			 
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				if (!facebook.isSessionValid()) {
@@ -91,7 +91,7 @@ public class ParseStarterProjectActivity extends Activity {
 							Facebook.FORCE_DIALOG_AUTH,
 							new DialogListener() {
 
-								@Override
+								 
 								public void onFacebookError(
 										final FacebookError e) {
 									// TODO Auto-generated method stub
@@ -99,14 +99,14 @@ public class ParseStarterProjectActivity extends Activity {
 											e.getMessage(), Toast.LENGTH_SHORT);
 								}
 
-								@Override
+								 
 								public void onError(final DialogError e) {
 									// TODO Auto-generated method stub
 									Toast.makeText(getApplicationContext(),
 											e.getMessage(), Toast.LENGTH_SHORT);
 								}
 
-								@Override
+								 
 								public void onComplete(Bundle values) {
 									// TODO Auto-generated method stub
 
@@ -119,7 +119,7 @@ public class ParseStarterProjectActivity extends Activity {
 									
 								}
 
-								@Override
+								 
 								public void onCancel() {
 									// TODO Auto-generated method stub
 									Toast.makeText(getApplicationContext(),
@@ -139,33 +139,33 @@ public class ParseStarterProjectActivity extends Activity {
 
 	private RequestListener myProfileListener = new RequestListener() {
 
-		@Override
+		 
 		public void onMalformedURLException(MalformedURLException e,
 				Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		 
 		public void onIOException(IOException e, Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		 
 		public void onFileNotFoundException(FileNotFoundException e,
 				Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		 
 		public void onFacebookError(FacebookError e, Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		 
 		public void onComplete(String response, Object state) {
 			// TODO Auto-generated method stub
 			JSONObject myProfile;
@@ -177,7 +177,7 @@ public class ParseStarterProjectActivity extends Activity {
 				final String queryId = myId;
 				final String queryName = myName;
 				ParseStarterProjectActivity.this.runOnUiThread(new Runnable() {
-					@Override
+					 
 					public void run() {
 						// TODO Auto-generated method stub
 						ParseQuery query = new ParseQuery("User");
@@ -212,33 +212,33 @@ public class ParseStarterProjectActivity extends Activity {
 	};
 	private RequestListener friendsRequestListener = new RequestListener() {
 
-		@Override
+		 
 		public void onMalformedURLException(MalformedURLException e,
 				Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		 
 		public void onIOException(IOException e, Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		 
 		public void onFileNotFoundException(FileNotFoundException e,
 				Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		 
 		public void onFacebookError(FacebookError e, Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		 
 		public void onComplete(String response, Object state) {
 			// TODO Auto-generated method stub
 			JSONObject friend;
@@ -253,7 +253,7 @@ public class ParseStarterProjectActivity extends Activity {
 				}
 				final String[] queryFriendsId = FBfriendsId;
 				ParseStarterProjectActivity.this.runOnUiThread(new Runnable() {
-					@Override
+					 
 					public void run() {
 						// TODO Auto-generated method stub
 						setUserList( queryFriendsId);
@@ -265,7 +265,7 @@ public class ParseStarterProjectActivity extends Activity {
 			}
 			loginout.setOnClickListener(new OnClickListener() {
 
-				@Override
+				 
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
 					fbAsyncRunner.logout(ParseStarterProjectActivity.this,
@@ -276,33 +276,33 @@ public class ParseStarterProjectActivity extends Activity {
 	};
 	private RequestListener logoutListener = new RequestListener() {
 
-		@Override
+		 
 		public void onMalformedURLException(MalformedURLException e,
 				Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		 
 		public void onIOException(IOException e, Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		 
 		public void onFileNotFoundException(FileNotFoundException e,
 				Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		 
 		public void onFacebookError(FacebookError e, Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		 
 		public void onComplete(String response, Object state) {
 			// TODO Auto-generated method stub
 			ParseStarterProjectActivity.this.runOnUiThread(new Runnable() {
@@ -330,7 +330,7 @@ public class ParseStarterProjectActivity extends Activity {
 				"complete!",
 				Toast.LENGTH_SHORT);
 		mainTitle
-				.setText("朋友名單");
+				.setText("���");
 		// //Parse.initialize(ParseStarterProjectActivity.this,
 		// "L6Qx3IQVB2zNv3bHrUzTwNbak0MF1xHQHqE2BVCc",
 		// "ksAA2JMvQVhQwnWLV8ZanZIChJlpsGIRUfKo3GIX");
@@ -346,7 +346,7 @@ public class ParseStarterProjectActivity extends Activity {
 		loginout.setText("logout");
 		btnClear.setOnClickListener(new OnClickListener() {
 
-			@Override
+			 
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				Toast.makeText(
@@ -359,14 +359,13 @@ public class ParseStarterProjectActivity extends Activity {
 		btnInvite
 				.setOnClickListener(new OnClickListener() {
 
-					@Override
+					 
 					public void onClick(View v) {
 						// TODO Auto-generated
 						// method
 						// stub
 						try {
-							long[] invited = listViewFriends
-									.getCheckedItemIds();
+							/*long[] invited = listViewFriends.getCheckItemIds();
 							Intent intent = new Intent(
 									ParseStarterProjectActivity.this,
 									ChoosingPhoto.class);
@@ -379,16 +378,18 @@ public class ParseStarterProjectActivity extends Activity {
 							bundle.putString(
 									"myName",
 									myName);
-							bundle.putString(
-									"numSelectedFriends",
-									""
-											+ invited.length);
+							bundle.putString("numSelectedFriends",""+ invited.length);
 							for (int i = 0; i < invited.length; i++) {
 								bundle.putString(
 										"friend"
 												+ i,
 										FBfriendsId[(int) invited[i]]);
 							}
+							*/
+							Intent intent = new Intent(ParseStarterProjectActivity.this,
+									MyGallery.class);
+							Bundle bundle = new Bundle();
+							
 							intent.putExtras(bundle);
 							startActivity(intent);
 						} catch (Exception e) {
