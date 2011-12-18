@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -59,7 +60,6 @@ public class ParseStarterProjectActivity extends Activity {
 	public static final String PREF = "SMALL_ELEPHANT_PREF";
 	public static final String PREF_USER_ID = "PARSE_USER_id";
 	private String parse_user_id = null;
-	
 
 	@Override
 	public void onStop() {
@@ -98,24 +98,28 @@ public class ParseStarterProjectActivity extends Activity {
 		mainTitle = (TextView) findViewById(R.id.mainTitle);
 		listViewFriends = (ListView) findViewById(R.id.listView1);
 		listViewFriends.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-		listViewFriends.setOnItemClickListener(new OnItemClickListener(){
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            	Log.d("CheckBox", "onItemClick  ");
-            	ViewCache vc = (ViewCache) view.getTag();    
-                vc.getCheckbox().toggle();
-                if( listViewFriends.getAdapter()!=null && listViewFriends.getAdapter().getClass() == ImageAndTextListAdapter.class){
-                	((ImageAndTextListAdapter)listViewFriends.getAdapter()).isSelected.put(position, vc.getCheckbox().isChecked());
-                }
-            }    
-        });
+		listViewFriends.setOnItemClickListener(new OnItemClickListener() {
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				Log.d("CheckBox", "onItemClick  ");
+				ViewCache vc = (ViewCache) view.getTag();
+				vc.getCheckbox().toggle();
+				if (listViewFriends.getAdapter() != null
+						&& listViewFriends.getAdapter().getClass() == ImageAndTextListAdapter.class) {
+					((ImageAndTextListAdapter) listViewFriends.getAdapter()).isSelected
+							.put(position, vc.getCheckbox().isChecked());
+				}
+			}
+		});
 		listViewFriends.setItemsCanFocus(true);
 		btnClear = (Button) findViewById(R.id.clear);
 		btnInvite = (Button) findViewById(R.id.invite);
 	}
 
 	private void setListener() {
-		loginout.setOnClickListener( loginListener);
+		loginout.setOnClickListener(loginListener);
 	}
+
 	private OnClickListener loginListener = new OnClickListener() {
 
 		public void onClick(View v) {
@@ -126,8 +130,7 @@ public class ParseStarterProjectActivity extends Activity {
 						new String[] { "read_friendlists" },
 						Facebook.FORCE_DIALOG_AUTH, new DialogListener() {
 
-							public void onFacebookError(
-									final FacebookError e) {
+							public void onFacebookError(final FacebookError e) {
 								// TODO Auto-generated method stub
 								Log.d("fbSession",
 										"facebook error: " + e.getMessage());
@@ -209,7 +212,7 @@ public class ParseStarterProjectActivity extends Activity {
 								0);
 						parse_user_id = settings.getString(myId, "");
 						if (!"".equals(parse_user_id)) {
-							Log.d("shrPref", "get "+ parse_user_id);
+							Log.d("shrPref", "get " + parse_user_id);
 							query.getInBackground(parse_user_id,
 									new GetCallback() {
 
@@ -217,14 +220,14 @@ public class ParseStarterProjectActivity extends Activity {
 										public void done(ParseObject object,
 												ParseException e) {
 											// TODO Auto-generated method stub
-											object.put("online",true);
+											object.put("online", true);
 											object.saveInBackground();
 										}
 									});
 						} else {
 							Log.d("shrPref", "parse_user_id not found");
 							query.whereEqualTo("idNumber", queryId);
-//							query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
+							// query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
 							query.findInBackground(new FindCallback() {
 								public void done(List<ParseObject> friendList,
 										ParseException e) {
@@ -238,21 +241,33 @@ public class ParseStarterProjectActivity extends Activity {
 											myPost.put("name", queryName);
 											myPost.put("online", true);
 											myPost.saveInBackground();
-											parse_user_id = myPost.getObjectId();
-											Log.d("shrPref", "parse_user_id stored "+ parse_user_id);
-											SharedPreferences settings = getSharedPreferences(PREF,
-													0);
-											settings.edit().putString(queryId, parse_user_id).commit();
+											parse_user_id = myPost
+													.getObjectId();
+											Log.d("shrPref",
+													"parse_user_id stored "
+															+ parse_user_id);
+											SharedPreferences settings = getSharedPreferences(
+													PREF, 0);
+											settings.edit()
+													.putString(queryId,
+															parse_user_id)
+													.commit();
 										} else {
 											ParseObject myPost = friendList
 													.get(0);
 											myPost.put("online", true);
 											myPost.saveInBackground();
-											parse_user_id = myPost.getObjectId();
-											Log.d("shrPref", "parse_user_id stored "+ parse_user_id);
-											SharedPreferences settings = getSharedPreferences(PREF,
-													0);
-											settings.edit().putString(queryId, parse_user_id).commit();
+											parse_user_id = myPost
+													.getObjectId();
+											Log.d("shrPref",
+													"parse_user_id stored "
+															+ parse_user_id);
+											SharedPreferences settings = getSharedPreferences(
+													PREF, 0);
+											settings.edit()
+													.putString(queryId,
+															parse_user_id)
+													.commit();
 										}
 									} else {
 										parse_user_id = null;
@@ -323,7 +338,7 @@ public class ParseStarterProjectActivity extends Activity {
 					// TODO Auto-generated method stub
 					fbAsyncRunner.logout(ParseStarterProjectActivity.this,
 							logoutListener);
-					
+
 				}
 			});
 		}
@@ -369,11 +384,12 @@ public class ParseStarterProjectActivity extends Activity {
 	};
 
 	private void clearSelections() {
-		int count = this.listViewFriends.getAdapter().getCount();
-		for (int i = 0; i < count; i++) {
-			this.listViewFriends.setItemChecked(i, false);
+		if (listViewFriends != null && listViewFriends.getAdapter() != null) {
+			int count = listViewFriends.getAdapter().getCount();
+			for (int i = 0; i < count; i++) {
+				listViewFriends.setItemChecked(i, false);
+			}
 		}
-
 	}
 
 	private void changeToFriendSelectPage() {
@@ -436,7 +452,7 @@ public class ParseStarterProjectActivity extends Activity {
 	private void setUserList(final String[] queryFriendsId) {
 		ParseQuery query = new ParseQuery("User");
 		query.whereContainedIn("idNumber", Arrays.asList(queryFriendsId));
-		//query.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
+		query.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
 		query.findInBackground(new FindCallback() {
 			public void done(List<ParseObject> friendList, ParseException e) {
 				if (e == null) {
@@ -460,7 +476,7 @@ public class ParseStarterProjectActivity extends Activity {
 								+ friendsId[i] + "/picture?type=small";
 						ImageAndText item = new ImageAndText(img_url,
 								friendsName[i], friendsOnline[i]);
-						if( !list.contains(item)){
+						if (!list.contains(item)) {
 							list.add(item);
 						}
 					}
@@ -472,13 +488,21 @@ public class ParseStarterProjectActivity extends Activity {
 								.runOnUiThread(new Runnable() {
 									public void run() {
 										listViewFriends.setAdapter(adapter);
-										adapter.notifyDataSetChanged();
+										for( int i = 0; i < listViewFriends.getCount(); i++){
+											ViewGroup row = (ViewGroup)listViewFriends.getItemAtPosition(i);
+											if( row != null){
+												TextView txt = (TextView)row.findViewById(R.id.MyAdapter_TextView_title);
+												if( txt != null){
+													txt.setTextColor(0xFFcdcdcd);
+												}
+											}
+										}
 									}
 								});
 					}
 
 				} else {
-					Log.d("score", "Error: " + e.getMessage());
+					Log.d("Debug", "Error: " + e.getMessage());
 				}
 			}
 		});
@@ -486,7 +510,7 @@ public class ParseStarterProjectActivity extends Activity {
 
 	private void logoutParse() {
 		if (parse_user_id != null) {
-			Log.d("shrPref","logoutParse:  parse_user_id = "+ parse_user_id);
+			Log.d("shrPref", "logoutParse:  parse_user_id = " + parse_user_id);
 			ParseQuery query = new ParseQuery("User");
 			query.getInBackground(parse_user_id, new GetCallback() {
 				public void done(ParseObject object, ParseException e) {

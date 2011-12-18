@@ -110,10 +110,8 @@ public class ImageAndTextListAdapter extends ArrayAdapter<ImageAndText> {
 		viewCache.getCheckbox();
 		if (isSelected.get(position) != null)
 			viewCache.getCheckbox().setChecked(isSelected.get(position));
-		if (isOnline.get(position) != null){
+		if (isOnline.get(position) != null)
 			viewCache.getCheckbox().setOnline(isOnline.get(position));
-			viewCache.getTextView().setTextColor(0xFFcdcdcd);
-		}
 		// MyCheckbox.setOnline(true);
 		Log.d("CheckBox", "get View!  online? "+viewCache.getCheckbox().isOnline()+"  checked? "+viewCache.getCheckbox().isChecked());
 		viewCache.getCheckbox().refreshDrawableState();
