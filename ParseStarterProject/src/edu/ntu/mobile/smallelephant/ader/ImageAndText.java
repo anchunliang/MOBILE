@@ -16,4 +16,7 @@ public class ImageAndText {
     public String getText() {
         return text;
     }
+    public Boolean isOnline(){
+    	return online;
+    }
 }

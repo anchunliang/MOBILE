@@ -1,6 +1,8 @@
 package edu.ntu.mobile.smallelephant.ader;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
@@ -8,7 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -20,15 +21,26 @@ public class ImageAndTextListAdapter extends ArrayAdapter<ImageAndText> {
 	 
     private ListView listView;
     private AsyncImageLoader asyncImageLoader;
- 
+    public static Map<Integer, Boolean> isSelected;
+    public static Map<Integer, Boolean> isOnline;
+    
     public ImageAndTextListAdapter(Activity activity, List<ImageAndText> imageAndTexts, ListView listView) {
         super(activity, 0, imageAndTexts);
         this.listView = listView;
         asyncImageLoader = new AsyncImageLoader();
+        isOnline = new HashMap<Integer, Boolean>();
+        isSelected = new HashMap<Integer, Boolean>();
+        for( int i = 0; i < imageAndTexts.size(); i++){
+        	if( imageAndTexts.get(i).isOnline()){
+        		isOnline.put(i,true);
+        	}
+        	else isOnline.put(i,false);
+        	isSelected.put(i, false);
+        }
     }
     @Override
     public boolean isEnabled(int position){
-		return false;
+		return isOnline.get(position);
     }
     
     

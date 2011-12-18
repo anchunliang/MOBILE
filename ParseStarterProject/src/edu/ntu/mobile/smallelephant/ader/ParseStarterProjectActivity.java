@@ -429,6 +429,7 @@ public class ParseStarterProjectActivity extends Activity {
 					friendsOnline = new Boolean[friendList.size()];
 					Log.d("friends", "Retrieved " + friendList.size()
 							+ " scores");
+					list.clear();
 					int i = 0;
 					for (ParseObject friend : friendList) {
 						friendsName[i] = friend.getString("name");

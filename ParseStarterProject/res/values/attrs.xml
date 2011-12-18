@@ -5,6 +5,5 @@
     </declare-styleable>
     <declare-styleable name="MyCheckbox">
         <attr name="state_online" format="boolean" />
-        <attr name="state_checked" format="boolean" />
     </declare-styleable>
 </resources>
