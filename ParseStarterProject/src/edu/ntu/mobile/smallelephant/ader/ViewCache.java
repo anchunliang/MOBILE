@@ -10,7 +10,7 @@ public class ViewCache {
     private View baseView;
     private TextView textView;
     private ImageView imageView;
-    private CheckBox checkbox;
+    private MyCheckbox checkbox;
  
     public ViewCache(View baseView) {
         this.baseView = baseView;
@@ -30,18 +30,31 @@ public class ViewCache {
         return imageView;
     }
     
-    public CheckBox getCheckbox() {
+    public MyCheckbox getCheckbox() {
     	if( checkbox == null) {
-    		checkbox = (CheckBox) baseView.findViewById(R.id.MyAdapter_CheckBox_checkBox);
+    		checkbox = (MyCheckbox) baseView.findViewById(R.id.MyAdapter_CheckBox_checkBox);
     	}
     	return checkbox;
     }
     
-    public void setChecked(boolean isChecked){
-    	checkbox.setChecked(isChecked);
-    }
-    
-    public boolean isChecked(){
-    	return checkbox.isChecked();
-    }
+//    public void setChecked(boolean isChecked){
+//    	if( checkbox != null)
+//    		checkbox.setChecked(isChecked);
+//    }
+//    
+//    public boolean isChecked(){
+//    	if( checkbox != null)
+//    		return checkbox.isChecked();
+//    	else return false;
+//    }
+//    
+//    public void toggle(){
+//    	if( checkbox != null)
+//    		checkbox.toggle();
+//    }
+//    public boolean isOnline(){
+//    	if( checkbox != null)
+//    		return checkbox.isOnline();
+//    	else return false;
+//    }
 }

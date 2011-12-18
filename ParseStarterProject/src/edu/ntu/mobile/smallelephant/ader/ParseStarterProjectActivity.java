@@ -18,6 +18,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -57,6 +59,7 @@ public class ParseStarterProjectActivity extends Activity {
 	public static final String PREF = "SMALL_ELEPHANT_PREF";
 	public static final String PREF_USER_ID = "PARSE_USER_id";
 	private String parse_user_id = null;
+	
 
 	@Override
 	public void onStop() {
@@ -95,61 +98,72 @@ public class ParseStarterProjectActivity extends Activity {
 		mainTitle = (TextView) findViewById(R.id.mainTitle);
 		listViewFriends = (ListView) findViewById(R.id.listView1);
 		listViewFriends.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+		listViewFriends.setOnItemClickListener(new OnItemClickListener(){
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            	Log.d("CheckBox", "onItemClick  ");
+            	ViewCache vc = (ViewCache) view.getTag();    
+                vc.getCheckbox().toggle();
+                if( listViewFriends.getAdapter()!=null && listViewFriends.getAdapter().getClass() == ImageAndTextListAdapter.class){
+                	((ImageAndTextListAdapter)listViewFriends.getAdapter()).isSelected.put(position, vc.getCheckbox().isChecked());
+                }
+            }    
+        });
+		listViewFriends.setItemsCanFocus(true);
 		btnClear = (Button) findViewById(R.id.clear);
 		btnInvite = (Button) findViewById(R.id.invite);
 	}
 
 	private void setListener() {
-		loginout.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				if (!facebook.isSessionValid()) {
-					Log.d("fbSession", "session invalid");
-					facebook.authorize(ParseStarterProjectActivity.this,
-							new String[] { "read_friendlists" },
-							Facebook.FORCE_DIALOG_AUTH, new DialogListener() {
-
-								public void onFacebookError(
-										final FacebookError e) {
-									// TODO Auto-generated method stub
-									Log.d("fbSession",
-											"facebook error: " + e.getMessage());
-								}
-
-								public void onError(final DialogError e) {
-									// TODO Auto-generated method stub
-									Log.d("fbSession",
-											"dialog error: " + e.getMessage());
-								}
-
-								public void onComplete(Bundle values) {
-									// TODO Auto-generated method stub
-
-									ParseStarterProjectActivity.this
-											.runOnUiThread(new Runnable() {
-												public void run() {
-													changeToFriendSelectPage();
-												}
-											});
-
-								}
-
-								public void onCancel() {
-									// TODO Auto-generated method stub
-									Log.d("fbSession", "cancel ");
-
-								}
-							});
-				} else {
-					Log.d("fbSession", "session valid 2");
-					mainTitle.setText("session Valid!");
-					changeToFriendSelectPage();
-				}
-			}
-		});
+		loginout.setOnClickListener( loginListener);
 	}
+	private OnClickListener loginListener = new OnClickListener() {
 
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			if (!facebook.isSessionValid()) {
+				Log.d("fbSession", "session invalid");
+				facebook.authorize(ParseStarterProjectActivity.this,
+						new String[] { "read_friendlists" },
+						Facebook.FORCE_DIALOG_AUTH, new DialogListener() {
+
+							public void onFacebookError(
+									final FacebookError e) {
+								// TODO Auto-generated method stub
+								Log.d("fbSession",
+										"facebook error: " + e.getMessage());
+							}
+
+							public void onError(final DialogError e) {
+								// TODO Auto-generated method stub
+								Log.d("fbSession",
+										"dialog error: " + e.getMessage());
+							}
+
+							public void onComplete(Bundle values) {
+								// TODO Auto-generated method stub
+
+								ParseStarterProjectActivity.this
+										.runOnUiThread(new Runnable() {
+											public void run() {
+												changeToFriendSelectPage();
+											}
+										});
+
+							}
+
+							public void onCancel() {
+								// TODO Auto-generated method stub
+								Log.d("fbSession", "cancel ");
+
+							}
+						});
+			} else {
+				Log.d("fbSession", "session valid 2");
+				mainTitle.setText("session Valid!");
+				changeToFriendSelectPage();
+			}
+		}
+	};
 	private RequestListener myProfileListener = new RequestListener() {
 
 		public void onMalformedURLException(MalformedURLException e,
@@ -210,7 +224,7 @@ public class ParseStarterProjectActivity extends Activity {
 						} else {
 							Log.d("shrPref", "parse_user_id not found");
 							query.whereEqualTo("idNumber", queryId);
-							query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
+//							query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
 							query.findInBackground(new FindCallback() {
 								public void done(List<ParseObject> friendList,
 										ParseException e) {
@@ -309,6 +323,7 @@ public class ParseStarterProjectActivity extends Activity {
 					// TODO Auto-generated method stub
 					fbAsyncRunner.logout(ParseStarterProjectActivity.this,
 							logoutListener);
+					
 				}
 			});
 		}
@@ -339,14 +354,15 @@ public class ParseStarterProjectActivity extends Activity {
 
 		public void onComplete(String response, Object state) {
 			// TODO Auto-generated method stub
+			loginout.setOnClickListener(loginListener);
+			logoutParse();
 			ParseStarterProjectActivity.this.runOnUiThread(new Runnable() {
 				public void run() {
 					mainTitle.setText(R.string.hello);
 					loginout.setText("login");
-					listViewFriends.setVisibility(View.INVISIBLE);
-					btnClear.setVisibility(View.GONE);
-					btnInvite.setVisibility(View.GONE);
-					logoutParse();
+					listViewFriends.setVisibility(View.GONE);
+					btnClear.setVisibility(View.INVISIBLE);
+					btnInvite.setVisibility(View.INVISIBLE);
 				}
 			});
 		}
@@ -420,7 +436,7 @@ public class ParseStarterProjectActivity extends Activity {
 	private void setUserList(final String[] queryFriendsId) {
 		ParseQuery query = new ParseQuery("User");
 		query.whereContainedIn("idNumber", Arrays.asList(queryFriendsId));
-		query.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
+		//query.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
 		query.findInBackground(new FindCallback() {
 			public void done(List<ParseObject> friendList, ParseException e) {
 				if (e == null) {
@@ -429,7 +445,6 @@ public class ParseStarterProjectActivity extends Activity {
 					friendsOnline = new Boolean[friendList.size()];
 					Log.d("friends", "Retrieved " + friendList.size()
 							+ " scores");
-					list.clear();
 					int i = 0;
 					for (ParseObject friend : friendList) {
 						friendsName[i] = friend.getString("name");
@@ -439,14 +454,15 @@ public class ParseStarterProjectActivity extends Activity {
 								+ "name\t" + friendsName[i]);
 						i++;
 					}
-
 					for (i = 0; i < friendsId.length; i++) {
 
 						String img_url = "http://graph.facebook.com/"
 								+ friendsId[i] + "/picture?type=small";
 						ImageAndText item = new ImageAndText(img_url,
 								friendsName[i], friendsOnline[i]);
-						list.add(item);
+						if( !list.contains(item)){
+							list.add(item);
+						}
 					}
 					final ImageAndTextListAdapter adapter = new ImageAndTextListAdapter(
 							ParseStarterProjectActivity.this, list,
@@ -456,45 +472,7 @@ public class ParseStarterProjectActivity extends Activity {
 								.runOnUiThread(new Runnable() {
 									public void run() {
 										listViewFriends.setAdapter(adapter);
-										// adapter = new SimpleAdapter(
-										// ParseStarterProjectActivity.this,
-										// list,
-										// R.layout.adapter,
-										// new String[] { "name","photo" },
-										// new int[] {
-										// R.id.MyAdapter_TextView_title,R.id.MyAdapter_ImageView_icon
-										// } );
-										// listViewFriends.setAdapter(adapter);
-										// for (int i = 0; i < friendsId.length;
-										// i++) {
-										// HashMap<String, Object> item = new
-										// HashMap<String, Object>();
-										// URL img_value;
-										// Bitmap mIcon1;
-										// try {
-										// img_value = new
-										// URL("http://graph.facebook.com/"+friendsId[i]+"/picture?type=small");
-										// Log.d("debug_url",img_value.toString());
-										// mIcon1 =
-										// BitmapFactory.decodeStream(img_value.openConnection().getInputStream());
-										// item.put("photo", mIcon1);
-										// } catch (MalformedURLException e1) {
-										// // TODO Auto-generated catch block
-										// e1.printStackTrace();
-										// } catch (IOException e) {
-										// // TODO Auto-generated catch block
-										// e.printStackTrace();
-										// }
-										// item.put("name", friendsName[i]);
-										// list.add(item);
-										// adapter.notifyDataSetChanged();
-										// }
-
-										// listViewFriends
-										// .setAdapter(new ArrayAdapter<String>(
-										// ParseStarterProjectActivity.this,
-										// android.R.layout.simple_list_item_multiple_choice,
-										// friendsFinal));
+										adapter.notifyDataSetChanged();
 									}
 								});
 					}

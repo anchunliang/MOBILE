@@ -19,4 +19,19 @@ public class ImageAndText {
     public Boolean isOnline(){
     	return online;
     }
+    @Override
+    public boolean equals(Object object){
+    	if( this == object)
+    		return true;
+    	if( object == null || object.getClass() != this.getClass())
+    		return false;
+    	ImageAndText obj = (ImageAndText)object;
+    	return ( text!=null&&text.equals(obj.text) ) || text==obj.text ;    	
+    }
+    @Override
+    public int hashCode(){
+    	int hash = 7;
+    	hash = 47*hash + (text == null ? 0 : text.hashCode());
+    	return hash;
+    }
 }
