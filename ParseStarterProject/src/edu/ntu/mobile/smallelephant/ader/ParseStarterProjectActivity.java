@@ -6,7 +6,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -15,13 +14,10 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -55,10 +51,44 @@ public class ParseStarterProjectActivity extends Activity {
 	private String myName;
 	private String[] FBfriendsId;
 	private String[] friendsId;
-	private SimpleAdapter adapter;
-	ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
+	private Boolean[] friendsOnline;
+//	private SimpleAdapter adapter;
+	ArrayList<ImageAndText> list = new ArrayList<ImageAndText>();
 	private String[] friendsName;
-
+	
+	@Override
+	public void onStop( ) {
+		super.onStop();
+		ParseQuery query = new ParseQuery("User");
+		query.whereEqualTo("idNumber", myId);
+		query.findInBackground(new FindCallback() {
+			public void done(List<ParseObject> friendList, ParseException e) {
+				if (e == null) {
+					// The count request succeeded. Log the
+					// count
+					if( friendList.size() == 0){
+						ParseObject myPost = new ParseObject(
+								"User");
+						myPost.put("idNumber", myId);
+						myPost.put("name", myName);
+						myPost.put("online", false);
+						myPost.saveInBackground();
+					}
+					else{
+						ParseObject myPost = friendList.get(0);
+						myPost.put("online", false);
+						myPost.saveInBackground();
+					}
+					
+				} else {
+					// The request failed
+				}
+			}
+		});
+		
+	}
+	
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
@@ -92,6 +122,7 @@ public class ParseStarterProjectActivity extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				if (!facebook.isSessionValid()) {
+					Log.d("fbSession", "session invalid");
 					facebook.authorize(ParseStarterProjectActivity.this,
 							new String[] { "read_friendlists" },
 							Facebook.FORCE_DIALOG_AUTH, new DialogListener() {
@@ -99,14 +130,12 @@ public class ParseStarterProjectActivity extends Activity {
 								public void onFacebookError(
 										final FacebookError e) {
 									// TODO Auto-generated method stub
-									Toast.makeText(getApplicationContext(),
-											e.getMessage(), Toast.LENGTH_SHORT);
+									Log.d("fbSession","facebook error: " + e.getMessage());
 								}
 
 								public void onError(final DialogError e) {
 									// TODO Auto-generated method stub
-									Toast.makeText(getApplicationContext(),
-											e.getMessage(), Toast.LENGTH_SHORT);
+									Log.d("fbSession","dialog error: " + e.getMessage());
 								}
 
 								public void onComplete(Bundle values) {
@@ -123,12 +152,12 @@ public class ParseStarterProjectActivity extends Activity {
 
 								public void onCancel() {
 									// TODO Auto-generated method stub
-									Toast.makeText(getApplicationContext(),
-											"cancelled?", Toast.LENGTH_SHORT);
+									Log.d("fbSession","cancel ");
 
 								}
 							});
 				} else {
+					Log.d("fbSession", "session valid");
 					mainTitle.setText("session Valid!");
 					changeToFriendSelectPage();
 				}
@@ -176,20 +205,25 @@ public class ParseStarterProjectActivity extends Activity {
 						// TODO Auto-generated method stub
 						ParseQuery query = new ParseQuery("User");
 						query.whereEqualTo("idNumber", queryId);
-						query.countInBackground(new CountCallback() {
-							public void done(int count, ParseException e) {
+						query.findInBackground(new FindCallback() {
+							public void done(List<ParseObject> friendList, ParseException e) {
 								if (e == null) {
 									// The count request succeeded. Log the
 									// count
-									Log.d("score", "Sean has played " + count
-											+ " games");
-									if (count == 0) {
+									if( friendList.size() == 0){
 										ParseObject myPost = new ParseObject(
 												"User");
 										myPost.put("idNumber", queryId);
 										myPost.put("name", queryName);
+										myPost.put("online", true);
 										myPost.saveInBackground();
 									}
+									else{
+										ParseObject myPost = friendList.get(0);
+										myPost.put("online", true);
+										myPost.saveInBackground();
+									}
+									
 								} else {
 									// The request failed
 								}
@@ -373,48 +407,58 @@ public class ParseStarterProjectActivity extends Activity {
 				if (e == null) {
 					friendsName = new String[friendList.size()];
 					friendsId = new String[friendList.size()];
+					friendsOnline = new Boolean[friendList.size()];
 					Log.d("friends", "Retrieved " + friendList.size()
 							+ " scores");
 					int i = 0;
 					for (ParseObject friend : friendList) {
 						friendsName[i] = friend.getString("name");
-						friendsId[i] = friend.getString("id");
-						Log.d("friends profile", "Id " + friendsId[i] + "name" + friendsName[i]);
+						friendsId[i] = friend.getString("idNumber");
+						friendsOnline[i] = friend.getBoolean("online");
+						Log.d("friends profile", "Id " + friendsId[i] + "name\t" + friendsName[i]);
 						i++;
 					}
 					
-					final String[] friendsFinal = friendsName;
+					for ( i = 0; i < friendsId.length; i++) {
+						
+						String img_url = "http://graph.facebook.com/"+friendsId[i]+"/picture?type=small";
+						ImageAndText item = new ImageAndText(img_url,friendsName[i], friendsOnline[i]);
+						list.add(item);
+					}
+					final ImageAndTextListAdapter adapter = 
+								new ImageAndTextListAdapter(ParseStarterProjectActivity.this, list, listViewFriends);
 					if (friendsName.length > 0) {
 						ParseStarterProjectActivity.this
 								.runOnUiThread(new Runnable() {
 									public void run() {
-										adapter = new SimpleAdapter( 
-												 ParseStarterProjectActivity.this, 
-												 list,
-												 R.layout.adapter,
-												 new String[] { "name","photo" },
-												 new int[] { R.id.MyAdapter_TextView_title,R.id.MyAdapter_ImageView_icon } );
 										listViewFriends.setAdapter(adapter);
-										for (int i = 0; i < friendsId.length; i++) {
-											HashMap<String, Object> item = new HashMap<String, Object>();
-											URL img_value;
-											Bitmap mIcon1;
-											try {
-												img_value = new URL("http://graph.facebook.com/"+friendsId[i]+"/picture?type=small");
-												Log.d("debug_url",img_value.toString());
-												mIcon1 = BitmapFactory.decodeStream(img_value.openConnection().getInputStream());
-												item.put("photo", mIcon1);
-											} catch (MalformedURLException e1) {
-												// TODO Auto-generated catch block
-												e1.printStackTrace();
-											} catch (IOException e) {
-												// TODO Auto-generated catch block
-												e.printStackTrace();
-											}
-											item.put("name", friendsName[i]);
-											list.add(item);
-											adapter.notifyDataSetChanged();
-										}
+//										adapter = new SimpleAdapter( 
+//												 ParseStarterProjectActivity.this, 
+//												 list,
+//												 R.layout.adapter,
+//												 new String[] { "name","photo" },
+//												 new int[] { R.id.MyAdapter_TextView_title,R.id.MyAdapter_ImageView_icon } );
+//										listViewFriends.setAdapter(adapter);
+//										for (int i = 0; i < friendsId.length; i++) {
+//											HashMap<String, Object> item = new HashMap<String, Object>();
+//											URL img_value;
+//											Bitmap mIcon1;
+//											try {
+//												img_value = new URL("http://graph.facebook.com/"+friendsId[i]+"/picture?type=small");
+//												Log.d("debug_url",img_value.toString());
+//												mIcon1 = BitmapFactory.decodeStream(img_value.openConnection().getInputStream());
+//												item.put("photo", mIcon1);
+//											} catch (MalformedURLException e1) {
+//												// TODO Auto-generated catch block
+//												e1.printStackTrace();
+//											} catch (IOException e) {
+//												// TODO Auto-generated catch block
+//												e.printStackTrace();
+//											}
+//											item.put("name", friendsName[i]);
+//											list.add(item);
+//											adapter.notifyDataSetChanged();
+//										}
 										
 //										listViewFriends
 //												.setAdapter(new ArrayAdapter<String>(

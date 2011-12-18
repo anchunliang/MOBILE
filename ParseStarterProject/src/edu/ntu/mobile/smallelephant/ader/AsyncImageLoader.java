@@ -48,6 +48,7 @@ public class AsyncImageLoader {
 		try {
 			inputStream = new URL(url).openStream();
 		} catch (IOException e) {
+			e.getStackTrace();
 			throw new RuntimeException(e);
 		}
 		return Drawable.createFromStream(inputStream, "src");
