@@ -9,6 +9,22 @@ package com.facebook.android;
 
 public final class R {
     public static final class attr {
+        /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int state_checked=0x7f010001;
+        /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int state_online=0x7f010000;
     }
     public static final class drawable {
         public static final int close=0x7f020000;
@@ -18,20 +34,25 @@ public final class R {
         public static final int wood1=0x7f020004;
     }
     public static final class id {
-        public static final int Gallery=0x7f050000;
-        public static final int clear=0x7f050005;
-        public static final int invite=0x7f050004;
-        public static final int linearLayout1=0x7f050008;
-        public static final int linearLayout2=0x7f050002;
-        public static final int listView1=0x7f050009;
-        public static final int loginout=0x7f050006;
-        public static final int mainTitle=0x7f050003;
-        public static final int sGallery=0x7f050001;
-        public static final int scrollView1=0x7f050007;
+        public static final int Gallery=0x7f050003;
+        public static final int MyAdapter_CheckBox_checkBox=0x7f050002;
+        public static final int MyAdapter_ImageView_icon=0x7f050000;
+        public static final int MyAdapter_TextView_title=0x7f050001;
+        public static final int clear=0x7f050008;
+        public static final int invite=0x7f050007;
+        public static final int linearLayout1=0x7f05000b;
+        public static final int linearLayout2=0x7f050005;
+        public static final int listView1=0x7f05000c;
+        public static final int loginout=0x7f050009;
+        public static final int mainTitle=0x7f050006;
+        public static final int sGallery=0x7f050004;
+        public static final int scrollView1=0x7f05000a;
     }
     public static final class layout {
-        public static final int gallery=0x7f030000;
-        public static final int login=0x7f030001;
+        public static final int adapter=0x7f030000;
+        public static final int checkbox=0x7f030001;
+        public static final int gallery=0x7f030002;
+        public static final int login=0x7f030003;
     }
     public static final class string {
         public static final int app_name=0x7f040001;
@@ -57,5 +78,48 @@ public final class R {
           @attr name android:android_galleryItemBackground
         */
         public static final int GalleryTheme_android_galleryItemBackground = 0;
+        /** Attributes that can be used with a MyCheckbox.
+           <p>Includes the following attributes:</p>
+           <table>
+           <colgroup align="left" />
+           <colgroup align="left" />
+           <tr><th>Attribute</th><th>Description</th></tr>
+           <tr><td><code>{@link #MyCheckbox_state_checked edu.ntu.mobile.smallelephant.ader:state_checked}</code></td><td></td></tr>
+           <tr><td><code>{@link #MyCheckbox_state_online edu.ntu.mobile.smallelephant.ader:state_online}</code></td><td></td></tr>
+           </table>
+           @see #MyCheckbox_state_checked
+           @see #MyCheckbox_state_online
+         */
+        public static final int[] MyCheckbox = {
+            0x7f010000, 0x7f010001
+        };
+        /**
+          <p>This symbol is the offset where the {@link edu.ntu.mobile.smallelephant.ader.R.attr#state_checked}
+          attribute's value can be found in the {@link #MyCheckbox} array.
+
+
+          <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name android:state_checked
+        */
+        public static final int MyCheckbox_state_checked = 1;
+        /**
+          <p>This symbol is the offset where the {@link edu.ntu.mobile.smallelephant.ader.R.attr#state_online}
+          attribute's value can be found in the {@link #MyCheckbox} array.
+
+
+          <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name android:state_online
+        */
+        public static final int MyCheckbox_state_online = 0;
     };
 }

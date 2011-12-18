@@ -4,13 +4,13 @@
     android:layout_height="fill_parent"
     android:background="@drawable/wood1">
     >
-	<edu.ntu.mobile.smallelephant.ader.CoverFlow xmlns:android="http://schemas.android.com/apk/res/android"
-		android:id="@+id/Gallery" 
-		android:layout_width="fill_parent"
-		android:layout_height="fill_parent"	/>
-	<edu.ntu.mobile.smallelephant.ader.CoverFlow xmlns:android="http://schemas.android.com/apk/res/android"
-		android:id="@+id/sGallery" 
-		android:layout_gravity="bottom|right"
-		android:layout_width="200dp"
-		android:layout_height="wrap_content"/>
+    <edu.ntu.mobile.smallelephant.ader.CoverFlow xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/Gallery" 
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+    <edu.ntu.mobile.smallelephant.ader.CoverFlow xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/sGallery" 
+        android:layout_gravity="bottom|right"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"/>
 </FrameLayout>

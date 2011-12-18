@@ -3,7 +3,10 @@ package edu.ntu.mobile.smallelephant.ader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -12,6 +15,8 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +24,7 @@ import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,9 +55,10 @@ public class ParseStarterProjectActivity extends Activity {
 	private String myName;
 	private String[] FBfriendsId;
 	private String[] friendsId;
+	private SimpleAdapter adapter;
+	ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
 	private String[] friendsName;
 
-	 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
@@ -66,8 +73,8 @@ public class ParseStarterProjectActivity extends Activity {
 	}
 
 	private void setVisibilities() {
-		btnClear.setVisibility(View.GONE);
-		btnInvite.setVisibility(View.GONE);
+		btnClear.setVisibility(View.INVISIBLE);
+		btnInvite.setVisibility(View.INVISIBLE);
 	}
 
 	private void findViews() {
@@ -82,16 +89,13 @@ public class ParseStarterProjectActivity extends Activity {
 	private void setListener() {
 		loginout.setOnClickListener(new OnClickListener() {
 
-			 
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				if (!facebook.isSessionValid()) {
 					facebook.authorize(ParseStarterProjectActivity.this,
 							new String[] { "read_friendlists" },
-							Facebook.FORCE_DIALOG_AUTH,
-							new DialogListener() {
+							Facebook.FORCE_DIALOG_AUTH, new DialogListener() {
 
-								 
 								public void onFacebookError(
 										final FacebookError e) {
 									// TODO Auto-generated method stub
@@ -99,14 +103,12 @@ public class ParseStarterProjectActivity extends Activity {
 											e.getMessage(), Toast.LENGTH_SHORT);
 								}
 
-								 
 								public void onError(final DialogError e) {
 									// TODO Auto-generated method stub
 									Toast.makeText(getApplicationContext(),
 											e.getMessage(), Toast.LENGTH_SHORT);
 								}
 
-								 
 								public void onComplete(Bundle values) {
 									// TODO Auto-generated method stub
 
@@ -116,10 +118,9 @@ public class ParseStarterProjectActivity extends Activity {
 													changeToFriendSelectPage();
 												}
 											});
-									
+
 								}
 
-								 
 								public void onCancel() {
 									// TODO Auto-generated method stub
 									Toast.makeText(getApplicationContext(),
@@ -127,10 +128,8 @@ public class ParseStarterProjectActivity extends Activity {
 
 								}
 							});
-				}
-				else{
-					mainTitle
-					.setText("session Valid!");
+				} else {
+					mainTitle.setText("session Valid!");
 					changeToFriendSelectPage();
 				}
 			}
@@ -139,33 +138,28 @@ public class ParseStarterProjectActivity extends Activity {
 
 	private RequestListener myProfileListener = new RequestListener() {
 
-		 
 		public void onMalformedURLException(MalformedURLException e,
 				Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		 
 		public void onIOException(IOException e, Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		 
 		public void onFileNotFoundException(FileNotFoundException e,
 				Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		 
 		public void onFacebookError(FacebookError e, Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		 
 		public void onComplete(String response, Object state) {
 			// TODO Auto-generated method stub
 			JSONObject myProfile;
@@ -177,7 +171,7 @@ public class ParseStarterProjectActivity extends Activity {
 				final String queryId = myId;
 				final String queryName = myName;
 				ParseStarterProjectActivity.this.runOnUiThread(new Runnable() {
-					 
+
 					public void run() {
 						// TODO Auto-generated method stub
 						ParseQuery query = new ParseQuery("User");
@@ -212,33 +206,28 @@ public class ParseStarterProjectActivity extends Activity {
 	};
 	private RequestListener friendsRequestListener = new RequestListener() {
 
-		 
 		public void onMalformedURLException(MalformedURLException e,
 				Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		 
 		public void onIOException(IOException e, Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		 
 		public void onFileNotFoundException(FileNotFoundException e,
 				Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		 
 		public void onFacebookError(FacebookError e, Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		 
 		public void onComplete(String response, Object state) {
 			// TODO Auto-generated method stub
 			JSONObject friend;
@@ -253,10 +242,10 @@ public class ParseStarterProjectActivity extends Activity {
 				}
 				final String[] queryFriendsId = FBfriendsId;
 				ParseStarterProjectActivity.this.runOnUiThread(new Runnable() {
-					 
+
 					public void run() {
 						// TODO Auto-generated method stub
-						setUserList( queryFriendsId);
+						setUserList(queryFriendsId);
 					}
 				});
 			} catch (JSONException e) {
@@ -265,7 +254,6 @@ public class ParseStarterProjectActivity extends Activity {
 			}
 			loginout.setOnClickListener(new OnClickListener() {
 
-				 
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
 					fbAsyncRunner.logout(ParseStarterProjectActivity.this,
@@ -276,33 +264,28 @@ public class ParseStarterProjectActivity extends Activity {
 	};
 	private RequestListener logoutListener = new RequestListener() {
 
-		 
 		public void onMalformedURLException(MalformedURLException e,
 				Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		 
 		public void onIOException(IOException e, Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		 
 		public void onFileNotFoundException(FileNotFoundException e,
 				Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		 
 		public void onFacebookError(FacebookError e, Object state) {
 			// TODO Auto-generated method stub
 
 		}
 
-		 
 		public void onComplete(String response, Object state) {
 			// TODO Auto-generated method stub
 			ParseStarterProjectActivity.this.runOnUiThread(new Runnable() {
@@ -324,114 +307,120 @@ public class ParseStarterProjectActivity extends Activity {
 		}
 
 	}
-	private void changeToFriendSelectPage(){
-		Toast.makeText(
-				getApplicationContext(),
-				"complete!",
-				Toast.LENGTH_SHORT);
-		mainTitle
-				.setText("���");
+
+	private void changeToFriendSelectPage() {
+		Toast.makeText(getApplicationContext(), "complete!", Toast.LENGTH_SHORT);
+		mainTitle.setText("朋友名單");
 		// //Parse.initialize(ParseStarterProjectActivity.this,
 		// "L6Qx3IQVB2zNv3bHrUzTwNbak0MF1xHQHqE2BVCc",
 		// "ksAA2JMvQVhQwnWLV8ZanZIChJlpsGIRUfKo3GIX");
-		listViewFriends
-				.setVisibility(View.VISIBLE);
+		listViewFriends.setVisibility(View.VISIBLE);
 		btnClear.setVisibility(View.VISIBLE);
-		btnInvite
-				.setVisibility(View.VISIBLE);
-		fbAsyncRunner.request("me",
-				myProfileListener);
-		fbAsyncRunner.request("me/friends",
-				friendsRequestListener);
+		btnInvite.setVisibility(View.VISIBLE);
+		fbAsyncRunner.request("me", myProfileListener);
+		fbAsyncRunner.request("me/friends", friendsRequestListener);
 		loginout.setText("logout");
 		btnClear.setOnClickListener(new OnClickListener() {
 
-			 
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Toast.makeText(
-						getApplicationContext(),
-						"Clear button clicked!",
-						Toast.LENGTH_SHORT);
+				Toast.makeText(getApplicationContext(),
+						"Clear button clicked!", Toast.LENGTH_SHORT);
 				clearSelections();
 			}
 		});
-		btnInvite
-				.setOnClickListener(new OnClickListener() {
+		btnInvite.setOnClickListener(new OnClickListener() {
 
-					 
-					public void onClick(View v) {
-						// TODO Auto-generated
-						// method
-						// stub
-						try {
-							/*long[] invited = listViewFriends.getCheckItemIds();
-							Intent intent = new Intent(
-									ParseStarterProjectActivity.this,
-									ChoosingPhoto.class);
-							Bundle bundle = new Bundle();
-							bundle.putString(
-									"accessToken",
-									facebook.getAccessToken());
-							bundle.putString(
-									"myId", myId);
-							bundle.putString(
-									"myName",
-									myName);
-							bundle.putString("numSelectedFriends",""+ invited.length);
-							for (int i = 0; i < invited.length; i++) {
-								bundle.putString(
-										"friend"
-												+ i,
-										FBfriendsId[(int) invited[i]]);
-							}
-							*/
-							Intent intent = new Intent(ParseStarterProjectActivity.this,
-									MyGallery.class);
-							Bundle bundle = new Bundle();
-							
-							intent.putExtras(bundle);
-							startActivity(intent);
-						} catch (Exception e) {
-							// TODO: handle
-							// exception
-							Log.d("debug",
-									e.getMessage());
-						}
+			public void onClick(View v) {
+				// TODO Auto-generated
+				// method
+				// stub
+				try {
+					/*
+					 * long[] invited = listViewFriends.getCheckItemIds();
+					 * Intent intent = new Intent(
+					 * ParseStarterProjectActivity.this, ChoosingPhoto.class);
+					 * Bundle bundle = new Bundle(); bundle.putString(
+					 * "accessToken", facebook.getAccessToken());
+					 * bundle.putString( "myId", myId); bundle.putString(
+					 * "myName", myName);
+					 * bundle.putString("numSelectedFriends",""+
+					 * invited.length); for (int i = 0; i < invited.length; i++)
+					 * { bundle.putString( "friend" + i, FBfriendsId[(int)
+					 * invited[i]]); }
+					 */
+					Intent intent = new Intent(
+							ParseStarterProjectActivity.this, MyGallery.class);
+					Bundle bundle = new Bundle();
 
-					}
-				});
+					intent.putExtras(bundle);
+					startActivity(intent);
+				} catch (Exception e) {
+					// TODO: handle
+					// exception
+					Log.d("debug", e.getMessage());
+				}
+
+			}
+		});
 	}
-	private void setUserList(final String[] queryFriendsId){
+
+	private void setUserList(final String[] queryFriendsId) {
 		ParseQuery query = new ParseQuery("User");
-		query.whereContainedIn("idNumber",
-				Arrays.asList(queryFriendsId));
+		query.whereContainedIn("idNumber", Arrays.asList(queryFriendsId));
 		query.findInBackground(new FindCallback() {
-			public void done(List<ParseObject> friendList,
-					ParseException e) {
+			public void done(List<ParseObject> friendList, ParseException e) {
 				if (e == null) {
 					friendsName = new String[friendList.size()];
 					friendsId = new String[friendList.size()];
-					Log.d("friends",
-							"Retrieved " + friendList.size()
-									+ " scores");
+					Log.d("friends", "Retrieved " + friendList.size()
+							+ " scores");
 					int i = 0;
 					for (ParseObject friend : friendList) {
-						friendsName[i] = friend
-								.getString("name");
+						friendsName[i] = friend.getString("name");
 						friendsId[i] = friend.getString("id");
+						Log.d("friends profile", "Id " + friendsId[i] + "name" + friendsName[i]);
 						i++;
 					}
+					
 					final String[] friendsFinal = friendsName;
 					if (friendsName.length > 0) {
 						ParseStarterProjectActivity.this
 								.runOnUiThread(new Runnable() {
 									public void run() {
-										listViewFriends
-												.setAdapter(new ArrayAdapter<String>(
-														ParseStarterProjectActivity.this,
-														android.R.layout.simple_list_item_multiple_choice,
-														friendsFinal));
+										adapter = new SimpleAdapter( 
+												 ParseStarterProjectActivity.this, 
+												 list,
+												 R.layout.adapter,
+												 new String[] { "name","photo" },
+												 new int[] { R.id.MyAdapter_TextView_title,R.id.MyAdapter_ImageView_icon } );
+										listViewFriends.setAdapter(adapter);
+										for (int i = 0; i < friendsId.length; i++) {
+											HashMap<String, Object> item = new HashMap<String, Object>();
+											URL img_value;
+											Bitmap mIcon1;
+											try {
+												img_value = new URL("http://graph.facebook.com/"+friendsId[i]+"/picture?type=small");
+												Log.d("debug_url",img_value.toString());
+												mIcon1 = BitmapFactory.decodeStream(img_value.openConnection().getInputStream());
+												item.put("photo", mIcon1);
+											} catch (MalformedURLException e1) {
+												// TODO Auto-generated catch block
+												e1.printStackTrace();
+											} catch (IOException e) {
+												// TODO Auto-generated catch block
+												e.printStackTrace();
+											}
+											item.put("name", friendsName[i]);
+											list.add(item);
+											adapter.notifyDataSetChanged();
+										}
+										
+//										listViewFriends
+//												.setAdapter(new ArrayAdapter<String>(
+//														ParseStarterProjectActivity.this,
+//														android.R.layout.simple_list_item_multiple_choice,
+//														friendsFinal));
 									}
 								});
 					}
@@ -441,7 +430,7 @@ public class ParseStarterProjectActivity extends Activity {
 				}
 			}
 		});
-		
+
 	}
 
 }
