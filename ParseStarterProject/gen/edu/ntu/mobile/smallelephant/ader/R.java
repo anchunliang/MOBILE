@@ -45,13 +45,12 @@ containing a value of this type.
         public static final int MyAdapter_TextView_title=0x7f050001;
         public static final int clear=0x7f050008;
         public static final int invite=0x7f050007;
-        public static final int linearLayout1=0x7f05000b;
+        public static final int linearLayout1=0x7f05000a;
         public static final int linearLayout2=0x7f050005;
-        public static final int listView1=0x7f05000c;
+        public static final int listView1=0x7f05000b;
         public static final int loginout=0x7f050009;
         public static final int mainTitle=0x7f050006;
         public static final int sGallery=0x7f050004;
-        public static final int scrollView1=0x7f05000a;
     }
     public static final class layout {
         public static final int adapter=0x7f030000;

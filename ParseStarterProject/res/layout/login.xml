@@ -4,15 +4,11 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-
-
-
-
-
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="fill_parent"
-        android:layout_height="56dp" >
+        android:layout_height="56dp"
+        android:background="#ffCC6600" >
 
         <TextView
             android:id="@+id/mainTitle"
@@ -44,23 +40,22 @@
             android:text="login" />
     </LinearLayout>
 
-    <ScrollView
-        android:id="@+id/scrollView1"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+
 
         <LinearLayout
             android:id="@+id/linearLayout1"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent" >
+            android:layout_height="fill_parent"
+            android:background="#ffFFCC66" >
 
             <ListView
                 android:id="@+id/listView1"
                 android:layout_width="fill_parent"
-                android:layout_height="436dp"
-                android:fastScrollEnabled="true" >
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:fastScrollEnabled="true" android:fadeScrollbars="true">
             </ListView>
         </LinearLayout>
-    </ScrollView>
+    
 
 </LinearLayout>

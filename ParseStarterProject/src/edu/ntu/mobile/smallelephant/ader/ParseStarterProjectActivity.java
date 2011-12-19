@@ -488,15 +488,15 @@ public class ParseStarterProjectActivity extends Activity {
 								.runOnUiThread(new Runnable() {
 									public void run() {
 										listViewFriends.setAdapter(adapter);
-										for( int i = 0; i < listViewFriends.getCount(); i++){
-											ViewGroup row = (ViewGroup)listViewFriends.getItemAtPosition(i);
-											if( row != null){
-												TextView txt = (TextView)row.findViewById(R.id.MyAdapter_TextView_title);
-												if( txt != null){
-													txt.setTextColor(0xFFcdcdcd);
-												}
-											}
-										}
+//										for( int i = 0; i < listViewFriends.getCount(); i++){
+//											ImageAndText row = (ImageAndText)listViewFriends.getItemAtPosition(i);
+//											if( row != null){
+//												TextView txt = (TextView)row.findViewById(R.id.MyAdapter_TextView_title);
+//												if( txt != null){
+//													txt.setTextColor(0xFFcdcdcd);
+//												}
+//											}
+//										}
 									}
 								});
 					}
