@@ -10,7 +10,7 @@ public class ViewCache {
     private View baseView;
     private TextView textView;
     private ImageView imageView;
-    private MyCheckbox checkbox;
+    private CheckBox checkbox;
  
     public ViewCache(View baseView) {
         this.baseView = baseView;
@@ -30,9 +30,9 @@ public class ViewCache {
         return imageView;
     }
     
-    public MyCheckbox getCheckbox() {
+    public CheckBox getCheckbox() {
     	if( checkbox == null) {
-    		checkbox = (MyCheckbox) baseView.findViewById(R.id.MyAdapter_CheckBox_checkBox);
+    		checkbox = (CheckBox) baseView.findViewById(R.id.MyAdapter_CheckBox_checkBox);
     	}
     	return checkbox;
     }

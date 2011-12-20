@@ -24,7 +24,7 @@
         android:focusable="false"
     />
       
-    <edu.ntu.mobile.smallelephant.ader.MyCheckbox 
+    <CheckBox 
         android:id="@+id/MyAdapter_CheckBox_checkBox"
         android:layout_width="wrap_content"
          android:layout_height="wrap_content" 
@@ -33,7 +33,8 @@
          android:minHeight="?android:attr/listPreferredItemHeight"
          android:focusable="false"   
          android:focusableInTouchMode="false"
-         android:background="@drawable/mycheckboxbutton"   
+         android:enabled="true"
+         android:button="@drawable/btn_check"
          android:clickable="false" 
          app:state_online="false"
          app:state_checked="false"

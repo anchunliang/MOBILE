@@ -73,7 +73,7 @@ public class MyGallery extends Activity {
 		scoverFlow.setSelection(0, true);
 		coverFlow.setAnimationDuration(1000);
 		scoverFlow.setAnimationDuration(1000);
-
+		
 		PhotoURLS
 				.add("http://graph.facebook.com/100000582813465/picture?type=large");
 		PhotoURLS

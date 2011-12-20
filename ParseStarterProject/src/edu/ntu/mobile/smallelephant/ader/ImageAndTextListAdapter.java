@@ -73,9 +73,9 @@ public class ImageAndTextListAdapter extends ArrayAdapter<ImageAndText> {
 		rowView.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				ViewCache vc = (ViewCache)v.getTag();
-				if( vc.getCheckbox().isOnline())
+				if( vc.getCheckbox().isEnabled())
 					vc.getCheckbox().toggle();
-				Log.d("CheckBox", "item checked!  online? "+vc.getCheckbox().isOnline()+"  checked? "+vc.getCheckbox().isChecked());
+				Log.d("CheckBox", "item checked!  online? "+vc.getCheckbox().isEnabled()+"  checked? "+vc.getCheckbox().isChecked());
 			}
 
 		});
@@ -112,13 +112,14 @@ public class ImageAndTextListAdapter extends ArrayAdapter<ImageAndText> {
 		if (isSelected.get(position) != null)
 			viewCache.getCheckbox().setChecked(isSelected.get(position));
 		if (isOnline.get(position) != null){
-			viewCache.getCheckbox().setOnline(isOnline.get(position));
+			Log.d("online", position + "   is " + (isOnline.get(position)?"online":"offline"));
+			viewCache.getCheckbox().setEnabled(isOnline.get(position));
 			if( ! isOnline.get(position))
 				viewCache.getTextView().setTextColor(Color.GRAY);
 			else viewCache.getTextView().setTextColor(0xffCC6600);
 		}
-		// MyCheckbox.setOnline(true);
-		Log.d("CheckBox", "get View!  online? "+viewCache.getCheckbox().isOnline()+"  checked? "+viewCache.getCheckbox().isChecked());
+		// CheckBox.setOnline(true);
+		Log.d("CheckBox", "get View!  online? "+viewCache.getCheckbox().isEnabled()+"  checked? "+viewCache.getCheckbox().isChecked());
 		viewCache.getCheckbox().refreshDrawableState();
 		return rowView;
 	}

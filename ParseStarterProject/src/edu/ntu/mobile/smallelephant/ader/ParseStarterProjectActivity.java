@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -60,6 +61,7 @@ public class ParseStarterProjectActivity extends Activity {
 	public static final String PREF = "SMALL_ELEPHANT_PREF";
 	public static final String PREF_USER_ID = "PARSE_USER_id";
 	private String parse_user_id = null;
+	ImageAndTextListAdapter adapter = null;
 
 	@Override
 	public void onStop() {
@@ -127,7 +129,7 @@ public class ParseStarterProjectActivity extends Activity {
 			if (!facebook.isSessionValid()) {
 				Log.d("fbSession", "session invalid");
 				facebook.authorize(ParseStarterProjectActivity.this,
-						new String[] { "read_friendlists" },
+						new String[] { "read_friendlists","user_about_me","user_photos","friends_photos"},
 						Facebook.FORCE_DIALOG_AUTH, new DialogListener() {
 
 							public void onFacebookError(final FacebookError e) {
@@ -220,8 +222,10 @@ public class ParseStarterProjectActivity extends Activity {
 										public void done(ParseObject object,
 												ParseException e) {
 											// TODO Auto-generated method stub
-											object.put("online", true);
-											object.saveInBackground();
+											if ( e != null){
+												object.put("online", true);
+												object.saveInBackground();
+											}
 										}
 									});
 						} else {
@@ -434,9 +438,18 @@ public class ParseStarterProjectActivity extends Activity {
 					 * invited[i]]); }
 					 */
 					Intent intent = new Intent(
-							ParseStarterProjectActivity.this, MyGallery.class);
+							ParseStarterProjectActivity.this, ChoosingPhoto.class);
+					long[] invited = listViewFriends.getCheckItemIds();
 					Bundle bundle = new Bundle();
-
+					bundle.putString("accessToken", facebook.getAccessToken());
+					bundle.putString("myId", myId);
+					Log.d("facebookURL","myId was: "+myId);
+					bundle.putString("myName", myName);
+					bundle.putString("numSelectedFriends", "" + invited.length);
+					for (int i = 0; i < invited.length; i++) {
+						bundle.putString("friend" + i,
+								friendsId[(int) invited[i]]);
+					}
 					intent.putExtras(bundle);
 					startActivity(intent);
 				} catch (Exception e) {
@@ -480,7 +493,9 @@ public class ParseStarterProjectActivity extends Activity {
 							list.add(item);
 						}
 					}
-					final ImageAndTextListAdapter adapter = new ImageAndTextListAdapter(
+					ComparatorImageAndText comparator = new ComparatorImageAndText();
+					Collections.sort( list, comparator);
+					adapter = new ImageAndTextListAdapter(
 							ParseStarterProjectActivity.this, list,
 							listViewFriends);
 					if (friendsName.length > 0) {
@@ -488,15 +503,18 @@ public class ParseStarterProjectActivity extends Activity {
 								.runOnUiThread(new Runnable() {
 									public void run() {
 										listViewFriends.setAdapter(adapter);
-//										for( int i = 0; i < listViewFriends.getCount(); i++){
-//											ImageAndText row = (ImageAndText)listViewFriends.getItemAtPosition(i);
-//											if( row != null){
-//												TextView txt = (TextView)row.findViewById(R.id.MyAdapter_TextView_title);
-//												if( txt != null){
-//													txt.setTextColor(0xFFcdcdcd);
-//												}
-//											}
-//										}
+										// for( int i = 0; i <
+										// listViewFriends.getCount(); i++){
+										// ImageAndText row =
+										// (ImageAndText)listViewFriends.getItemAtPosition(i);
+										// if( row != null){
+										// TextView txt =
+										// (TextView)row.findViewById(R.id.MyAdapter_TextView_title);
+										// if( txt != null){
+										// txt.setTextColor(0xFFcdcdcd);
+										// }
+										// }
+										// }
 									}
 								});
 					}

@@ -1,5 +1,7 @@
 package edu.ntu.mobile.smallelephant.ader;
 
+import java.util.Comparator;
+
 public class ImageAndText {
     private String imageUrl;
     private String text;

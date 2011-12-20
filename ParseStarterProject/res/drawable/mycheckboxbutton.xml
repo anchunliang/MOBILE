@@ -1,20 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android" 
     xmlns:app="http://schemas.android.com/apk/res/edu.ntu.mobile.smallelephant.ader">
-<item
-    app:state_online="true"
-    app:state_checked="true"
-    android:drawable="@drawable/checkbox_online_checked" />
-<item
-    app:state_online="true"
-    app:state_checked="false"
-    android:drawable="@drawable/checkbox_online_unchecked" />
-<item
-    app:state_online="false"
-    app:state_checked="false"
-    android:drawable="@drawable/checkbox_offline_unchecked" />
-<item
-    app:state_online="false"
-    app:state_checked="true"
-    android:drawable="@drawable/checkbox_offline_checked" />
+
+<item     android:state_enabled="false"
+          android:drawable="@drawable/btn_check_off_disable" />
 </selector>
