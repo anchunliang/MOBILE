@@ -321,7 +321,7 @@ public class ChoosingPhoto extends Activity {
 					albumPhotoUrls.add("https://graph.facebook.com/" + photoId
 							+ "/picture?type=thumbnail&access_token=" + accessToken);
 					Log.d("facebookURL","album "+ (String)state+"  photo: "+ i +"  https://graph.facebook.com/" + photoId
-							+ "/picture?type=thumbnail&accesstoken=" + accessToken);
+							+ "/picture?type=thumbnail&access_token=" + accessToken);
 				}
 				if( state.getClass().equals(String.class)){
 					photoUrls.put( (String)state, albumPhotoUrls);
