@@ -50,6 +50,7 @@ public class ChoosingPhoto extends Activity {
 	private List<String> ALBUMPRIVACY = Arrays.asList("everyone");
 	//albums�d
 	private ArrayList<String> albumIds;
+	private ArrayList<String> albumNames;
 	//albums�over photo�rl
 	private ArrayList<String> albumCoverUrls;
 	//������url: 摮�pair ( albumId, album銝剔�����貊��rl)
@@ -63,13 +64,19 @@ public class ChoosingPhoto extends Activity {
 	private boolean[] thumbnailsselection;
 	private String[] arrPath;
 	private ImageAdapter imageAdapter;
+	GridView imagegrid;
 	//private ArrayList<String> PhotoURLS = new ArrayList<String>();
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.album_main);
+		
+		imagegrid = (GridView) findViewById(R.id.PhoneImageGrid);
+		imageAdapter = new ImageAdapter();
+		imagegrid.setAdapter(imageAdapter);
+    	
 		Parse.initialize(this, "L6Qx3IQVB2zNv3bHrUzTwNbak0MF1xHQHqE2BVCc",
 				"ksAA2JMvQVhQwnWLV8ZanZIChJlpsGIRUfKo3GIX");
-		setContentView(R.layout.album_main);
 		getIntentData();
 		facebook.setAccessToken(accessToken);
 		Log.d("facebookURL","send album request");
@@ -148,7 +155,7 @@ public class ChoosingPhoto extends Activity {
 			});
 			//holder.imageview.setImageBitmap(thumbnails[position]);
 			holder.imageview.setImageDrawable(drawablesFromUrl.get(position));
-			holder.mtextview.setText("album"+position);
+			holder.mtextview.setText(albumNames.get(position));
 			//holder.imageview.setImageResource(R.drawable.ic_launcher);
 			//holder.imageview.setLayoutParams(new CoverFlow.LayoutParams(100, 100));
 
@@ -166,6 +173,7 @@ public class ChoosingPhoto extends Activity {
 		TextView mtextview;
 		int id;
 	}
+	
 	private Drawable LoadImageFromURL(String url) {
 		try {
 			URL URL = new URL(url);
@@ -240,6 +248,7 @@ public class ChoosingPhoto extends Activity {
 				result = new JSONObject(response);
 				albumList = result.getJSONArray("data");
 				albumIds = new ArrayList<String>();
+				albumNames = new ArrayList<String>();
 				albumCoverUrls = new ArrayList<String>();
 				photoUrls = new TreeMap< String, ArrayList<String>>();
 				for (int i = 0; i < albumList.length(); i++) {
@@ -248,22 +257,29 @@ public class ChoosingPhoto extends Activity {
 							.getString("privacy"))) {
 						String albumId = albumList.getJSONObject(i).getString(
 								"id");
+						String albumName = albumList.getJSONObject(i).getString(
+								"name");
 						albumIds.add(albumId);
+						albumNames.add(albumName);
 						albumCoverUrls.add("https://graph.facebook.com/"
+								+ albumId + "/picture?type=small&access_token="
+								+ accessToken);
+						Log.d("trace_album","https://graph.facebook.com/"
 								+ albumId + "/picture?type=small&access_token="
 								+ accessToken);
 						fbAsyncRunner.request(albumId + "/photos", albumPhotoRequestListener, albumId);
 					}
 				}
 				thumbnailsselection = new boolean[albumCoverUrls.size()];
-				GridView imagegrid = (GridView) findViewById(R.id.PhoneImageGrid);
-				imageAdapter = new ImageAdapter();
-				imagegrid.setAdapter(imageAdapter);
+				
+				
 				//imagecursor.close();
 				ChoosingPhoto.this.runOnUiThread(new Runnable() {
 				    public void run() {
+				    	
 				    	for (String url : albumCoverUrls) {
 				    		imageAdapter.addItem(LoadImageFromURL(url));
+				    		Log.d("trace","after addItem, url="+url);
 							Log.d("trace","after addItem");
 				    		
 				    		
@@ -278,7 +294,7 @@ public class ChoosingPhoto extends Activity {
 			catch (Exception e) {
 				// TODO: handle
 				// exception
-				Log.d("debug", e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	};
