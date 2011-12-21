@@ -1,4 +1,4 @@
-package edu.ntu.mobile.smallelephant.ader;
+package edu.ntu.mobile.smallelephant.mianher;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,6 +11,10 @@ import java.util.ArrayList;
 
 import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.Facebook;
+
+import edu.ntu.mobile.smallelephant.ader.R;
+import edu.ntu.mobile.smallelephant.ader.R.id;
+import edu.ntu.mobile.smallelephant.ader.R.layout;
 
 import android.app.Activity;
 import android.content.Context;

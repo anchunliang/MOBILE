@@ -40,6 +40,8 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import edu.ntu.mobile.smallelephant.mianher.ChoosingPhoto;
+
 public class ParseStarterProjectActivity extends Activity {
 	/** Called when the activity is first created. */
 	public static Facebook facebook = new Facebook("255313284527691");
@@ -103,14 +105,26 @@ public class ParseStarterProjectActivity extends Activity {
 		listViewFriends.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				Log.d("CheckBox", "onItemClick  ");
-				ViewCache vc = (ViewCache) view.getTag();
-				vc.getCheckbox().toggle();
-				if (listViewFriends.getAdapter() != null
-						&& listViewFriends.getAdapter().getClass() == ImageAndTextListAdapter.class) {
-					((ImageAndTextListAdapter) listViewFriends.getAdapter()).isSelected
-							.put(position, vc.getCheckbox().isChecked());
-				}
+				Intent intent = new Intent(
+						ParseStarterProjectActivity.this, ChoosingPhoto.class);
+				long[] invited = listViewFriends.getCheckItemIds();
+				Bundle bundle = new Bundle();
+				bundle.putString("accessToken", facebook.getAccessToken());
+				bundle.putString("myId", myId);
+				Log.d("facebookURL","myId was: "+myId);
+				bundle.putString("myName", myName);
+				bundle.putString("friendId", friendsId[position]);
+				intent.putExtras(bundle);
+				startActivity(intent);
+				
+//				Log.d("CheckBox", "onItemClick  ");
+//				ViewCache vc = (ViewCache) view.getTag();
+//				vc.getCheckbox().toggle();
+//				if (listViewFriends.getAdapter() != null
+//						&& listViewFriends.getAdapter().getClass() == ImageAndTextListAdapter.class) {
+//					((ImageAndTextListAdapter) listViewFriends.getAdapter()).isSelected
+//							.put(position, vc.getCheckbox().isChecked());
+//				}
 			}
 		});
 		listViewFriends.setItemsCanFocus(true);
@@ -417,6 +431,9 @@ public class ParseStarterProjectActivity extends Activity {
 				clearSelections();
 			}
 		});
+		
+		
+		//for test
 		btnInvite.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
@@ -437,6 +454,7 @@ public class ParseStarterProjectActivity extends Activity {
 					 * { bundle.putString( "friend" + i, FBfriendsId[(int)
 					 * invited[i]]); }
 					 */
+					
 					Intent intent = new Intent(
 							ParseStarterProjectActivity.this, ChoosingPhoto.class);
 					long[] invited = listViewFriends.getCheckItemIds();
@@ -445,6 +463,7 @@ public class ParseStarterProjectActivity extends Activity {
 					bundle.putString("myId", myId);
 					Log.d("facebookURL","myId was: "+myId);
 					bundle.putString("myName", myName);
+					bundle.putString("friendId", myId);
 					bundle.putString("numSelectedFriends", "" + invited.length);
 					for (int i = 0; i < invited.length; i++) {
 						bundle.putString("friend" + i,
