@@ -244,20 +244,16 @@ public class ChoosingPhoto extends Activity {
 				photoUrls = new TreeMap< String, ArrayList<String>>();
 				for (int i = 0; i < albumList.length(); i++) {
 					Log.d("facebookURL","album "+ i );
-					/*if (ALBUMPRIVACY.contains(albumList.getJSONObject(i)
-							.getString("privacy"))) {*/
-						Log.d("facebookURL"," 				everyone");
+					if (ALBUMPRIVACY.contains(albumList.getJSONObject(i)
+							.getString("privacy"))) {
 						String albumId = albumList.getJSONObject(i).getString(
 								"id");
 						albumIds.add(albumId);
-						albumCoverUrls.add("http://graph.facebook.com/"
-								+ albumId + "/picture?type=small&accessToken="
-								+ accessToken);
-						Log.d("trace","http://graph.facebook.com/"
-								+ albumId + "/picture?type=small&accessToken="
+						albumCoverUrls.add("https://graph.facebook.com/"
+								+ albumId + "/picture?type=small&access_token="
 								+ accessToken);
 						fbAsyncRunner.request(albumId + "/photos", albumPhotoRequestListener, albumId);
-					//}
+					}
 				}
 				thumbnailsselection = new boolean[albumCoverUrls.size()];
 				GridView imagegrid = (GridView) findViewById(R.id.PhoneImageGrid);
@@ -321,10 +317,11 @@ public class ChoosingPhoto extends Activity {
 				photoList = result.getJSONArray("data");
 				ArrayList<String> albumPhotoUrls = new ArrayList<String>(); 
 				for (int i = 0; i < photoList.length(); i++) {
-					Log.d("facebookURL","album "+ (String)state+"  photo: "+ i);
 					String photoId = photoList.getJSONObject(i).getString("id");
-					albumPhotoUrls.add("http://graph.facebook.com/" + photoId
-							+ "/picture?type=thumbnail&accessToken=" + accessToken);
+					albumPhotoUrls.add("https://graph.facebook.com/" + photoId
+							+ "/picture?type=thumbnail&access_token=" + accessToken);
+					Log.d("facebookURL","album "+ (String)state+"  photo: "+ i +"  https://graph.facebook.com/" + photoId
+							+ "/picture?type=thumbnail&accesstoken=" + accessToken);
 				}
 				if( state.getClass().equals(String.class)){
 					photoUrls.put( (String)state, albumPhotoUrls);
