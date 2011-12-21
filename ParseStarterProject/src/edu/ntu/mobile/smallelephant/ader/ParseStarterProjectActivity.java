@@ -433,7 +433,7 @@ public class ParseStarterProjectActivity extends Activity {
 		});
 		
 		
-		
+		//for test
 		btnInvite.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
@@ -454,6 +454,7 @@ public class ParseStarterProjectActivity extends Activity {
 					 * { bundle.putString( "friend" + i, FBfriendsId[(int)
 					 * invited[i]]); }
 					 */
+					
 					Intent intent = new Intent(
 							ParseStarterProjectActivity.this, ChoosingPhoto.class);
 					long[] invited = listViewFriends.getCheckItemIds();
