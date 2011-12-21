@@ -27,45 +27,53 @@ containing a value of this type.
         public static final int state_online=0x7f010000;
     }
     public static final class drawable {
-        public static final int btn_check=0x7f020000;
-        public static final int btn_check_buttonless_off=0x7f020001;
-        public static final int btn_check_buttonless_on=0x7f020002;
-        public static final int btn_check_label_background=0x7f020003;
-        public static final int btn_check_off=0x7f020004;
-        public static final int btn_check_off_disable=0x7f020005;
-        public static final int btn_check_off_disable_focused=0x7f020006;
-        public static final int btn_check_off_pressed=0x7f020007;
-        public static final int btn_check_off_selected=0x7f020008;
-        public static final int btn_check_on=0x7f020009;
-        public static final int btn_check_on_disable=0x7f02000a;
-        public static final int btn_check_on_disable_focused=0x7f02000b;
-        public static final int btn_check_on_pressed=0x7f02000c;
-        public static final int btn_check_on_selected=0x7f02000d;
-        public static final int close=0x7f02000e;
-        public static final int facebook_icon=0x7f02000f;
-        public static final int icon=0x7f020010;
-        public static final int mycheckboxbutton=0x7f020011;
-        public static final int no_image=0x7f020012;
-        public static final int wood1=0x7f020013;
+        public static final int arrow_right=0x7f020000;
+        public static final int btn_check=0x7f020001;
+        public static final int btn_check_buttonless_off=0x7f020002;
+        public static final int btn_check_buttonless_on=0x7f020003;
+        public static final int btn_check_label_background=0x7f020004;
+        public static final int btn_check_off=0x7f020005;
+        public static final int btn_check_off_disable=0x7f020006;
+        public static final int btn_check_off_disable_focused=0x7f020007;
+        public static final int btn_check_off_pressed=0x7f020008;
+        public static final int btn_check_off_selected=0x7f020009;
+        public static final int btn_check_on=0x7f02000a;
+        public static final int btn_check_on_disable=0x7f02000b;
+        public static final int btn_check_on_disable_focused=0x7f02000c;
+        public static final int btn_check_on_pressed=0x7f02000d;
+        public static final int btn_check_on_selected=0x7f02000e;
+        public static final int close=0x7f02000f;
+        public static final int facebook_icon=0x7f020010;
+        public static final int icon=0x7f020011;
+        public static final int mycheckboxbutton=0x7f020012;
+        public static final int no_image=0x7f020013;
+        public static final int wood1=0x7f020014;
     }
     public static final class id {
-        public static final int Gallery=0x7f050003;
+        public static final int Gallery=0x7f050008;
         public static final int MyAdapter_CheckBox_checkBox=0x7f050002;
         public static final int MyAdapter_ImageView_icon=0x7f050000;
         public static final int MyAdapter_TextView_title=0x7f050001;
-        public static final int clear=0x7f050008;
-        public static final int invite=0x7f050007;
-        public static final int linearLayout1=0x7f05000a;
-        public static final int linearLayout2=0x7f050005;
-        public static final int listView1=0x7f05000b;
-        public static final int loginout=0x7f050009;
-        public static final int mainTitle=0x7f050006;
-        public static final int sGallery=0x7f050004;
+        public static final int PhoneImageGrid=0x7f050006;
+        public static final int clear=0x7f05000d;
+        public static final int imageView1=0x7f050007;
+        public static final int invite=0x7f05000c;
+        public static final int itemCheckBox=0x7f050004;
+        public static final int linearLayout1=0x7f05000f;
+        public static final int linearLayout2=0x7f05000a;
+        public static final int listView1=0x7f050010;
+        public static final int loginout=0x7f05000e;
+        public static final int mainTitle=0x7f05000b;
+        public static final int sGallery=0x7f050009;
+        public static final int textView1=0x7f050005;
+        public static final int thumbImage=0x7f050003;
     }
     public static final class layout {
         public static final int adapter=0x7f030000;
-        public static final int gallery=0x7f030001;
-        public static final int login=0x7f030002;
+        public static final int album_item=0x7f030001;
+        public static final int album_main=0x7f030002;
+        public static final int gallery=0x7f030003;
+        public static final int login=0x7f030004;
     }
     public static final class string {
         public static final int app_name=0x7f040001;

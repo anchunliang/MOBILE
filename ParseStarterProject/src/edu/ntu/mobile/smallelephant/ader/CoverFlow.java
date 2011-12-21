@@ -1,10 +1,15 @@
 package edu.ntu.mobile.smallelephant.ader;
 
 
+import edu.ntu.mobile.smallelephant.ader.MyGallery.ImageAdapter;
+import edu.ntu.mobile.smallelephant.ader.MyGallery.sImageAdapter;
 import android.content.Context;
 import android.graphics.Camera;
 import android.graphics.Matrix;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Transformation;
 import android.widget.Gallery;
@@ -17,8 +22,9 @@ public class CoverFlow extends Gallery {
      */
 	
     private Camera mCamera = new Camera();
-
-    /**
+    static ImageAdapter coverImageAdapter;
+	static sImageAdapter scoverImageAdapter; 
+   /**
      * The maximum angle the Child ImageView will be rotated by
      */    
     private int mMaxRotationAngle = 60;
@@ -49,6 +55,17 @@ public CoverFlow(Context context, AttributeSet attrs) {
    this.setStaticTransformationsEnabled(true);   
   }
  
+  public boolean onKeyDown(int keyCode, KeyEvent event) {
+	  	
+	  	
+	    return super.onKeyDown(keyCode, event);
+	}
+  
+  public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY){
+	  Log.d("trace","onScroll");
+	  	  
+	  return super.onScroll(e1,e2,distanceX,distanceY);
+  }
     /**
      * Get the max rotational angle of the image
   * @return the mMaxRotationAngle

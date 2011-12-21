@@ -27,11 +27,14 @@ import android.graphics.Shader.TileMode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseAdapter;
 import android.widget.Gallery.LayoutParams;
 import android.widget.ImageView;
@@ -39,27 +42,28 @@ import android.widget.ImageView.ScaleType;
 
 public class MyGallery extends Activity {
 	/** Called when the activity is first created. */
-	public static Facebook facebook = new Facebook("255313284527691");
-	public static AsyncFacebookRunner fbAsyncRunner = new AsyncFacebookRunner(
-			facebook);
+	//public static Facebook facebook = new Facebook("255313284527691");
+	//public static AsyncFacebookRunner fbAsyncRunner = new AsyncFacebookRunner(facebook);
 	static CoverFlow coverFlow;
 	static CoverFlow scoverFlow;
 	private ArrayList<String> PhotoURLS = new ArrayList<String>();
-	ImageAdapter coverImageAdapter = new ImageAdapter(this);
-	sImageAdapter scoverImageAdapter = new sImageAdapter(this);
+	static ImageAdapter coverImageAdapter;
+	static sImageAdapter scoverImageAdapter; 
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.gallery);
-
+		coverImageAdapter = new ImageAdapter(this);
+		scoverImageAdapter= new sImageAdapter(this);
 		coverFlow = (CoverFlow) findViewById(R.id.Gallery);
 		scoverFlow = (CoverFlow) findViewById(R.id.sGallery);
 		Log.d("trace", "findviewbyid");
 		scoverFlow.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View v,
 					int position, long id) {
-				coverFlow.setSelection(position, true);
+				//coverFlow.setSelection(position, true);
+				//coverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT, null);
 			}
 		});
 		// coverFlow.setAdapter(new ImageAdapter(this));
@@ -73,19 +77,53 @@ public class MyGallery extends Activity {
 		scoverFlow.setSelection(0, true);
 		coverFlow.setAnimationDuration(1000);
 		scoverFlow.setAnimationDuration(1000);
-		
-		PhotoURLS
-				.add("http://graph.facebook.com/100000582813465/picture?type=large");
-		PhotoURLS
-				.add("http://graph.facebook.com/1397199871/picture?type=large");
-		PhotoURLS
-				.add("http://graph.facebook.com/1614072820/picture?type=large");
-		PhotoURLS
-				.add("http://graph.facebook.com/1816303569/picture?type=large");
-		PhotoURLS
-				.add("http://graph.facebook.com/100000049127720/picture?type=large");
-		PhotoURLS
-				.add("http://graph.facebook.com/100001416500297/picture?type=large");
+		coverFlow.setOnItemSelectedListener(new OnItemSelectedListener() 
+        {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long i){
+            	//int diff=scoverFlow.getSelectedItemPosition()-position;
+            	if(scoverFlow.getSelectedItemPosition()>position){
+            		int diff=scoverFlow.getSelectedItemPosition()-position;
+            		for(int j=0;j<diff;j++){
+            			scoverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_LEFT, null);
+            			/*Handler handler = new Handler(); 
+            		    handler.postDelayed(new Runnable() { 
+            		         public void run() { 
+            		              //my_button.setBackgroundResource(R.drawable.defaultcard); 
+            		         } 
+            		    }, 1000); */
+            		}
+            		
+            	}
+            	else if(scoverFlow.getSelectedItemPosition()<position){
+            		int diff=position-scoverFlow.getSelectedItemPosition();
+            		for(int j=0;j<diff;j++){
+            			scoverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT, null);
+            			/*Handler handler = new Handler(); 
+            		    handler.postDelayed(new Runnable() { 
+            		         public void run() { 
+            		              //my_button.setBackgroundResource(R.drawable.defaultcard); 
+            		         } 
+            		    }, 1000); */
+            		}
+            		
+            	}
+            	//scoverFlow.setSelection(position, true);
+            }
+
+			public void onNothingSelected(AdapterView<?> arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+           
+        });
+
+		PhotoURLS.add("http://graph.facebook.com/100000582813465/picture?type=large");
+		PhotoURLS.add("http://graph.facebook.com/1397199871/picture?type=large");
+		PhotoURLS.add("http://graph.facebook.com/1614072820/picture?type=large");
+		PhotoURLS.add("http://graph.facebook.com/1816303569/picture?type=large");
+		PhotoURLS.add("http://graph.facebook.com/100000049127720/picture?type=large");
+		PhotoURLS.add("http://graph.facebook.com/100001416500297/picture?type=large");
 		/*
 		 * MyGallery.this.runOnUiThread(new Runnable() { public void run() { for
 		 * (String url : PhotoURLS) {
@@ -217,7 +255,7 @@ public class MyGallery extends Activity {
 			/* Formula: 1 / (2 ^ offset) */
 			return Math.max(0, 1.0f / (float) Math.pow(2, Math.abs(offset)));
 		}
-
+		
 	}
 
 	public class sImageAdapter extends ImageAdapter {
@@ -226,7 +264,7 @@ public class MyGallery extends Activity {
 			super(c);
 			// TODO Auto-generated constructor stub
 		}
-
+		
 		public View getView(int position, View convertView, ViewGroup parent) {
 
 			// Use this code if you want to load from resources
