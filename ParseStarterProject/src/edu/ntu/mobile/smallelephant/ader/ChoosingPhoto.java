@@ -18,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -65,6 +66,8 @@ public class ChoosingPhoto extends Activity {
 	private String[] arrPath;
 	private ImageAdapter imageAdapter;
 	GridView imagegrid;
+	private ProgressDialog progressDialog;
+
 	//private ArrayList<String> PhotoURLS = new ArrayList<String>();
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -80,7 +83,29 @@ public class ChoosingPhoto extends Activity {
 		getIntentData();
 		facebook.setAccessToken(accessToken);
 		Log.d("facebookURL","send album request");
-		fbAsyncRunner.request(myId+"/albums", albumsRequestListener);
+		progressDialog = ProgressDialog.show(ChoosingPhoto.this, "讀取相簿列表中", "請稍候...", true, false); 
+		progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		
+      
+     new Thread()
+     { 
+       public void run()
+       { 
+         try
+         { 
+        	 sleep(2000);
+         }
+         catch (Exception e)
+         {
+           e.printStackTrace();
+         }
+         finally
+         {
+        	 progressDialog.dismiss();   
+         }
+       }
+     }.start(); 
+     fbAsyncRunner.request(myId+"/albums", albumsRequestListener);
 		
 	}
 	public class ImageAdapter extends BaseAdapter {
