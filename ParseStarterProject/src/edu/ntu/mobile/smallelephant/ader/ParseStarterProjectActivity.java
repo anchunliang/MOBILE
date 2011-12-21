@@ -19,7 +19,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -39,6 +38,8 @@ import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+
+import edu.ntu.mobile.smallelephant.hu.ChoosingPhoto;
 
 public class ParseStarterProjectActivity extends Activity {
 	/** Called when the activity is first created. */
@@ -85,6 +86,13 @@ public class ParseStarterProjectActivity extends Activity {
 		if (facebook.isSessionValid()) {
 			Log.d("fbSession", "session valid 1");
 			mainTitle.setText("session Valid!");
+			facebookFriendRequest();
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			changeToFriendSelectPage();
 		}
 
@@ -150,6 +158,7 @@ public class ParseStarterProjectActivity extends Activity {
 								ParseStarterProjectActivity.this
 										.runOnUiThread(new Runnable() {
 											public void run() {
+												facebookFriendRequest();
 												changeToFriendSelectPage();
 											}
 										});
@@ -231,7 +240,7 @@ public class ParseStarterProjectActivity extends Activity {
 						} else {
 							Log.d("shrPref", "parse_user_id not found");
 							query.whereEqualTo("idNumber", queryId);
-							// query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
+							query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
 							query.findInBackground(new FindCallback() {
 								public void done(List<ParseObject> friendList,
 										ParseException e) {
@@ -395,7 +404,10 @@ public class ParseStarterProjectActivity extends Activity {
 			}
 		}
 	}
-
+	private void facebookFriendRequest(){
+		fbAsyncRunner.request("me", myProfileListener);
+		fbAsyncRunner.request("me/friends", friendsRequestListener);
+	}
 	private void changeToFriendSelectPage() {
 		Toast.makeText(getApplicationContext(), "complete!", Toast.LENGTH_SHORT);
 		mainTitle.setText("朋友名單");
@@ -405,8 +417,6 @@ public class ParseStarterProjectActivity extends Activity {
 		listViewFriends.setVisibility(View.VISIBLE);
 		btnClear.setVisibility(View.VISIBLE);
 		btnInvite.setVisibility(View.VISIBLE);
-		fbAsyncRunner.request("me", myProfileListener);
-		fbAsyncRunner.request("me/friends", friendsRequestListener);
 		loginout.setText("logout");
 		btnClear.setOnClickListener(new OnClickListener() {
 
@@ -503,18 +513,6 @@ public class ParseStarterProjectActivity extends Activity {
 								.runOnUiThread(new Runnable() {
 									public void run() {
 										listViewFriends.setAdapter(adapter);
-										// for( int i = 0; i <
-										// listViewFriends.getCount(); i++){
-										// ImageAndText row =
-										// (ImageAndText)listViewFriends.getItemAtPosition(i);
-										// if( row != null){
-										// TextView txt =
-										// (TextView)row.findViewById(R.id.MyAdapter_TextView_title);
-										// if( txt != null){
-										// txt.setTextColor(0xFFcdcdcd);
-										// }
-										// }
-										// }
 									}
 								});
 					}
