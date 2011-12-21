@@ -103,14 +103,26 @@ public class ParseStarterProjectActivity extends Activity {
 		listViewFriends.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				Log.d("CheckBox", "onItemClick  ");
-				ViewCache vc = (ViewCache) view.getTag();
-				vc.getCheckbox().toggle();
-				if (listViewFriends.getAdapter() != null
-						&& listViewFriends.getAdapter().getClass() == ImageAndTextListAdapter.class) {
-					((ImageAndTextListAdapter) listViewFriends.getAdapter()).isSelected
-							.put(position, vc.getCheckbox().isChecked());
-				}
+				Intent intent = new Intent(
+						ParseStarterProjectActivity.this, ChoosingPhoto.class);
+				long[] invited = listViewFriends.getCheckItemIds();
+				Bundle bundle = new Bundle();
+				bundle.putString("accessToken", facebook.getAccessToken());
+				bundle.putString("myId", myId);
+				Log.d("facebookURL","myId was: "+myId);
+				bundle.putString("myName", myName);
+				bundle.putString("friendId", friendsId[position]);
+				intent.putExtras(bundle);
+				startActivity(intent);
+				
+//				Log.d("CheckBox", "onItemClick  ");
+//				ViewCache vc = (ViewCache) view.getTag();
+//				vc.getCheckbox().toggle();
+//				if (listViewFriends.getAdapter() != null
+//						&& listViewFriends.getAdapter().getClass() == ImageAndTextListAdapter.class) {
+//					((ImageAndTextListAdapter) listViewFriends.getAdapter()).isSelected
+//							.put(position, vc.getCheckbox().isChecked());
+//				}
 			}
 		});
 		listViewFriends.setItemsCanFocus(true);
@@ -417,49 +429,52 @@ public class ParseStarterProjectActivity extends Activity {
 				clearSelections();
 			}
 		});
-		btnInvite.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				// TODO Auto-generated
-				// method
-				// stub
-				try {
-					/*
-					 * long[] invited = listViewFriends.getCheckItemIds();
-					 * Intent intent = new Intent(
-					 * ParseStarterProjectActivity.this, ChoosingPhoto.class);
-					 * Bundle bundle = new Bundle(); bundle.putString(
-					 * "accessToken", facebook.getAccessToken());
-					 * bundle.putString( "myId", myId); bundle.putString(
-					 * "myName", myName);
-					 * bundle.putString("numSelectedFriends",""+
-					 * invited.length); for (int i = 0; i < invited.length; i++)
-					 * { bundle.putString( "friend" + i, FBfriendsId[(int)
-					 * invited[i]]); }
-					 */
-					Intent intent = new Intent(
-							ParseStarterProjectActivity.this, ChoosingPhoto.class);
-					long[] invited = listViewFriends.getCheckItemIds();
-					Bundle bundle = new Bundle();
-					bundle.putString("accessToken", facebook.getAccessToken());
-					bundle.putString("myId", myId);
-					Log.d("facebookURL","myId was: "+myId);
-					bundle.putString("myName", myName);
-					bundle.putString("numSelectedFriends", "" + invited.length);
-					for (int i = 0; i < invited.length; i++) {
-						bundle.putString("friend" + i,
-								friendsId[(int) invited[i]]);
-					}
-					intent.putExtras(bundle);
-					startActivity(intent);
-				} catch (Exception e) {
-					// TODO: handle
-					// exception
-					Log.d("debug", e.getMessage());
-				}
-
-			}
-		});
+		
+		
+		
+//		btnInvite.setOnClickListener(new OnClickListener() {
+//
+//			public void onClick(View v) {
+//				// TODO Auto-generated
+//				// method
+//				// stub
+//				try {
+//					/*
+//					 * long[] invited = listViewFriends.getCheckItemIds();
+//					 * Intent intent = new Intent(
+//					 * ParseStarterProjectActivity.this, ChoosingPhoto.class);
+//					 * Bundle bundle = new Bundle(); bundle.putString(
+//					 * "accessToken", facebook.getAccessToken());
+//					 * bundle.putString( "myId", myId); bundle.putString(
+//					 * "myName", myName);
+//					 * bundle.putString("numSelectedFriends",""+
+//					 * invited.length); for (int i = 0; i < invited.length; i++)
+//					 * { bundle.putString( "friend" + i, FBfriendsId[(int)
+//					 * invited[i]]); }
+//					 */
+//					Intent intent = new Intent(
+//							ParseStarterProjectActivity.this, ChoosingPhoto.class);
+//					long[] invited = listViewFriends.getCheckItemIds();
+//					Bundle bundle = new Bundle();
+//					bundle.putString("accessToken", facebook.getAccessToken());
+//					bundle.putString("myId", myId);
+//					Log.d("facebookURL","myId was: "+myId);
+//					bundle.putString("myName", myName);
+//					bundle.putString("numSelectedFriends", "" + invited.length);
+//					for (int i = 0; i < invited.length; i++) {
+//						bundle.putString("friend" + i,
+//								friendsId[(int) invited[i]]);
+//					}
+//					intent.putExtras(bundle);
+//					startActivity(intent);
+//				} catch (Exception e) {
+//					// TODO: handle
+//					// exception
+//					Log.d("debug", e.getMessage());
+//				}
+//
+//			}
+//		});
 	}
 
 	private void setUserList(final String[] queryFriendsId) {

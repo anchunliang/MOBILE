@@ -57,7 +57,8 @@ public class ChoosingPhoto extends Activity {
 	String accessToken;
 	String myId;
 	String myName;
-	String friendIds[];
+	String friendId;
+//	String friendIds[];
 	private int count;
 	private Bitmap[] thumbnails;
 	private boolean[] thumbnailsselection;
@@ -200,11 +201,12 @@ public class ChoosingPhoto extends Activity {
 		myId = bundle.getString("myId");
 		Log.d("facebookURL","myId is: "+myId);
 		myName = bundle.getString("myName");
-		Integer count = Integer.valueOf(bundle.getString("numSelectedFriends"));
-		friendIds = new String[count];
-		for (int i = 0; i < count; i++) {
-			friendIds[i] = bundle.getString("friend" + i);
-		}
+		friendId = bundle.getString("friendId");
+//		Integer count = Integer.valueOf(bundle.getString("numSelectedFriends"));
+//		friendIds = new String[count];
+//		for (int i = 0; i < count; i++) {
+//			friendIds[i] = bundle.getString("friend" + i);
+//		}
 	};
 
 	RequestListener albumsRequestListener = new RequestListener() {

@@ -42,12 +42,15 @@ containing a value of this type.
         public static final int btn_check_on_disable_focused=0x7f02000c;
         public static final int btn_check_on_pressed=0x7f02000d;
         public static final int btn_check_on_selected=0x7f02000e;
-        public static final int close=0x7f02000f;
-        public static final int facebook_icon=0x7f020010;
-        public static final int icon=0x7f020011;
-        public static final int mycheckboxbutton=0x7f020012;
-        public static final int no_image=0x7f020013;
-        public static final int wood1=0x7f020014;
+        public static final int btn_radio_off=0x7f02000f;
+        public static final int btn_radio_on=0x7f020010;
+        public static final int btn_state=0x7f020011;
+        public static final int close=0x7f020012;
+        public static final int facebook_icon=0x7f020013;
+        public static final int icon=0x7f020014;
+        public static final int mycheckboxbutton=0x7f020015;
+        public static final int no_image=0x7f020016;
+        public static final int wood1=0x7f020017;
     }
     public static final class id {
         public static final int Gallery=0x7f050008;

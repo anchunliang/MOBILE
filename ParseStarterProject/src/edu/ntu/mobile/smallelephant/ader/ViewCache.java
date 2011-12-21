@@ -1,6 +1,7 @@
 package edu.ntu.mobile.smallelephant.ader;
 
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -10,7 +11,8 @@ public class ViewCache {
     private View baseView;
     private TextView textView;
     private ImageView imageView;
-    private CheckBox checkbox;
+//    private CheckBox checkbox;
+    private Button button;
  
     public ViewCache(View baseView) {
         this.baseView = baseView;
@@ -30,11 +32,17 @@ public class ViewCache {
         return imageView;
     }
     
-    public CheckBox getCheckbox() {
-    	if( checkbox == null) {
-    		checkbox = (CheckBox) baseView.findViewById(R.id.MyAdapter_CheckBox_checkBox);
+//    public CheckBox getCheckbox() {
+//    	if( checkbox == null) {
+//    		checkbox = (CheckBox) baseView.findViewById(R.id.MyAdapter_CheckBox_checkBox);
+//    	}
+//    	return checkbox;
+//    }
+    public Button getButton() {
+    	if( button == null) {
+    		button = (Button) baseView.findViewById(R.id.MyAdapter_CheckBox_checkBox);
     	}
-    	return checkbox;
+    	return button;
     }
     
 //    public void setChecked(boolean isChecked){

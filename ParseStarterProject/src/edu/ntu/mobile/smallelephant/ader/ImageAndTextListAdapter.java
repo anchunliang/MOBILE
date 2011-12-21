@@ -69,16 +69,18 @@ public class ImageAndTextListAdapter extends ArrayAdapter<ImageAndText> {
 
 		rowView.setClickable(true);
 		rowView.setFocusable(true);
-		//rowView.setBackgroundResource(android.R.drawable.menuitem_background);
-		rowView.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				ViewCache vc = (ViewCache)v.getTag();
-				if( vc.getCheckbox().isEnabled())
-					vc.getCheckbox().toggle();
-				Log.d("CheckBox", "item checked!  online? "+vc.getCheckbox().isEnabled()+"  checked? "+vc.getCheckbox().isChecked());
-			}
-
-		});
+		// rowView.setBackgroundResource(android.R.drawable.menuitem_background);
+//		rowView.setOnClickListener(new OnClickListener() {
+//			public void onClick(View v) {
+//				ViewCache vc = (ViewCache) v.getTag();
+//				if (vc.getCheckbox().isEnabled())
+//					vc.getCheckbox().toggle();
+//				Log.d("CheckBox", "item checked!  online? "
+//						+ vc.getCheckbox().isEnabled() + "  checked? "
+//						+ vc.getCheckbox().isChecked());
+//			}
+//
+//		});
 		// Load the image and set it on the ImageView
 
 		Log.d("ImageAndText", "Load the image and set it on the ImageView "
@@ -108,19 +110,26 @@ public class ImageAndTextListAdapter extends ArrayAdapter<ImageAndText> {
 		textView.setText(imageAndText.getText());
 
 		// // Set the state on the CheckBox
-		viewCache.getCheckbox();
-		if (isSelected.get(position) != null)
-			viewCache.getCheckbox().setChecked(isSelected.get(position));
-		if (isOnline.get(position) != null){
-			Log.d("online", position + "   is " + (isOnline.get(position)?"online":"offline"));
-			viewCache.getCheckbox().setEnabled(isOnline.get(position));
-			if( ! isOnline.get(position))
+		// viewCache.getCheckbox();
+//		if (isSelected.get(position) != null) {
+//			viewCache.getCheckbox().setChecked(isSelected.get(position));
+//		}
+		if (isOnline.get(position) != null) {
+			Log.d("online", position + "   is "
+					+ (isOnline.get(position) ? "online" : "offline"));
+//			viewCache.getCheckbox().setEnabled(isOnline.get(position));
+			viewCache.getButton().setEnabled(isOnline.get(position));
+			rowView.setEnabled(isOnline.get(position));
+			if (!isOnline.get(position))
 				viewCache.getTextView().setTextColor(Color.GRAY);
-			else viewCache.getTextView().setTextColor(0xffCC6600);
+			else
+				viewCache.getTextView().setTextColor(0xffCC6600);
 		}
 		// CheckBox.setOnline(true);
-		Log.d("CheckBox", "get View!  online? "+viewCache.getCheckbox().isEnabled()+"  checked? "+viewCache.getCheckbox().isChecked());
-		viewCache.getCheckbox().refreshDrawableState();
+		// Log.d("CheckBox",
+		// "get View!  online? "+viewCache.getCheckbox().isEnabled()+"  checked? "+viewCache.getCheckbox().isChecked());
+		// viewCache.getCheckbox().refreshDrawableState();
+		viewCache.getButton().refreshDrawableState();
 		return rowView;
 	}
 }
