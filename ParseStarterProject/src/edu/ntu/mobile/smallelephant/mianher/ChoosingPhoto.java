@@ -1,4 +1,4 @@
-package edu.ntu.mobile.smallelephant.ader;
+package edu.ntu.mobile.smallelephant.mianher;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -41,6 +41,10 @@ import com.facebook.android.AsyncFacebookRunner.RequestListener;
 import com.facebook.android.Facebook;
 import com.facebook.android.FacebookError;
 import com.parse.Parse;
+
+import edu.ntu.mobile.smallelephant.ader.R;
+import edu.ntu.mobile.smallelephant.ader.R.id;
+import edu.ntu.mobile.smallelephant.ader.R.layout;
 
 public class ChoosingPhoto extends Activity {
 	public static Facebook facebook = new Facebook("255313284527691");

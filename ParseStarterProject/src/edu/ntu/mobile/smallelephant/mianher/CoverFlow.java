@@ -1,8 +1,8 @@
-package edu.ntu.mobile.smallelephant.ader;
+package edu.ntu.mobile.smallelephant.mianher;
 
 
-import edu.ntu.mobile.smallelephant.ader.MyGallery.ImageAdapter;
-import edu.ntu.mobile.smallelephant.ader.MyGallery.sImageAdapter;
+import edu.ntu.mobile.smallelephant.mianher.MyGallery.ImageAdapter;
+import edu.ntu.mobile.smallelephant.mianher.MyGallery.sImageAdapter;
 import android.content.Context;
 import android.graphics.Camera;
 import android.graphics.Matrix;

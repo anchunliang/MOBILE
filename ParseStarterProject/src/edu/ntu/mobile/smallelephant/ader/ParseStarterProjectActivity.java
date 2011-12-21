@@ -40,6 +40,8 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import edu.ntu.mobile.smallelephant.mianher.ChoosingPhoto;
+
 public class ParseStarterProjectActivity extends Activity {
 	/** Called when the activity is first created. */
 	public static Facebook facebook = new Facebook("255313284527691");
