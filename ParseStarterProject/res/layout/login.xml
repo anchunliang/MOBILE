@@ -26,7 +26,7 @@
             android:text="invite" />
 
         <Button
-            android:id="@+id/refresh"
+            android:id="@+id/clear"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="3"

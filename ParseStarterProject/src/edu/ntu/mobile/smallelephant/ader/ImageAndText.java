@@ -5,22 +5,14 @@ import java.util.Comparator;
 public class ImageAndText {
     private String imageUrl;
     private String text;
-    private Boolean online = false;
-    public String id = null;
-    public String ip = null;
+    private Boolean online;
+    public String id;
 
     public ImageAndText(String imageUrl, String text, Boolean online, String id) {
         this.imageUrl = imageUrl;
         this.text = text;
         this.online = online;
         this.id = id;
-    }
-    public ImageAndText(String imageUrl, String text, Boolean online, String id, String ip) {
-        this.imageUrl = imageUrl;
-        this.text = text;
-        this.online = online;
-        this.id = id;
-        this.ip = ip;
     }
     public String getImageUrl() {
         return imageUrl;

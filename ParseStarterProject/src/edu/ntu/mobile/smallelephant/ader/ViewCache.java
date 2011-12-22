@@ -14,7 +14,6 @@ public class ViewCache {
 //    private CheckBox checkbox;
     private RadioButton button;
     public String id;
-    public String ip;
  
     public ViewCache(View baseView) {
         this.baseView = baseView;
