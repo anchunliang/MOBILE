@@ -2,10 +2,13 @@ package edu.ntu.mobile.smallelephant.ader;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -40,6 +43,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import edu.ntu.mobile.smallelephant.mianher.ChoosingPhoto;
+import edu.ntu.mobile.smallelephant.ader.CONSTANT;
 
 public class ParseStarterProjectActivity extends Activity {
 	/** Called when the activity is first created. */
@@ -47,7 +51,7 @@ public class ParseStarterProjectActivity extends Activity {
 	public static AsyncFacebookRunner fbAsyncRunner = new AsyncFacebookRunner(
 			facebook);
 	private Button loginout;
-	private Button btnClear;
+	private Button btnRefresh;
 	private Button btnInvite;
 	private TextView mainTitle;
 	private ListView listViewFriends;
@@ -55,6 +59,7 @@ public class ParseStarterProjectActivity extends Activity {
 	private String myName;
 	private String[] FBfriendsId;
 	private String[] friendsId;
+	private String[] friendsIp;
 	private Boolean[] friendsOnline;
 	// private SimpleAdapter adapter;
 	ArrayList<ImageAndText> list = new ArrayList<ImageAndText>();
@@ -66,7 +71,7 @@ public class ParseStarterProjectActivity extends Activity {
 
 	@Override
 	public void onStop() {
-		Log.d("fbSession", "onStop");
+		Log.d(CONSTANT.DEBUG_TAG, "onStop");
 		super.onStop();
 		logoutParse();
 	}
@@ -84,7 +89,7 @@ public class ParseStarterProjectActivity extends Activity {
 		Parse.initialize(this, "L6Qx3IQVB2zNv3bHrUzTwNbak0MF1xHQHqE2BVCc",
 				"ksAA2JMvQVhQwnWLV8ZanZIChJlpsGIRUfKo3GIX");
 		if (facebook.isSessionValid()) {
-			Log.d("fbSession", "session valid 1");
+			Log.d(CONSTANT.DEBUG_FACEBOOK, "oncreate: session valid");
 			mainTitle.setText("session Valid!");
 			changeToFriendSelectPage();
 		}
@@ -92,7 +97,7 @@ public class ParseStarterProjectActivity extends Activity {
 	}
 
 	private void setVisibilities() {
-		btnClear.setVisibility(View.INVISIBLE);
+		btnRefresh.setVisibility(View.INVISIBLE);
 		btnInvite.setVisibility(View.INVISIBLE);
 	}
 
@@ -104,7 +109,7 @@ public class ParseStarterProjectActivity extends Activity {
 		listViewFriends.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				Log.d("Debug", "item clicked");
+				Log.d(CONSTANT.DEBUG_TAG, "findViews: item clicked");
 				ViewCache vc = (ViewCache) view.getTag();
 				if (vc.getButton().isChecked()) {
 					Intent intent = new Intent(
@@ -113,9 +118,10 @@ public class ParseStarterProjectActivity extends Activity {
 					Bundle bundle = new Bundle();
 					bundle.putString("accessToken", facebook.getAccessToken());
 					bundle.putString("myId", myId);
-					Log.d("facebookURL", "myId was: " + myId);
+					Log.d(CONSTANT.DEBUG_FACEBOOK, "myId was: " + myId);
 					bundle.putString("myName", myName);
 					bundle.putString("friendId", vc.id);
+					bundle.putString("friendIp", vc.ip);
 					intent.putExtras(bundle);
 					startActivity(intent);
 				} else {
@@ -129,7 +135,7 @@ public class ParseStarterProjectActivity extends Activity {
 		adapter = new ImageAndTextListAdapter(ParseStarterProjectActivity.this,
 				list, listViewFriends);
 		listViewFriends.setAdapter(adapter);
-		btnClear = (Button) findViewById(R.id.clear);
+		btnRefresh = (Button) findViewById(R.id.refresh);
 		btnInvite = (Button) findViewById(R.id.invite);
 	}
 
@@ -142,7 +148,7 @@ public class ParseStarterProjectActivity extends Activity {
 		public void onClick(View v) {
 			// TODO Auto-generated method stub
 			if (!facebook.isSessionValid()) {
-				Log.d("fbSession", "session invalid");
+				Log.d(CONSTANT.DEBUG_FACEBOOK, "login onclick : session invalid");
 				facebook.authorize(ParseStarterProjectActivity.this,
 						new String[] { "read_friendlists", "user_about_me",
 								"user_photos", "friends_photos" },
@@ -150,13 +156,13 @@ public class ParseStarterProjectActivity extends Activity {
 
 							public void onFacebookError(final FacebookError e) {
 								// TODO Auto-generated method stub
-								Log.d("fbSession",
+								Log.d(CONSTANT.ERROR_FACEBOOK,
 										"facebook error: " + e.getMessage());
 							}
 
 							public void onError(final DialogError e) {
 								// TODO Auto-generated method stub
-								Log.d("fbSession",
+								Log.d(CONSTANT.ERROR_FACEBOOK,
 										"dialog error: " + e.getMessage());
 							}
 
@@ -174,12 +180,12 @@ public class ParseStarterProjectActivity extends Activity {
 
 							public void onCancel() {
 								// TODO Auto-generated method stub
-								Log.d("fbSession", "cancel ");
+								Log.d(CONSTANT.DEBUG_FACEBOOK, "cancel ");
 
 							}
 						});
 			} else {
-				Log.d("fbSession", "session valid 2");
+				Log.d(CONSTANT.DEBUG_FACEBOOK, "login onclick: session valid");
 				mainTitle.setText("session Valid!");
 				changeToFriendSelectPage();
 			}
@@ -229,72 +235,88 @@ public class ParseStarterProjectActivity extends Activity {
 						SharedPreferences settings = getSharedPreferences(PREF,
 								0);
 						parse_user_id = settings.getString(myId, "");
-						if (!"".equals(parse_user_id)) {
-							Log.d("shrPref", "get " + parse_user_id);
-							query.getInBackground(parse_user_id,
-									new GetCallback() {
-
-										@Override
-										public void done(ParseObject object,
-												ParseException e) {
-											// TODO Auto-generated method stub
-											if (e != null) {
-												object.put("online", true);
-												object.saveInBackground();
-											}
-										}
-									});
+						final String myIpAddress = getLocalIpAddress();
+						if (myIpAddress == null) {
+							Log.d(CONSTANT.DEBUG_TAG, "Ip address is null");
 						} else {
-							Log.d("shrPref", "parse_user_id not found");
-							query.whereEqualTo("idNumber", queryId);
-							// query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
-							query.findInBackground(new FindCallback() {
-								public void done(List<ParseObject> friendList,
-										ParseException e) {
-									if (e == null) {
-										// The count request succeeded. Log the
-										// count
-										if (friendList.size() == 0) {
-											ParseObject myPost = new ParseObject(
-													"User");
-											myPost.put("idNumber", queryId);
-											myPost.put("name", queryName);
-											myPost.put("online", true);
-											myPost.saveInBackground();
-											parse_user_id = myPost
-													.getObjectId();
-											Log.d("shrPref",
-													"parse_user_id stored "
-															+ parse_user_id);
-											SharedPreferences settings = getSharedPreferences(
-													PREF, 0);
-											settings.edit()
-													.putString(queryId,
-															parse_user_id)
-													.commit();
+							if (!"".equals(parse_user_id)) {
+								Log.d(CONSTANT.DEBUG_SHAREPREF, "get " + parse_user_id);
+								query.getInBackground(parse_user_id,
+										new GetCallback() {
+
+											@Override
+											public void done(
+													ParseObject object,
+													ParseException e) {
+												// TODO Auto-generated method
+												// stub
+												if (e == null) {
+													Log.d(CONSTANT.DEBUG_SHAREPREF," parse_user_id  :  "+parse_user_id + " ipaddress: "+myIpAddress);
+													object.put("ip",
+															myIpAddress);
+													object.put("online", true);
+													object.saveInBackground();
+												}
+												else{
+													Log.e("ERROR",e.getMessage());
+												}
+											}
+										});
+							} else {
+								Log.d(CONSTANT.DEBUG_SHAREPREF, "parse_user_id not found");
+								query.whereEqualTo("facebookId", queryId);
+								query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
+								query.findInBackground(new FindCallback() {
+									public void done(
+											List<ParseObject> friendList,
+											ParseException e) {
+										if (e == null) {
+											// The count request succeeded. Log
+											if (friendList.size() == 0) {
+												ParseObject myPost = new ParseObject(
+														"User");
+												myPost.put("facebookId", queryId);
+												myPost.put("name", queryName);
+												myPost.put("online", true);
+												myPost.put("ip",
+														myIpAddress);
+												myPost.saveInBackground();
+												parse_user_id = myPost
+														.getObjectId();
+												Log.d(CONSTANT.DEBUG_SHAREPREF,
+														"User first login: "
+																+ parse_user_id);
+												SharedPreferences settings = getSharedPreferences(
+														PREF, 0);
+												settings.edit()
+														.putString(queryId,
+																parse_user_id)
+														.commit();
+											} else {
+												ParseObject myPost = friendList
+														.get(0);
+												myPost.put("online", true);
+												myPost.saveInBackground();
+												parse_user_id = myPost
+														.getObjectId();
+												Log.d(CONSTANT.DEBUG_SHAREPREF,
+														"parse_user_id stored "
+																+ parse_user_id);
+												SharedPreferences settings = getSharedPreferences(
+														PREF, 0);
+												settings.edit()
+														.putString(queryId,
+																parse_user_id)
+														.commit();
+											}
 										} else {
-											ParseObject myPost = friendList
-													.get(0);
-											myPost.put("online", true);
-											myPost.saveInBackground();
-											parse_user_id = myPost
-													.getObjectId();
-											Log.d("shrPref",
-													"parse_user_id stored "
-															+ parse_user_id);
-											SharedPreferences settings = getSharedPreferences(
-													PREF, 0);
-											settings.edit()
-													.putString(queryId,
-															parse_user_id)
-													.commit();
+											parse_user_id = null;
+											Log.d(CONSTANT.DEBUG_SHAREPREF,"find In background failed : "+ e.getMessage());
+											// The request failed
 										}
-									} else {
-										parse_user_id = null;
-										// The request failed
 									}
-								}
-							});
+								});
+							}
 						}
 					}
 				});
@@ -384,21 +406,35 @@ public class ParseStarterProjectActivity extends Activity {
 
 		public void onComplete(String response, Object state) {
 			// TODO Auto-generated method stub
-			loginout.setOnClickListener(loginListener);
-			logoutParse();
-			ParseStarterProjectActivity.this.runOnUiThread(new Runnable() {
-				public void run() {
-					mainTitle.setText(R.string.hello);
-					loginout.setText("login");
-					listViewFriends.setVisibility(View.GONE);
-					btnClear.setVisibility(View.INVISIBLE);
-					btnInvite.setVisibility(View.INVISIBLE);
-				}
-			});
+			logoutReset();
 		}
 	};
+	private void logoutReset(){
+		loginout.setOnClickListener(loginListener);
+		logoutParse();
+		ParseStarterProjectActivity.this.runOnUiThread(new Runnable() {
+			public void run() {
+				mainTitle.setText(R.string.hello);
+				loginout.setText("login");
+				listViewFriends.setVisibility(View.GONE);
+				btnRefresh.setVisibility(View.INVISIBLE);
+				btnInvite.setVisibility(View.INVISIBLE);
+			}
+		});
+		myId = null;
+		myName = null;
+		FBfriendsId = null;
+		friendsId = null;
+		friendsIp = null;
+		friendsOnline = null;
+		list.clear();
+		friendsName = null;
+		parse_user_id = null;
+		adapter.clear();
+		adapter.notifyDataSetChanged();
 
-	private void clearSelections() {
+	}
+	private void refreshFriendStatus() {
 		setUserList(FBfriendsId);
 		// if (listViewFriends != null && listViewFriends.getAdapter() != null)
 		// {
@@ -416,68 +452,68 @@ public class ParseStarterProjectActivity extends Activity {
 		// "L6Qx3IQVB2zNv3bHrUzTwNbak0MF1xHQHqE2BVCc",
 		// "ksAA2JMvQVhQwnWLV8ZanZIChJlpsGIRUfKo3GIX");
 		listViewFriends.setVisibility(View.VISIBLE);
-		btnClear.setVisibility(View.VISIBLE);
-		btnInvite.setVisibility(View.VISIBLE);
+		btnRefresh.setVisibility(View.VISIBLE);
+//		btnInvite.setVisibility(View.VISIBLE);
 		fbAsyncRunner.request("me", myProfileListener);
 		fbAsyncRunner.request("me/friends", friendsRequestListener);
 		loginout.setText("logout");
-		btnClear.setOnClickListener(new OnClickListener() {
+		btnRefresh.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				Toast.makeText(getApplicationContext(),
-						"Clear button clicked!", Toast.LENGTH_SHORT).show();
-				clearSelections();
+						"Refresh button clicked!", Toast.LENGTH_SHORT).show();
+				refreshFriendStatus();
 			}
 		});
 
 		// for test
-		btnInvite.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				// TODO Auto-generated
-				// method
-				// stub
-				try {
-					/*
-					 * long[] invited = listViewFriends.getCheckItemIds();
-					 * Intent intent = new Intent(
-					 * ParseStarterProjectActivity.this, ChoosingPhoto.class);
-					 * Bundle bundle = new Bundle(); bundle.putString(
-					 * "accessToken", facebook.getAccessToken());
-					 * bundle.putString( "myId", myId); bundle.putString(
-					 * "myName", myName);
-					 * bundle.putString("numSelectedFriends",""+
-					 * invited.length); for (int i = 0; i < invited.length; i++)
-					 * { bundle.putString( "friend" + i, FBfriendsId[(int)
-					 * invited[i]]); }
-					 */
-
-					Intent intent = new Intent(
-							ParseStarterProjectActivity.this,
-							ChoosingPhoto.class);
-					long[] invited = listViewFriends.getCheckItemIds();
-					Bundle bundle = new Bundle();
-					bundle.putString("accessToken", facebook.getAccessToken());
-					bundle.putString("myId", myId);
-					Log.d("facebookURL", "myId was: " + myId);
-					bundle.putString("myName", myName);
-					bundle.putString("friendId", myId);
-					bundle.putString("numSelectedFriends", "" + invited.length);
-					for (int i = 0; i < invited.length; i++) {
-						bundle.putString("friend" + i,
-								friendsId[(int) invited[i]]);
-					}
-					intent.putExtras(bundle);
-					startActivity(intent);
-				} catch (Exception e) {
-					// TODO: handle
-					// exception
-					Log.d("debug", e.getMessage());
-				}
-
-			}
-		});
+//		btnInvite.setOnClickListener(new OnClickListener() {
+//
+//			public void onClick(View v) {
+//				// TODO Auto-generated
+//				// method
+//				// stub
+//				try {
+//					/*
+//					 * long[] invited = listViewFriends.getCheckItemIds();
+//					 * Intent intent = new Intent(
+//					 * ParseStarterProjectActivity.this, ChoosingPhoto.class);
+//					 * Bundle bundle = new Bundle(); bundle.putString(
+//					 * "accessToken", facebook.getAccessToken());
+//					 * bundle.putString( "myId", myId); bundle.putString(
+//					 * "myName", myName);
+//					 * bundle.putString("numSelectedFriends",""+
+//					 * invited.length); for (int i = 0; i < invited.length; i++)
+//					 * { bundle.putString( "friend" + i, FBfriendsId[(int)
+//					 * invited[i]]); }
+//					 */
+//
+//					Intent intent = new Intent(
+//							ParseStarterProjectActivity.this,
+//							ChoosingPhoto.class);
+//					long[] invited = listViewFriends.getCheckItemIds();
+//					Bundle bundle = new Bundle();
+//					bundle.putString("accessToken", facebook.getAccessToken());
+//					bundle.putString("myId", myId);
+//					Log.d(CONSTANT.DEBUG_FACEBOOK, "myId was: " + myId);
+//					bundle.putString("myName", myName);
+//					bundle.putString("friendId", myId);
+//					bundle.putString("numSelectedFriends", "" + invited.length);
+//					for (int i = 0; i < invited.length; i++) {
+//						bundle.putString("friend" + i,
+//								friendsId[(int) invited[i]]);
+//					}
+//					intent.putExtras(bundle);
+//					startActivity(intent);
+//				} catch (Exception e) {
+//					// TODO: handle
+//					// exception
+//					Log.d(CONSTANT.DEBUG_TAG, e.getMessage());
+//				}
+//
+//			}
+//		});
 	}
 
 	private void setUserList(final String[] queryFriendsId) {
@@ -487,25 +523,27 @@ public class ParseStarterProjectActivity extends Activity {
 				// TODO Auto-generated method stub
 
 				ParseQuery query = new ParseQuery("User");
-				query.whereContainedIn("idNumber",
+				query.whereContainedIn("facebookId",
 						Arrays.asList(queryFriendsId));
 				query.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
 				query.findInBackground(new FindCallback() {
 					public void done(List<ParseObject> friendList,
 							ParseException e) {
 						if (e == null) {
-							Log.d("Debug", "find");
+							Log.d(CONSTANT.DEBUG_PARSE, "parse find:");
 							friendsName = new String[friendList.size()];
 							friendsId = new String[friendList.size()];
+							friendsIp = new String[friendList.size()];
 							friendsOnline = new Boolean[friendList.size()];
-							Log.d("friends", "Retrieved " + friendList.size()
+							Log.d(CONSTANT.DEBUG_PARSE, "Retrieved " + friendList.size()
 									+ " scores");
 							int i = 0;
 							for (ParseObject friend : friendList) {
 								friendsName[i] = friend.getString("name");
-								friendsId[i] = friend.getString("idNumber");
+								friendsId[i] = friend.getString("facebookId");
 								friendsOnline[i] = friend.getBoolean("online");
-								Log.d("friends profile", "Id " + friendsId[i]
+								friendsIp[i] = friend.getString("ip");
+								Log.d(CONSTANT.DEBUG_PARSE, "Id " + friendsId[i]
 										+ "name\t" + friendsName[i]);
 								i++;
 							}
@@ -517,6 +555,9 @@ public class ParseStarterProjectActivity extends Activity {
 								ImageAndText item = new ImageAndText(img_url,
 										friendsName[i], friendsOnline[i],
 										friendsId[i]);
+								if( friendsOnline[i]){
+									item.ip = friendsIp[i];
+								}
 								adapter.add(item);
 							}
 							// ComparatorImageAndText comparator = new
@@ -533,7 +574,7 @@ public class ParseStarterProjectActivity extends Activity {
 							}
 
 						} else {
-							Log.d("Debug", "Error: " + e.getMessage());
+							Log.e(CONSTANT.ERROR_TAG, "Error: " + e.getMessage());
 						}
 					}
 				});
@@ -543,19 +584,20 @@ public class ParseStarterProjectActivity extends Activity {
 
 	private void logoutParse() {
 		if (parse_user_id != null) {
-			Log.d("shrPref", "logoutParse:  parse_user_id = " + parse_user_id);
+			Log.d(CONSTANT.DEBUG_SHAREPREF, "logoutParse:  parse_user_id = " + parse_user_id);
 			ParseQuery query = new ParseQuery("User");
 			query.getInBackground(parse_user_id, new GetCallback() {
 				public void done(ParseObject object, ParseException e) {
 					if (e == null) {
 						// The count request succeeded. Log the
 						// count
+						object.put("ip", "");
 						object.put("online", false);
 						object.saveInBackground();
 
 					} else {
 						// The request failed
-						Log.d("Parse", e.getMessage());
+						Log.e(CONSTANT.ERROR_TAG, e.getMessage());
 					}
 				}
 			});
@@ -563,4 +605,28 @@ public class ParseStarterProjectActivity extends Activity {
 		}
 	}
 
+	public String getLocalIpAddress() {
+		String defaultReturn = null;
+		try {
+			for (Enumeration<NetworkInterface> en = NetworkInterface
+					.getNetworkInterfaces(); en.hasMoreElements();) {
+				NetworkInterface intf = en.nextElement();
+				for (Enumeration<InetAddress> enumIpAddr = intf
+						.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+					InetAddress inetAddress = enumIpAddr.nextElement();
+					if (!inetAddress.isLoopbackAddress()) {
+						if (! inetAddress.getHostAddress().toString().equals("10.0.2.15")){
+							return inetAddress.getHostAddress().toString();
+						}
+						else{
+							defaultReturn = "10.0.2.15";
+						}
+					}
+				}
+			}
+		} catch (SocketException ex) {
+			Log.e("socket Exception", ex.toString());
+		}
+		return defaultReturn;
+	}
 }

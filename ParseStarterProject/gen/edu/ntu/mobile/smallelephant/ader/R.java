@@ -65,7 +65,6 @@ containing a value of this type.
         public static final int begin_login=0x7f050009;
         public static final int begin_logout=0x7f05000c;
         public static final int begin_start=0x7f05000a;
-        public static final int clear=0x7f050014;
         public static final int imageView1=0x7f050007;
         public static final int instruction_back=0x7f050010;
         public static final int invite=0x7f050013;
@@ -75,6 +74,7 @@ containing a value of this type.
         public static final int listView1=0x7f050017;
         public static final int loginout=0x7f050015;
         public static final int mainTitle=0x7f050012;
+        public static final int refresh=0x7f050014;
         public static final int relativeLayout1=0x7f05000f;
         public static final int sGallery=0x7f05000e;
         public static final int textView1=0x7f050005;
