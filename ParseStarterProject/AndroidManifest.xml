@@ -10,15 +10,11 @@
         android:debuggable="true"
         android:icon="@drawable/icon"
         android:label="@string/app_name" >
-        <activity android:name="edu.ntu.mobile.smallelephant.mianher.MyGallery" >
-        </activity>
-        <activity
-            android:label="@string/app_name"
-            android:name="ParseStarterProjectActivity"
-           >
-                        
-                    </activity>
+        <activity android:name="edu.ntu.mobile.smallelephant.mianher.MyGallery" ></activity>
+        <activity android:label="@string/app_name"
+            android:name="ParseStarterProjectActivity" ></activity>
         <activity android:name="edu.ntu.mobile.smallelephant.mianher.ChoosingPhoto"></activity>
+        <activity android:name="edu.ntu.mobile.smallelephant.mianher.instruction"></activity>
         <activity android:name="edu.ntu.mobile.smallelephant.mianher.beginner"
              android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
              <intent-filter >
@@ -28,7 +24,7 @@
             </intent-filter>
             
                     </activity>
-        <activity android:name="edu.ntu.mobile.smallelephant.mianher.instruction"></activity>
+        
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

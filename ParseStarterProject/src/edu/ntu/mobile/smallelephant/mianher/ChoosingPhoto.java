@@ -26,6 +26,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,7 +60,8 @@ public class ChoosingPhoto extends Activity {
 	//albums�over photo�rl
 	private ArrayList<String> albumCoverUrls;
 	//������url: 摮�pair ( albumId, album銝剔�����貊��rl)
-	private TreeMap<String,ArrayList<String>> photoUrls;
+	private TreeMap<String,ArrayList<PhotoUnit>> photos;
+	//private TreeMap<String,ArrayList<Boolean>> photoselection;
 	String accessToken;
 	String myId;
 	String myName;
@@ -67,21 +69,25 @@ public class ChoosingPhoto extends Activity {
 //	String friendIds[];
 	private int count;
 	private Bitmap[] thumbnails;
-	private boolean[] thumbnailsselection;
+	//private boolean[] photoselection;
 	private String[] arrPath;
-	private ImageAdapter imageAdapter;
-	GridView imagegrid;
+	private AlbumAdapter albumAdapter;
+	private PhotoAdapter photoAdapter;
+	GridView albumgrid;
+	GridView photogrid;
 	private ProgressDialog progressDialog;
-
+	int flag=0;
 	//private ArrayList<String> PhotoURLS = new ArrayList<String>();
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.album_main);
 		
-		imagegrid = (GridView) findViewById(R.id.PhoneImageGrid);
-		imageAdapter = new ImageAdapter();
-		imagegrid.setAdapter(imageAdapter);
+		albumgrid = (GridView) findViewById(R.id.AlbumGrid);
+		photogrid = (GridView) findViewById(R.id.PhotoGrid);
+		photogrid.setVisibility(View.GONE);
+		albumAdapter = new AlbumAdapter();
+		albumgrid.setAdapter(albumAdapter);
     	
 		Parse.initialize(this, "L6Qx3IQVB2zNv3bHrUzTwNbak0MF1xHQHqE2BVCc",
 				"ksAA2JMvQVhQwnWLV8ZanZIChJlpsGIRUfKo3GIX");
@@ -113,12 +119,128 @@ public class ChoosingPhoto extends Activity {
      fbAsyncRunner.request(myId+"/albums", albumsRequestListener);
 		
 	}
-	public class ImageAdapter extends BaseAdapter {
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+			// do something on back.
+			flag=0;
+			ChoosingPhoto.this.runOnUiThread(new Runnable() {
+			    public void run() {
+			    	albumgrid.setVisibility(View.VISIBLE);
+					photogrid.setVisibility(View.GONE);
+					
+					
+			    }
+			});
+		return true;
+		}
+
+		return super.onKeyDown(keyCode, event);
+	}
+	public class AlbumAdapter extends BaseAdapter {
 		private LayoutInflater mInflater;
 		ArrayList<Drawable> drawablesFromUrl = new ArrayList<Drawable>();
 		Context mContext;
 		FileInputStream fis;
-		public ImageAdapter() {
+		public AlbumAdapter() {
+			mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		}
+
+		public int getCount() {
+			return drawablesFromUrl.size();
+		}
+
+		public Object getItem(int position) {
+			return position;
+		}
+
+		public long getItemId(int position) {
+			return position;
+		}
+		public void addItem(Drawable item) {
+			drawablesFromUrl.add(item);
+		}
+		public View getView(int position, View convertView, ViewGroup parent) {
+			ViewHolder holder;
+			if (convertView == null) {
+				holder = new ViewHolder();
+				convertView = mInflater.inflate(
+						R.layout.album_item, null);
+				holder.imageview = (ImageView) convertView.findViewById(R.id.thumbImage);
+				holder.checkbox = (CheckBox) convertView.findViewById(R.id.itemCheckBox);
+				holder.checkbox.setVisibility(View.INVISIBLE);
+				holder.mtextview = (TextView) convertView.findViewById(R.id.textView1);
+				convertView.setTag(holder);
+			}
+			else {
+				holder = (ViewHolder) convertView.getTag();
+			}
+			//holder.checkbox.setId(position);
+			holder.imageview.setId(position);
+			holder.mtextview.setId(position);
+			/*holder.checkbox.setOnClickListener(new OnClickListener() {
+				
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					CheckBox cb = (CheckBox) v;
+					int id = cb.getId();
+					if (photoselection[id]){
+						cb.setChecked(false);
+						photoselection[id] = false;
+						//Toast.makeText(MyCustomActivity.this, "onClick", Toast.LENGTH_SHORT).show();
+					} else {
+						cb.setChecked(true);
+						photoselection[id] = true;
+						//Toast.makeText(MyCustomActivity.this, "onClick", Toast.LENGTH_SHORT).show();
+					}
+				}
+			});*/
+			holder.imageview.setOnClickListener(new OnClickListener() {
+				
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					
+					photoAdapter = new PhotoAdapter();
+					photogrid.setAdapter(photoAdapter);
+					final int id=((ImageView)v).getId();
+					flag=1;//select photo
+					ChoosingPhoto.this.runOnUiThread(new Runnable() {
+					    public void run() {
+					    	albumgrid.setVisibility(View.GONE);
+							photogrid.setVisibility(View.VISIBLE);
+							
+							ArrayList<PhotoUnit> Urls=photos.get(albumIds.get(id));
+					    	for (PhotoUnit photounit : Urls) {
+					    		photoAdapter.addItem(LoadImageFromURL(photounit.photourl));
+					    		Log.d("trace","photoadapter after addItem, url="+photounit.photourl);
+								
+					    		
+					    	}
+					    	photoAdapter.notifyDataSetChanged();
+					    }
+					});
+					Log.d("trace","image onclick");
+				}
+			});
+			//holder.imageview.setImageBitmap(thumbnails[position]);
+			holder.imageview.setImageDrawable(drawablesFromUrl.get(position));
+			holder.mtextview.setText(albumNames.get(position));
+			//holder.imageview.setImageResource(R.drawable.ic_launcher);
+			//holder.imageview.setLayoutParams(new CoverFlow.LayoutParams(100, 100));
+
+			holder.imageview.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+			//holder.checkbox.setChecked(photoselection[position]);
+			holder.id = position;
+			//BitmapDrawable drawable = (BitmapDrawable) holder.imageview.getDrawable();
+			//drawable.setAntiAlias(true);
+			return convertView;
+		}
+	}
+	public class PhotoAdapter extends BaseAdapter {
+		private LayoutInflater mInflater;
+		ArrayList<Drawable> drawablesFromUrl = new ArrayList<Drawable>();
+		Context mContext;
+		FileInputStream fis;
+		public PhotoAdapter() {
 			mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		}
 
@@ -153,23 +275,24 @@ public class ChoosingPhoto extends Activity {
 			holder.checkbox.setId(position);
 			holder.imageview.setId(position);
 			holder.mtextview.setId(position);
-			holder.checkbox.setOnClickListener(new OnClickListener() {
+			holder.mtextview.setVisibility(View.INVISIBLE);
+			/*holder.checkbox.setOnClickListener(new OnClickListener() {
 				
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
 					CheckBox cb = (CheckBox) v;
 					int id = cb.getId();
-					if (thumbnailsselection[id]){
+					if (photoselection[id]){
 						cb.setChecked(false);
-						thumbnailsselection[id] = false;
+						photoselection[id] = false;
 						//Toast.makeText(MyCustomActivity.this, "onClick", Toast.LENGTH_SHORT).show();
 					} else {
 						cb.setChecked(true);
-						thumbnailsselection[id] = true;
+						photoselection[id] = true;
 						//Toast.makeText(MyCustomActivity.this, "onClick", Toast.LENGTH_SHORT).show();
 					}
 				}
-			});
+			});*/
 			holder.imageview.setOnClickListener(new OnClickListener() {
 				
 				public void onClick(View v) {
@@ -185,12 +308,12 @@ public class ChoosingPhoto extends Activity {
 			});
 			//holder.imageview.setImageBitmap(thumbnails[position]);
 			holder.imageview.setImageDrawable(drawablesFromUrl.get(position));
-			holder.mtextview.setText(albumNames.get(position));
+			//holder.mtextview.setText(albumNames.get(position));
 			//holder.imageview.setImageResource(R.drawable.ic_launcher);
 			//holder.imageview.setLayoutParams(new CoverFlow.LayoutParams(100, 100));
 
 			holder.imageview.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-			holder.checkbox.setChecked(thumbnailsselection[position]);
+			//holder.checkbox.setChecked(photoselection[position]);
 			holder.id = position;
 			//BitmapDrawable drawable = (BitmapDrawable) holder.imageview.getDrawable();
 			//drawable.setAntiAlias(true);
@@ -202,6 +325,11 @@ public class ChoosingPhoto extends Activity {
 		CheckBox checkbox;
 		TextView mtextview;
 		int id;
+	}
+	
+	class PhotoUnit{
+		String photourl;
+		boolean photoselection;
 	}
 	
 	private Drawable LoadImageFromURL(String url) {
@@ -281,7 +409,7 @@ public class ChoosingPhoto extends Activity {
 				albumIds = new ArrayList<String>();
 				albumNames = new ArrayList<String>();
 				albumCoverUrls = new ArrayList<String>();
-				photoUrls = new TreeMap< String, ArrayList<String>>();
+				photos = new TreeMap< String, ArrayList<PhotoUnit>>();
 				for (int i = 0; i < albumList.length(); i++) {
 					Log.d("facebookURL","album "+ i );
 					if (ALBUMPRIVACY.contains(albumList.getJSONObject(i)
@@ -301,7 +429,6 @@ public class ChoosingPhoto extends Activity {
 						fbAsyncRunner.request(albumId + "/photos", albumPhotoRequestListener, albumId);
 					}
 				}
-				thumbnailsselection = new boolean[albumCoverUrls.size()];
 				
 				
 				//imagecursor.close();
@@ -309,13 +436,13 @@ public class ChoosingPhoto extends Activity {
 				    public void run() {
 				    	
 				    	for (String url : albumCoverUrls) {
-				    		imageAdapter.addItem(LoadImageFromURL(url));
+				    		albumAdapter.addItem(LoadImageFromURL(url));
 				    		Log.d("trace","after addItem, url="+url);
 							Log.d("trace","after addItem");
 				    		
 				    		
 				    	}
-				    	imageAdapter.notifyDataSetChanged();
+				    	albumAdapter.notifyDataSetChanged();
 				    }
 				});
 				// album����			} catch (JSONException e) {
@@ -362,17 +489,21 @@ public class ChoosingPhoto extends Activity {
 				Log.d("facebookURL","album "+ (String)state);
 				result = new JSONObject(response);
 				photoList = result.getJSONArray("data");
-				ArrayList<String> albumPhotoUrls = new ArrayList<String>(); 
+				ArrayList<PhotoUnit> albumPhotos = new ArrayList<PhotoUnit>(); 
+				
 				for (int i = 0; i < photoList.length(); i++) {
 					String photoId = photoList.getJSONObject(i).getString("id");
-					albumPhotoUrls.add("https://graph.facebook.com/" + photoId
-							+ "/picture?type=thumbnail&access_token=" + accessToken);
+					PhotoUnit p=new PhotoUnit();
+					p.photoselection=false;
+					p.photourl="https://graph.facebook.com/" + photoId+ "/picture?type=thumbnail&access_token=" + accessToken;
+					albumPhotos.add(p);
 					Log.d("facebookURL","album "+ (String)state+"  photo: "+ i +"  https://graph.facebook.com/" + photoId
 							+ "/picture?type=thumbnail&access_token=" + accessToken);
 				}
 				if( state.getClass().equals(String.class)){
 					Log.d("tracephoto",(String)state);
-					photoUrls.put( (String)state, albumPhotoUrls);
+					
+					photos.put( (String)state, albumPhotos);
 				}
 				else Log.d("facebookURL","state not correct");
 				// album����			} catch (JSONException e) {

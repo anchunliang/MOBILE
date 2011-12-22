@@ -58,6 +58,7 @@ public class beginner extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.beginner);
+		Log.d("trace","beginner");
 		Parse.initialize(this, "L6Qx3IQVB2zNv3bHrUzTwNbak0MF1xHQHqE2BVCc",
 				"ksAA2JMvQVhQwnWLV8ZanZIChJlpsGIRUfKo3GIX");
 		login = (ImageButton)findViewById(R.id.begin_login);

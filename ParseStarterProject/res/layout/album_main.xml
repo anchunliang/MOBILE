@@ -3,16 +3,25 @@
 	android:layout_width="fill_parent" android:layout_height="fill_parent">
 
 	<GridView
-	    android:id="@+id/PhoneImageGrid"
+	    android:id="@+id/AlbumGrid"
 	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
+	    android:layout_height="wrap_content"
 	    android:columnWidth="90dp"
 	    android:gravity="center"
 	    android:horizontalSpacing="10dp"
 	    android:numColumns="auto_fit"
 	    android:stretchMode="columnWidth"
 	    android:verticalSpacing="10dp"/>
-
+	<GridView
+	    android:id="@+id/PhotoGrid"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:columnWidth="90dp"
+	    android:gravity="center"
+	    android:horizontalSpacing="10dp"
+	    android:numColumns="auto_fit"
+	    android:stretchMode="columnWidth"
+	    android:verticalSpacing="10dp"/>
 	<ImageView
 	    android:id="@+id/imageView1"
 	    android:layout_width="wrap_content"
