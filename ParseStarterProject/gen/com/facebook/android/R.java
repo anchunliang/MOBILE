@@ -47,10 +47,12 @@ containing a value of this type.
         public static final int btn_state=0x7f020011;
         public static final int close=0x7f020012;
         public static final int facebook_icon=0x7f020013;
-        public static final int icon=0x7f020014;
-        public static final int mycheckboxbutton=0x7f020015;
-        public static final int no_image=0x7f020016;
-        public static final int wood1=0x7f020017;
+        public static final int first_page=0x7f020014;
+        public static final int icon=0x7f020015;
+        public static final int mycheckboxbutton=0x7f020016;
+        public static final int no_image=0x7f020017;
+        public static final int small_elephant=0x7f020018;
+        public static final int wood1=0x7f020019;
     }
     public static final class id {
         public static final int Gallery=0x7f050008;

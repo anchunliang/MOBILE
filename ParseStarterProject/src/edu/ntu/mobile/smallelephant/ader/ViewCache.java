@@ -2,8 +2,8 @@ package edu.ntu.mobile.smallelephant.ader;
 
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 public class ViewCache {
@@ -12,7 +12,8 @@ public class ViewCache {
     private TextView textView;
     private ImageView imageView;
 //    private CheckBox checkbox;
-    private Button button;
+    private RadioButton button;
+    public String id;
  
     public ViewCache(View baseView) {
         this.baseView = baseView;
@@ -38,9 +39,9 @@ public class ViewCache {
 //    	}
 //    	return checkbox;
 //    }
-    public Button getButton() {
+    public RadioButton getButton() {
     	if( button == null) {
-    		button = (Button) baseView.findViewById(R.id.MyAdapter_CheckBox_checkBox);
+    		button = (RadioButton) baseView.findViewById(R.id.MyAdapter_CheckBox_checkBox);
     	}
     	return button;
     }
