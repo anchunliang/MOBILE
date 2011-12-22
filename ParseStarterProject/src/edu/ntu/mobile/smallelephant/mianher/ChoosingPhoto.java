@@ -120,7 +120,7 @@ public class ChoosingPhoto extends Activity {
 		
 	}
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0 && flag==1) {
 			// do something on back.
 			flag=0;
 			ChoosingPhoto.this.runOnUiThread(new Runnable() {
