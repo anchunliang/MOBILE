@@ -16,9 +16,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -43,7 +45,6 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import edu.ntu.mobile.smallelephant.mianher.ChoosingPhoto;
-import edu.ntu.mobile.smallelephant.ader.CONSTANT;
 
 public class ParseStarterProjectActivity extends Activity {
 	/** Called when the activity is first created. */
@@ -236,6 +237,9 @@ public class ParseStarterProjectActivity extends Activity {
 								0);
 						parse_user_id = settings.getString(myId, "");
 						final String myIpAddress = getLocalIpAddress();
+						TelephonyManager tMgr =(TelephonyManager)ParseStarterProjectActivity.this.getSystemService(Context.TELEPHONY_SERVICE);
+						final String mPhoneNumber = tMgr.getLine1Number();
+						Log.d(CONSTANT.DEBUG_TAG, "my PhoneNumber is " + mPhoneNumber);
 						if (myIpAddress == null) {
 							Log.d(CONSTANT.DEBUG_TAG, "Ip address is null");
 						} else {
@@ -246,16 +250,17 @@ public class ParseStarterProjectActivity extends Activity {
 
 											@Override
 											public void done(
-													ParseObject object,
+													ParseObject myPost,
 													ParseException e) {
 												// TODO Auto-generated method
 												// stub
 												if (e == null) {
 													Log.d(CONSTANT.DEBUG_SHAREPREF," parse_user_id  :  "+parse_user_id + " ipaddress: "+myIpAddress);
-													object.put("ip",
+													myPost.put("ip",
 															myIpAddress);
-													object.put("online", true);
-													object.saveInBackground();
+													myPost.put("online", true);
+													myPost.put("phoneNumber",mPhoneNumber);
+													myPost.saveInBackground();
 												}
 												else{
 													Log.e("ERROR",e.getMessage());
@@ -278,6 +283,7 @@ public class ParseStarterProjectActivity extends Activity {
 												myPost.put("facebookId", queryId);
 												myPost.put("name", queryName);
 												myPost.put("online", true);
+												myPost.put("phoneNumber",mPhoneNumber);
 												myPost.put("ip",
 														myIpAddress);
 												myPost.saveInBackground();
@@ -296,6 +302,7 @@ public class ParseStarterProjectActivity extends Activity {
 												ParseObject myPost = friendList
 														.get(0);
 												myPost.put("online", true);
+												myPost.put("phoneNumber",mPhoneNumber);
 												myPost.saveInBackground();
 												parse_user_id = myPost
 														.getObjectId();
