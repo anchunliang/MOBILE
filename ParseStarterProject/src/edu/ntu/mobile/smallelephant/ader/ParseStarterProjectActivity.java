@@ -237,8 +237,14 @@ public class ParseStarterProjectActivity extends Activity {
 						parse_user_id = settings.getString(myId, "");
 						final String myIpAddress = getLocalIpAddress();
 						TelephonyManager tMgr =(TelephonyManager)ParseStarterProjectActivity.this.getSystemService(Context.TELEPHONY_SERVICE);
-						final String mPhoneNumber = tMgr.getLine1Number();
-						Log.d(CONSTANT.DEBUG_TAG, "my PhoneNumber is " + mPhoneNumber);
+						String mPhoneNumber = tMgr.getLine1Number();
+						if( mPhoneNumber == null){
+							Log.d(CONSTANT.DEBUG_TAG, "my PhoneNumber is null");
+							mPhoneNumber = "";
+						}
+						else
+							Log.d(CONSTANT.DEBUG_TAG, "my PhoneNumber is "+mPhoneNumber);
+						final String finalmPhoneNumber = mPhoneNumber;
 						if (myIpAddress == null) {
 							Log.d(CONSTANT.DEBUG_TAG, "Ip address is null");
 						} else {
@@ -258,7 +264,7 @@ public class ParseStarterProjectActivity extends Activity {
 													myPost.put("ip",
 															myIpAddress);
 													myPost.put("online", true);
-													myPost.put("phoneNumber",mPhoneNumber);
+													myPost.put("phoneNumber",finalmPhoneNumber);
 													myPost.saveInBackground();
 												}
 												else{
@@ -282,7 +288,7 @@ public class ParseStarterProjectActivity extends Activity {
 												myPost.put("facebookId", queryId);
 												myPost.put("name", queryName);
 												myPost.put("online", true);
-												myPost.put("phoneNumber",mPhoneNumber);
+												myPost.put("phoneNumber",finalmPhoneNumber);
 												myPost.put("ip",
 														myIpAddress);
 												myPost.saveInBackground();
@@ -301,7 +307,7 @@ public class ParseStarterProjectActivity extends Activity {
 												ParseObject myPost = friendList
 														.get(0);
 												myPost.put("online", true);
-												myPost.put("phoneNumber",mPhoneNumber);
+												myPost.put("phoneNumber",finalmPhoneNumber);
 												myPost.saveInBackground();
 												parse_user_id = myPost
 														.getObjectId();
