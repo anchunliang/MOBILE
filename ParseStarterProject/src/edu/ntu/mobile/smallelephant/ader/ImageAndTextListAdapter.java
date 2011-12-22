@@ -109,15 +109,14 @@ public class ImageAndTextListAdapter extends ArrayAdapter<ImageAndText> {
 		TextView textView = viewCache.getTextView();
 		textView.setText(item.getText());
 		viewCache.id = item.id;
-		if (item.isOnline() != null) {
-			Log.d("online", position + "   is "
-					+ (item.isOnline() ? "online" : "offline"));
-			viewCache.getButton().setChecked(item.isOnline());
-			if (!item.isOnline())
-				viewCache.getTextView().setTextColor(Color.GRAY);
-			else
-				viewCache.getTextView().setTextColor(0xffCC6600);
-		}
+		viewCache.ip = item.ip;
+		Log.d("online", position + "   is "
+				+ (item.isOnline() ? "online" : "offline"));
+		viewCache.getButton().setChecked(item.isOnline());
+		if (!item.isOnline())
+			viewCache.getTextView().setTextColor(Color.GRAY);
+		else
+			viewCache.getTextView().setTextColor(0xffCC6600);
 		viewCache.getButton().refreshDrawableState();
 		return rowView;
 	}

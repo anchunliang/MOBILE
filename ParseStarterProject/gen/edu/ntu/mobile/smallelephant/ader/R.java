@@ -60,7 +60,6 @@ containing a value of this type.
         public static final int MyAdapter_ImageView_icon=0x7f050000;
         public static final int MyAdapter_TextView_title=0x7f050001;
         public static final int PhoneImageGrid=0x7f050006;
-        public static final int clear=0x7f05000d;
         public static final int imageView1=0x7f050007;
         public static final int invite=0x7f05000c;
         public static final int itemCheckBox=0x7f050004;
@@ -69,6 +68,7 @@ containing a value of this type.
         public static final int listView1=0x7f050010;
         public static final int loginout=0x7f05000e;
         public static final int mainTitle=0x7f05000b;
+        public static final int refresh=0x7f05000d;
         public static final int sGallery=0x7f050009;
         public static final int textView1=0x7f050005;
         public static final int thumbImage=0x7f050003;
