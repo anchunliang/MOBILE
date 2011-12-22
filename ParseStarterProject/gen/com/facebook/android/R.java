@@ -55,28 +55,21 @@ containing a value of this type.
         public static final int wood1=0x7f020019;
     }
     public static final class id {
-        public static final int Gallery=0x7f05000d;
+        public static final int Gallery=0x7f050008;
         public static final int MyAdapter_CheckBox_checkBox=0x7f050002;
         public static final int MyAdapter_ImageView_icon=0x7f050000;
         public static final int MyAdapter_TextView_title=0x7f050001;
         public static final int PhoneImageGrid=0x7f050006;
-        public static final int begin_image=0x7f050008;
-        public static final int begin_instruction=0x7f05000b;
-        public static final int begin_login=0x7f050009;
-        public static final int begin_logout=0x7f05000c;
-        public static final int begin_start=0x7f05000a;
-        public static final int clear=0x7f050014;
+        public static final int clear=0x7f05000d;
         public static final int imageView1=0x7f050007;
-        public static final int instruction_back=0x7f050010;
-        public static final int invite=0x7f050013;
+        public static final int invite=0x7f05000c;
         public static final int itemCheckBox=0x7f050004;
-        public static final int linearLayout1=0x7f050016;
-        public static final int linearLayout2=0x7f050011;
-        public static final int listView1=0x7f050017;
-        public static final int loginout=0x7f050015;
-        public static final int mainTitle=0x7f050012;
-        public static final int relativeLayout1=0x7f05000f;
-        public static final int sGallery=0x7f05000e;
+        public static final int linearLayout1=0x7f05000f;
+        public static final int linearLayout2=0x7f05000a;
+        public static final int listView1=0x7f050010;
+        public static final int loginout=0x7f05000e;
+        public static final int mainTitle=0x7f05000b;
+        public static final int sGallery=0x7f050009;
         public static final int textView1=0x7f050005;
         public static final int thumbImage=0x7f050003;
     }
@@ -84,10 +77,8 @@ containing a value of this type.
         public static final int adapter=0x7f030000;
         public static final int album_item=0x7f030001;
         public static final int album_main=0x7f030002;
-        public static final int beginner=0x7f030003;
-        public static final int gallery=0x7f030004;
-        public static final int instruct=0x7f030005;
-        public static final int login=0x7f030006;
+        public static final int gallery=0x7f030003;
+        public static final int login=0x7f030004;
     }
     public static final class string {
         public static final int app_name=0x7f040001;

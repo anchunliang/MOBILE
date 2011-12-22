@@ -371,6 +371,7 @@ public class ChoosingPhoto extends Activity {
 							+ "/picture?type=thumbnail&access_token=" + accessToken);
 				}
 				if( state.getClass().equals(String.class)){
+					Log.d("tracephoto",(String)state);
 					photoUrls.put( (String)state, albumPhotoUrls);
 				}
 				else Log.d("facebookURL","state not correct");
