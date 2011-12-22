@@ -94,7 +94,6 @@ public class ParseStarterProjectActivity extends Activity {
 			mainTitle.setText("session Valid!");
 			changeToFriendSelectPage();
 		}
-
 	}
 
 	private void setVisibilities() {
