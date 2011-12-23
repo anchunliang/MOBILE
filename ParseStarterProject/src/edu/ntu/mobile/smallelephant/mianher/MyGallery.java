@@ -53,11 +53,13 @@ public class MyGallery extends Activity {
 	private ArrayList<String> PhotoURLS = new ArrayList<String>();
 	static ImageAdapter coverImageAdapter;
 	static sImageAdapter scoverImageAdapter; 
-
+	int selections;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.gallery);
+		getIntentData();
 		coverImageAdapter = new ImageAdapter(this);
 		scoverImageAdapter= new sImageAdapter(this);
 		coverFlow = (CoverFlow) findViewById(R.id.Gallery);
@@ -122,12 +124,13 @@ public class MyGallery extends Activity {
            
         });
 
-		PhotoURLS.add("http://graph.facebook.com/100000582813465/picture?type=large");
+		/*PhotoURLS.add("http://graph.facebook.com/100000582813465/picture?type=large");
 		PhotoURLS.add("http://graph.facebook.com/1397199871/picture?type=large");
 		PhotoURLS.add("http://graph.facebook.com/1614072820/picture?type=large");
 		PhotoURLS.add("http://graph.facebook.com/1816303569/picture?type=large");
 		PhotoURLS.add("http://graph.facebook.com/100000049127720/picture?type=large");
 		PhotoURLS.add("http://graph.facebook.com/100001416500297/picture?type=large");
+		*/
 		/*
 		 * MyGallery.this.runOnUiThread(new Runnable() { public void run() { for
 		 * (String url : PhotoURLS) {
@@ -293,7 +296,7 @@ public class MyGallery extends Activity {
 	}
 
 	private Drawable LoadImageFromURL(String url) {
-		try {
+		/*try {
 			URL URL = new URL(url);
 			URLConnection conn = URL.openConnection();
 
@@ -307,16 +310,37 @@ public class MyGallery extends Activity {
 				Bitmap b = BitmapFactory.decodeStream(inputStream);
 				inputStream.close();
 				Drawable d = new BitmapDrawable(b);
+				Log.d("trace","Load image OK");
 				return d;
 				// mImage.setImageBitmap(bitmap);
 			}
 		} catch (MalformedURLException e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			Log.d("trace","MalformedURLException");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.d("trace","IOException");
 		}
 		return null;
+		*/
+		try{
+			InputStream is = (InputStream) new URL(url).getContent();
+			Drawable d = Drawable.createFromStream(is, "src name");
+			return d;
+		}
+		catch (Exception e) {
+			Log.d("trace","Exception");
+			e.printStackTrace();
+			return null;
+		}
 	}
+	private void getIntentData() {
+		Bundle bundle = this.getIntent().getExtras();
+		selections = Integer.parseInt(bundle.getString("selections"));
+		
+		for(int i=0;i<selections;i++){
+			String url=bundle.getString("photo"+i);
+			PhotoURLS.add(url);		
+		}
+	};
 }

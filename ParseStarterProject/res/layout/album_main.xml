@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="fill_parent">
-
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:background="@drawable/androidbg">
 	<GridView
 	    android:id="@+id/AlbumGrid"
 	    android:layout_width="fill_parent"
@@ -23,7 +23,7 @@
 	    android:stretchMode="columnWidth"
 	    android:verticalSpacing="10dp"/>
 	<ImageView
-	    android:id="@+id/imageView1"
+	    android:id="@+id/arrow"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:src="@drawable/arrow_right" android:layout_alignParentRight="true" android:layout_alignParentBottom="true"/>
