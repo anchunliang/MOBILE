@@ -78,6 +78,13 @@ public class beginner extends Activity {
 		}
 		
 		login.setOnClickListener(loginListener);
+		start.setOnClickListener(new OnClickListener(){
+
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				pass_to_ader();
+			}
+		});
 		logout.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
@@ -124,6 +131,9 @@ public class beginner extends Activity {
 
 							public void onComplete(Bundle values) {
 								// TODO Auto-generated method stub
+								login.setVisibility(View.INVISIBLE);
+								logout.setVisibility(View.VISIBLE);
+								start.setVisibility(View.VISIBLE);
 									pass_to_ader();
 							}
 
