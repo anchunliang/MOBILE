@@ -79,8 +79,15 @@ public class ParseStarterProjectActivity extends Activity {
 	@Override
 	public void onStop() {
 		Log.d(CONSTANT.DEBUG_TAG, "onStop");
-		super.onStop();
 		logoutParse();
+		super.onStop();
+	}
+	
+	@Override
+	public void onDestroy(){
+		Log.d(CONSTANT.DEBUG_TAG, "onDestroy");
+		logoutParse();
+		super.onDestroy();
 	}
 
 	@Override
