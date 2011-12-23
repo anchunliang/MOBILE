@@ -22,9 +22,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -82,9 +86,9 @@ public class ParseStarterProjectActivity extends Activity {
 		logoutParse();
 		super.onStop();
 	}
-	
+
 	@Override
-	public void onDestroy(){
+	public void onDestroy() {
 		Log.d(CONSTANT.DEBUG_TAG, "onDestroy");
 		logoutParse();
 		super.onDestroy();
@@ -92,6 +96,7 @@ public class ParseStarterProjectActivity extends Activity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		getContactsName();
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
 		findViews();
@@ -695,21 +700,46 @@ public class ParseStarterProjectActivity extends Activity {
 					// Log.i("externalip",str);
 					return str;
 				} else {
-					Log.d(CONSTANT.ERROR_TAG,"get ipaddress: Response too long or error.");
+					Log.d(CONSTANT.ERROR_TAG,
+							"get ipaddress: Response too long or error.");
 					return null;
 					// debug
 					// ip.setText("Response too long or error: "+EntityUtils.toString(entity));
 					// Log.i("externalip",EntityUtils.toString(entity));
 				}
 			} else {
-				Log.d(CONSTANT.ERROR_TAG, "get ipaddress: (Null) " + response.getStatusLine().toString());
+				Log.d(CONSTANT.ERROR_TAG, "get ipaddress: (Null) "
+						+ response.getStatusLine().toString());
 				return null;
 			}
 
 		} catch (Exception e) {
-			Log.d(CONSTANT.ERROR_TAG, "get ipaddress: (Exception) " + e.getMessage());
+			Log.d(CONSTANT.ERROR_TAG,
+					"get ipaddress: (Exception) " + e.getMessage());
 			return null;
 		}
 
+	}
+
+	public void getContactsName() {
+		// 取得內容解析器
+		ContentResolver contentResolver = this.getContentResolver();
+		// 設定你要從電話簿取出的欄位
+//		String[] projection = new String[] { Contacts.People.NAME,
+//				Contacts.People.NUMBER };
+		Uri uri = Uri.parse("content://contacts/myContactCard");
+		// 取得所有聯絡人
+		Cursor cursor = contentResolver.query( uri,
+				null, null, null, null);
+//		String[] contactsName = new String[cursor.getCount()];
+		Log.d(CONSTANT.DEBUG_TAG,"htc count: "+cursor.getCount());
+		for (int i = 0; i < cursor.getCount(); i++) {
+			// 移到指定位置
+			cursor.moveToPosition(i);
+			// 取得第一個欄位
+//			contactsName[i] = cursor.getString(0);
+			Log.d(CONSTANT.DEBUG_TAG,"htc content: "+cursor.getString(0));
+		}
+//		return contactsName;
 	}
 }
