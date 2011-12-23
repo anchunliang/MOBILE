@@ -26,6 +26,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -85,7 +87,8 @@ public class ChoosingPhoto extends Activity {
 	GridView albumgrid;
 	GridView photogrid;
 	ImageView mimage;
-	private ProgressDialog progressDialog;
+	private ProgressDialog AlbumprogressDialog;
+	private ProgressDialog PhotoprogressDialog;
 	int flag=0;
 	int selections=0; 
 	//private ArrayList<String> PhotoURLS = new ArrayList<String>();
@@ -93,6 +96,9 @@ public class ChoosingPhoto extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.album_main);
+		AlbumprogressDialog = ProgressDialog.show(ChoosingPhoto.this, "讀取相簿列表中", "請稍候...", true, false); 
+		AlbumprogressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		
 		mimage=(ImageView) findViewById(R.id.arrow);
 		albumgrid = (GridView) findViewById(R.id.AlbumGrid);
 		photogrid = (GridView) findViewById(R.id.PhotoGrid);
@@ -164,31 +170,38 @@ public class ChoosingPhoto extends Activity {
 		getIntentData();
 		facebook.setAccessToken(accessToken);
 		Log.d("facebookURL","send album request");
-		progressDialog = ProgressDialog.show(ChoosingPhoto.this, "讀取相簿列表中", "請稍候...", true, false); 
-		progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		
-      
-     new Thread()
-     { 
-       public void run()
-       { 
-         try
-         { 
-        	 sleep(2000);
-         }
-         catch (Exception e)
-         {
-           e.printStackTrace();
-         }
-         finally
-         {
-        	 progressDialog.dismiss();   
-         }
-       }
-     }.start(); 
-     fbAsyncRunner.request(myId+"/albums", albumsRequestListener);
+		Thread mThread = new Thread(new Runnable() {  
+            
+            public void run() {  
+                  
+            	fbAsyncRunner.request(myId+"/albums", albumsRequestListener);
+                  
+            }  
+        });  
+        mThread.start();  
+     
 		
 	}
+	private Handler mHandler = new Handler(){  
+        public void handleMessage(Message msg){  
+            switch (msg.what) {  
+            case 0:  
+            	albumAdapter.notifyDataSetChanged();
+            	AlbumprogressDialog.dismiss();   
+                break;    
+            case 1:
+            	Log.d("time","handler begin Tid="+getTaskId());
+            	albumgrid.setVisibility(View.GONE);
+				photogrid.setVisibility(View.VISIBLE);
+            	photogrid.setAdapter(photoAdapter);
+            	PhotoprogressDialog.dismiss();   
+            	Log.d("time","handler finish Tid="+getTaskId());
+            	
+                break;   
+            }  
+        }  
+    };  
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0 && flag==1) {
 			// do something on back.
@@ -268,28 +281,43 @@ public class ChoosingPhoto extends Activity {
 				
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
-					
 					photoAdapter = new PhotoAdapter();
-					photogrid.setAdapter(photoAdapter);
+					PhotoprogressDialog = ProgressDialog.show(ChoosingPhoto.this, "讀取相片中", "請稍候...", true, false); 
+					PhotoprogressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 					final int id=((ImageView)v).getId();
-					nowalbumid=albumIds.get(id);
-					flag=1;//select photo
-					ChoosingPhoto.this.runOnUiThread(new Runnable() {
-					    public void run() {
-					    	albumgrid.setVisibility(View.GONE);
-							photogrid.setVisibility(View.VISIBLE);
+					Thread mThread = new Thread(new Runnable() {  
+			            
+			            public void run() {  
+			                  
+			            	Log.d("time","onclick begin Tid=");
 							
-							ArrayList<PhotoUnit> photo=photos.get(albumIds.get(id));
-					    	for (PhotoUnit photounit : photo) {
-					    		photoAdapter.addItem(LoadImageFromURL(photounit.photourlsmall));
-					    		Log.d("trace","photoadapter after addItem, url="+photounit.photourlsmall);
-								
-					    		
-					    	}
-					    	photoAdapter.notifyDataSetChanged();
-					    }
-					});
-					Log.d("trace","image onclick");
+							nowalbumid=albumIds.get(id);
+							flag=1;//select photo
+							/*ChoosingPhoto.this.runOnUiThread(new Runnable() {
+							    public void run() {*/
+							    	
+									
+									ArrayList<PhotoUnit> photo=photos.get(albumIds.get(id));
+							    	for (PhotoUnit photounit : photo) {
+							    		photoAdapter.addItem(LoadImageFromURL(photounit.photourlsmall));
+							    		Log.d("trace","photoadapter after addItem, url="+photounit.photourlsmall);
+										
+							    		
+							    	}
+							    	//photoAdapter.notifyDataSetChanged();
+							    	Log.d("time","onclick finish Tid="+getTaskId());
+							    	Message msg = new Message();  
+					                msg.what = 1;  
+					                mHandler.sendMessage(msg);  
+							   // }
+							//});
+							Log.d("trace","image onclick"); 
+			            }  
+			        });  
+			        mThread.start();  
+					//photoAdapter = new PhotoAdapter();
+					
+					
 				}
 			});
 			//holder.imageview.setImageBitmap(thumbnails[position]);
@@ -528,8 +556,8 @@ public class ChoosingPhoto extends Activity {
 				
 				
 				//imagecursor.close();
-				ChoosingPhoto.this.runOnUiThread(new Runnable() {
-				    public void run() {
+				/*ChoosingPhoto.this.runOnUiThread(new Runnable() {
+				    public void run() {*/
 				    	
 				    	for (String url : albumCoverUrls) {
 				    		albumAdapter.addItem(LoadImageFromURL(url));
@@ -538,9 +566,12 @@ public class ChoosingPhoto extends Activity {
 				    		
 				    		
 				    	}
-				    	albumAdapter.notifyDataSetChanged();
-				    }
-				});
+				    	//albumAdapter.notifyDataSetChanged();
+				   // }
+				//});
+				Message msg = new Message();  
+                msg.what = 0;  
+                mHandler.sendMessage(msg);  
 				// album����			} catch (JSONException e) {
 				// TODO: handle exception
 				//e.printStackTrace();
