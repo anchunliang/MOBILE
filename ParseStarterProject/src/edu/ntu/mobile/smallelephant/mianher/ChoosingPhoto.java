@@ -20,22 +20,28 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
 
 import com.facebook.android.AsyncFacebookRunner;
@@ -44,7 +50,10 @@ import com.facebook.android.Facebook;
 import com.facebook.android.FacebookError;
 import com.parse.Parse;
 
+import edu.ntu.mobile.smallelephant.ader.CONSTANT;
+import edu.ntu.mobile.smallelephant.ader.ParseStarterProjectActivity;
 import edu.ntu.mobile.smallelephant.ader.R;
+import edu.ntu.mobile.smallelephant.ader.ViewCache;
 import edu.ntu.mobile.smallelephant.ader.R.id;
 import edu.ntu.mobile.smallelephant.ader.R.layout;
 
@@ -57,6 +66,7 @@ public class ChoosingPhoto extends Activity {
 	//albums�d
 	private ArrayList<String> albumIds;
 	private ArrayList<String> albumNames;
+	
 	//albums�over photo�rl
 	private ArrayList<String> albumCoverUrls;
 	//������url: 摮�pair ( albumId, album銝剔�����貊��rl)
@@ -66,6 +76,7 @@ public class ChoosingPhoto extends Activity {
 	String myId;
 	String myName;
 	String friendId;
+	String nowalbumid;
 //	String friendIds[];
 	private int count;
 	private Bitmap[] thumbnails;
@@ -75,16 +86,81 @@ public class ChoosingPhoto extends Activity {
 	private PhotoAdapter photoAdapter;
 	GridView albumgrid;
 	GridView photogrid;
-	private ProgressDialog progressDialog;
+	ImageView mimage;
+	private ProgressDialog AlbumprogressDialog;
+	private ProgressDialog PhotoprogressDialog;
 	int flag=0;
+	int selections=0; 
 	//private ArrayList<String> PhotoURLS = new ArrayList<String>();
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.album_main);
+		AlbumprogressDialog = ProgressDialog.show(ChoosingPhoto.this, "讀取相簿列表中", "請稍候...", true, false); 
+		AlbumprogressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		
+		mimage=(ImageView) findViewById(R.id.arrow);
 		albumgrid = (GridView) findViewById(R.id.AlbumGrid);
 		photogrid = (GridView) findViewById(R.id.PhotoGrid);
+		mimage.setOnClickListener(new OnClickListener() {
+			/*public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				Log.d(CONSTANT.DEBUG_TAG, "findViews: item clicked");
+				ViewCache vc = (ViewCache) view.getTag();
+				if (vc.getButton().isChecked()) {
+					Intent intent = new Intent(
+							ParseStarterProjectActivity.this,
+							ChoosingPhoto.class);
+					Bundle bundle = new Bundle();
+					bundle.putString("accessToken", facebook.getAccessToken());
+					bundle.putString("myId", myId);
+					Log.d(CONSTANT.DEBUG_FACEBOOK, "myId was: " + myId);
+					bundle.putString("myName", myName);
+					bundle.putString("friendId", vc.id);
+					bundle.putString("friendIp", vc.ip);
+					intent.putExtras(bundle);
+					startActivity(intent);
+				} else {
+					Toast.makeText(ParseStarterProjectActivity.this,
+							"the person you selected is offline!",
+							Toast.LENGTH_SHORT).show();
+				}
+			}*/
+
+			public void onClick(View arg0) {
+				Intent intent = new Intent(ChoosingPhoto.this,MyGallery.class);
+				Bundle bundle = new Bundle();
+				
+				int count=0;
+				if(selections==0)
+					Toast.makeText(ChoosingPhoto.this,"Please select some photos.",Toast.LENGTH_SHORT).show();
+				else{
+					for(String albumid: albumIds){
+						ArrayList<PhotoUnit> photounits =photos.get(albumid);
+						for(PhotoUnit p:photounits){
+							if(p.photoselection){
+								bundle.putString("photo"+count,p.photourllarge);
+								count++;
+							}						
+						}
+					}
+					if(count==selections){
+						bundle.putString("selections", ""+selections);
+						intent.putExtras(bundle);
+						startActivity(intent);
+						
+					}
+					else{
+						Log.d("trace","selection count not match!");
+						
+					}
+					
+				}
+					
+				
+				
+			}
+		});
 		photogrid.setVisibility(View.GONE);
 		albumAdapter = new AlbumAdapter();
 		albumgrid.setAdapter(albumAdapter);
@@ -94,31 +170,38 @@ public class ChoosingPhoto extends Activity {
 		getIntentData();
 		facebook.setAccessToken(accessToken);
 		Log.d("facebookURL","send album request");
-		progressDialog = ProgressDialog.show(ChoosingPhoto.this, "讀取相簿列表中", "請稍候...", true, false); 
-		progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		
-      
-     new Thread()
-     { 
-       public void run()
-       { 
-         try
-         { 
-        	 sleep(2000);
-         }
-         catch (Exception e)
-         {
-           e.printStackTrace();
-         }
-         finally
-         {
-        	 progressDialog.dismiss();   
-         }
-       }
-     }.start(); 
-     fbAsyncRunner.request(myId+"/albums", albumsRequestListener);
+		Thread mThread = new Thread(new Runnable() {  
+            
+            public void run() {  
+                  
+            	fbAsyncRunner.request(myId+"/albums", albumsRequestListener);
+                  
+            }  
+        });  
+        mThread.start();  
+     
 		
 	}
+	private Handler mHandler = new Handler(){  
+        public void handleMessage(Message msg){  
+            switch (msg.what) {  
+            case 0:  
+            	albumAdapter.notifyDataSetChanged();
+            	AlbumprogressDialog.dismiss();   
+                break;    
+            case 1:
+            	Log.d("time","handler begin Tid="+getTaskId());
+            	albumgrid.setVisibility(View.GONE);
+				photogrid.setVisibility(View.VISIBLE);
+            	photogrid.setAdapter(photoAdapter);
+            	PhotoprogressDialog.dismiss();   
+            	Log.d("time","handler finish Tid="+getTaskId());
+            	
+                break;   
+            }  
+        }  
+    };  
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0 && flag==1) {
 			// do something on back.
@@ -198,27 +281,43 @@ public class ChoosingPhoto extends Activity {
 				
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
-					
 					photoAdapter = new PhotoAdapter();
-					photogrid.setAdapter(photoAdapter);
+					PhotoprogressDialog = ProgressDialog.show(ChoosingPhoto.this, "讀取相片中", "請稍候...", true, false); 
+					PhotoprogressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 					final int id=((ImageView)v).getId();
-					flag=1;//select photo
-					ChoosingPhoto.this.runOnUiThread(new Runnable() {
-					    public void run() {
-					    	albumgrid.setVisibility(View.GONE);
-							photogrid.setVisibility(View.VISIBLE);
+					Thread mThread = new Thread(new Runnable() {  
+			            
+			            public void run() {  
+			                  
+			            	Log.d("time","onclick begin Tid=");
 							
-							ArrayList<PhotoUnit> Urls=photos.get(albumIds.get(id));
-					    	for (PhotoUnit photounit : Urls) {
-					    		photoAdapter.addItem(LoadImageFromURL(photounit.photourl));
-					    		Log.d("trace","photoadapter after addItem, url="+photounit.photourl);
-								
-					    		
-					    	}
-					    	photoAdapter.notifyDataSetChanged();
-					    }
-					});
-					Log.d("trace","image onclick");
+							nowalbumid=albumIds.get(id);
+							flag=1;//select photo
+							/*ChoosingPhoto.this.runOnUiThread(new Runnable() {
+							    public void run() {*/
+							    	
+									
+									ArrayList<PhotoUnit> photo=photos.get(albumIds.get(id));
+							    	for (PhotoUnit photounit : photo) {
+							    		photoAdapter.addItem(LoadImageFromURL(photounit.photourlsmall));
+							    		Log.d("trace","photoadapter after addItem, url="+photounit.photourlsmall);
+										
+							    		
+							    	}
+							    	//photoAdapter.notifyDataSetChanged();
+							    	Log.d("time","onclick finish Tid="+getTaskId());
+							    	Message msg = new Message();  
+					                msg.what = 1;  
+					                mHandler.sendMessage(msg);  
+							   // }
+							//});
+							Log.d("trace","image onclick"); 
+			            }  
+			        });  
+			        mThread.start();  
+					//photoAdapter = new PhotoAdapter();
+					
+					
 				}
 			});
 			//holder.imageview.setImageBitmap(thumbnails[position]);
@@ -276,24 +375,36 @@ public class ChoosingPhoto extends Activity {
 			holder.imageview.setId(position);
 			holder.mtextview.setId(position);
 			holder.mtextview.setVisibility(View.INVISIBLE);
-			/*holder.checkbox.setOnClickListener(new OnClickListener() {
+			if (getselectionbyalbumandposition(nowalbumid,position)){
+				holder.checkbox.setChecked(true);
+				//Toast.makeText(MyCustomActivity.this, "onClick", Toast.LENGTH_SHORT).show();
+			} 
+			else {
+				holder.checkbox.setChecked(false);
+				//Toast.makeText(MyCustomActivity.this, "onClick", Toast.LENGTH_SHORT).show();
+			}
+			
+			
+			holder.checkbox.setOnClickListener(new OnClickListener() {
 				
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
 					CheckBox cb = (CheckBox) v;
 					int id = cb.getId();
-					if (photoselection[id]){
+					if (getselectionbyalbumandposition(nowalbumid,id)){
 						cb.setChecked(false);
-						photoselection[id] = false;
+						setselectionbyalbumandposition(nowalbumid,id,false);
+						selections--;
 						//Toast.makeText(MyCustomActivity.this, "onClick", Toast.LENGTH_SHORT).show();
 					} else {
 						cb.setChecked(true);
-						photoselection[id] = true;
+						setselectionbyalbumandposition(nowalbumid,id,true);
+						selections++;
 						//Toast.makeText(MyCustomActivity.this, "onClick", Toast.LENGTH_SHORT).show();
 					}
 				}
-			});*/
-			holder.imageview.setOnClickListener(new OnClickListener() {
+			});
+			/*holder.imageview.setOnClickListener(new OnClickListener() {
 				
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
@@ -302,10 +413,10 @@ public class ChoosingPhoto extends Activity {
 					intent.setAction(Intent.ACTION_VIEW);
 					intent.setDataAndType(Uri.parse("file://" + arrPath[id]), "image/*");
 					startActivity(intent);
-					*/
+					
 					Log.d("trace","image onclick");
 				}
-			});
+			});*/
 			//holder.imageview.setImageBitmap(thumbnails[position]);
 			holder.imageview.setImageDrawable(drawablesFromUrl.get(position));
 			//holder.mtextview.setText(albumNames.get(position));
@@ -328,12 +439,13 @@ public class ChoosingPhoto extends Activity {
 	}
 	
 	class PhotoUnit{
-		String photourl;
+		String photourlsmall;
+		String photourllarge;
 		boolean photoselection;
 	}
 	
 	private Drawable LoadImageFromURL(String url) {
-		try {
+		/*try {
 			URL URL = new URL(url);
 			URLConnection conn = URL.openConnection();
 
@@ -353,12 +465,23 @@ public class ChoosingPhoto extends Activity {
 			}
 		} catch (MalformedURLException e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			Log.d("trace","MalformedURLException");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.d("trace","IOException");
 		}
 		return null;
+		*/
+		try{
+			InputStream is = (InputStream) new URL(url).getContent();
+			Drawable d = Drawable.createFromStream(is, "src name");
+			return d;
+		}
+		catch (Exception e) {
+			Log.d("trace","Exception");
+			e.printStackTrace();
+			return null;
+		}
 	}
 	private void getIntentData() {
 		Bundle bundle = this.getIntent().getExtras();
@@ -410,6 +533,7 @@ public class ChoosingPhoto extends Activity {
 				albumNames = new ArrayList<String>();
 				albumCoverUrls = new ArrayList<String>();
 				photos = new TreeMap< String, ArrayList<PhotoUnit>>();
+				Log.d("trace","albumList.length="+albumList.length());
 				for (int i = 0; i < albumList.length(); i++) {
 					Log.d("facebookURL","album "+ i );
 					if (ALBUMPRIVACY.contains(albumList.getJSONObject(i)
@@ -432,8 +556,8 @@ public class ChoosingPhoto extends Activity {
 				
 				
 				//imagecursor.close();
-				ChoosingPhoto.this.runOnUiThread(new Runnable() {
-				    public void run() {
+				/*ChoosingPhoto.this.runOnUiThread(new Runnable() {
+				    public void run() {*/
 				    	
 				    	for (String url : albumCoverUrls) {
 				    		albumAdapter.addItem(LoadImageFromURL(url));
@@ -442,9 +566,12 @@ public class ChoosingPhoto extends Activity {
 				    		
 				    		
 				    	}
-				    	albumAdapter.notifyDataSetChanged();
-				    }
-				});
+				    	//albumAdapter.notifyDataSetChanged();
+				   // }
+				//});
+				Message msg = new Message();  
+                msg.what = 0;  
+                mHandler.sendMessage(msg);  
 				// album����			} catch (JSONException e) {
 				// TODO: handle exception
 				//e.printStackTrace();
@@ -495,7 +622,8 @@ public class ChoosingPhoto extends Activity {
 					String photoId = photoList.getJSONObject(i).getString("id");
 					PhotoUnit p=new PhotoUnit();
 					p.photoselection=false;
-					p.photourl="https://graph.facebook.com/" + photoId+ "/picture?type=thumbnail&access_token=" + accessToken;
+					p.photourlsmall="https://graph.facebook.com/" + photoId+ "/picture?type=thumbnail&access_token=" + accessToken;
+					p.photourllarge="https://graph.facebook.com/" + photoId+ "/picture?type=normal&access_token=" + accessToken;
 					albumPhotos.add(p);
 					Log.d("facebookURL","album "+ (String)state+"  photo: "+ i +"  https://graph.facebook.com/" + photoId
 							+ "/picture?type=thumbnail&access_token=" + accessToken);
@@ -517,4 +645,22 @@ public class ChoosingPhoto extends Activity {
 			}
 		}
 	};
+	
+	boolean getselectionbyalbumandposition(String albumid,int index){
+		ArrayList<PhotoUnit> photounit=photos.get(albumid);
+		PhotoUnit p =photounit.get(index);
+		if(p.photoselection==true)
+			return true;
+		else
+			return false;
+	}
+	void setselectionbyalbumandposition(String albumid,int index,boolean select){
+		ArrayList<PhotoUnit> photounit=photos.get(albumid);
+		PhotoUnit p =photounit.get(index);
+		p.photoselection=select;
+		photounit.set(index, p);
+		
+	}
+	
+	
 }

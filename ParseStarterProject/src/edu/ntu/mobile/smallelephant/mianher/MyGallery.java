@@ -17,6 +17,7 @@ import edu.ntu.mobile.smallelephant.ader.R.id;
 import edu.ntu.mobile.smallelephant.ader.R.layout;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -32,6 +33,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -53,97 +56,131 @@ public class MyGallery extends Activity {
 	private ArrayList<String> PhotoURLS = new ArrayList<String>();
 	static ImageAdapter coverImageAdapter;
 	static sImageAdapter scoverImageAdapter; 
-
+	private ProgressDialog progressDialog;
+	int selections;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.gallery);
+		
 		coverImageAdapter = new ImageAdapter(this);
 		scoverImageAdapter= new sImageAdapter(this);
 		coverFlow = (CoverFlow) findViewById(R.id.Gallery);
 		scoverFlow = (CoverFlow) findViewById(R.id.sGallery);
-		Log.d("trace", "findviewbyid");
-		scoverFlow.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> parent, View v,
-					int position, long id) {
-				//coverFlow.setSelection(position, true);
-				//coverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT, null);
-			}
-		});
-		// coverFlow.setAdapter(new ImageAdapter(this));
-		// scoverFlow.setAdapter(new ImageAdapter(this));
-		// coverImageAdapter.createReflectedImages();
-		coverFlow.setAdapter(coverImageAdapter);
-		scoverFlow.setAdapter(scoverImageAdapter);
-		coverFlow.setSpacing(-25);
-		scoverFlow.setSpacing(-25);
-		coverFlow.setSelection(0, true);
-		scoverFlow.setSelection(0, true);
-		coverFlow.setAnimationDuration(1000);
-		scoverFlow.setAnimationDuration(1000);
-		coverFlow.setOnItemSelectedListener(new OnItemSelectedListener() 
-        {
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long i){
-            	//int diff=scoverFlow.getSelectedItemPosition()-position;
-            	if(scoverFlow.getSelectedItemPosition()>position){
-            		int diff=scoverFlow.getSelectedItemPosition()-position;
-            		for(int j=0;j<diff;j++){
-            			scoverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_LEFT, null);
-            			/*Handler handler = new Handler(); 
-            		    handler.postDelayed(new Runnable() { 
-            		         public void run() { 
-            		              //my_button.setBackgroundResource(R.drawable.defaultcard); 
-            		         } 
-            		    }, 1000); */
-            		}
-            		
-            	}
-            	else if(scoverFlow.getSelectedItemPosition()<position){
-            		int diff=position-scoverFlow.getSelectedItemPosition();
-            		for(int j=0;j<diff;j++){
-            			scoverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT, null);
-            			/*Handler handler = new Handler(); 
-            		    handler.postDelayed(new Runnable() { 
-            		         public void run() { 
-            		              //my_button.setBackgroundResource(R.drawable.defaultcard); 
-            		         } 
-            		    }, 1000); */
-            		}
-            		
-            	}
-            	//scoverFlow.setSelection(position, true);
-            }
+		progressDialog = ProgressDialog.show(MyGallery.this, "正在生成Gallery", "請稍候...", true, false); 
+		progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+       // mThread.start();  
+        Thread mThread = new Thread(new Runnable() {  
+            
+            public void run() {  
+            	getIntentData();
+        		
+        		Log.d("trace", "findviewbyid");
+        		scoverFlow.setOnItemClickListener(new OnItemClickListener() {
+        			public void onItemClick(AdapterView<?> parent, View v,
+        					int position, long id) {
+        				//coverFlow.setSelection(position, true);
+        				//coverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT, null);
+        			}
+        		});
+        		// coverFlow.setAdapter(new ImageAdapter(this));
+        		// scoverFlow.setAdapter(new ImageAdapter(this));
+        		// coverImageAdapter.createReflectedImages();
+        		coverFlow.setOnItemSelectedListener(new OnItemSelectedListener() 
+                {
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long i){
+                    	//int diff=scoverFlow.getSelectedItemPosition()-position;
+                    	if(scoverFlow.getSelectedItemPosition()>position){
+                    		int diff=scoverFlow.getSelectedItemPosition()-position;
+                    		for(int j=0;j<diff;j++){
+                    			scoverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_LEFT, null);
+                    			/*Handler handler = new Handler(); 
+                    		    handler.postDelayed(new Runnable() { 
+                    		         public void run() { 
+                    		              //my_button.setBackgroundResource(R.drawable.defaultcard); 
+                    		         } 
+                    		    }, 1000); */
+                    		}
+                    		
+                    	}
+                    	else if(scoverFlow.getSelectedItemPosition()<position){
+                    		int diff=position-scoverFlow.getSelectedItemPosition();
+                    		for(int j=0;j<diff;j++){
+                    			scoverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT, null);
+                    			/*Handler handler = new Handler(); 
+                    		    handler.postDelayed(new Runnable() { 
+                    		         public void run() { 
+                    		              //my_button.setBackgroundResource(R.drawable.defaultcard); 
+                    		         } 
+                    		    }, 1000); */
+                    		}
+                    		
+                    	}
+                    	//scoverFlow.setSelection(position, true);
+                    }
 
-			public void onNothingSelected(AdapterView<?> arg0) {
-				// TODO Auto-generated method stub
-				
-			}
+        			public void onNothingSelected(AdapterView<?> arg0) {
+        				// TODO Auto-generated method stub
+        				
+        			}
 
-           
-        });
+                   
+                });
+                    
+        		/*PhotoURLS.add("http://graph.facebook.com/100000582813465/picture?type=large");
+        		PhotoURLS.add("http://graph.facebook.com/1397199871/picture?type=large");
+        		PhotoURLS.add("http://graph.facebook.com/1614072820/picture?type=large");
+        		PhotoURLS.add("http://graph.facebook.com/1816303569/picture?type=large");
+        		PhotoURLS.add("http://graph.facebook.com/100000049127720/picture?type=large");
+        		PhotoURLS.add("http://graph.facebook.com/100001416500297/picture?type=large");
+        		*/
+        		/*
+        		 * MyGallery.this.runOnUiThread(new Runnable() { public void run() { for
+        		 * (String url : PhotoURLS) {
+        		 * coverImageAdapter.addItem(LoadImageFromURL(url));
+        		 * scoverImageAdapter.addItem(LoadImageFromURL(url)); }
+        		 * coverImageAdapter.notifyDataSetChanged();
+        		 * scoverImageAdapter.notifyDataSetChanged(); } });
+        		 */
+        		for (String url : PhotoURLS) {
+        			coverImageAdapter.addItem(LoadImageFromURL(url));
+        			scoverImageAdapter.addItem(LoadImageFromURL(url));
+        		}
+        		coverImageAdapter.notifyDataSetChanged();
+        		scoverImageAdapter.notifyDataSetChanged();
+        		Message msg = new Message();  
+                msg.what = 0;  
+                mHandler.sendMessage(msg);
+           }  
+             
+        });  
+        mThread.start();  
+        
+		
+        
+		
+		    
 
-		PhotoURLS.add("http://graph.facebook.com/100000582813465/picture?type=large");
-		PhotoURLS.add("http://graph.facebook.com/1397199871/picture?type=large");
-		PhotoURLS.add("http://graph.facebook.com/1614072820/picture?type=large");
-		PhotoURLS.add("http://graph.facebook.com/1816303569/picture?type=large");
-		PhotoURLS.add("http://graph.facebook.com/100000049127720/picture?type=large");
-		PhotoURLS.add("http://graph.facebook.com/100001416500297/picture?type=large");
-		/*
-		 * MyGallery.this.runOnUiThread(new Runnable() { public void run() { for
-		 * (String url : PhotoURLS) {
-		 * coverImageAdapter.addItem(LoadImageFromURL(url));
-		 * scoverImageAdapter.addItem(LoadImageFromURL(url)); }
-		 * coverImageAdapter.notifyDataSetChanged();
-		 * scoverImageAdapter.notifyDataSetChanged(); } });
-		 */
-		for (String url : PhotoURLS) {
-			coverImageAdapter.addItem(LoadImageFromURL(url));
-			scoverImageAdapter.addItem(LoadImageFromURL(url));
-		}
-		coverImageAdapter.notifyDataSetChanged();
-		scoverImageAdapter.notifyDataSetChanged();
+		
 	}
-
+	private Handler mHandler = new Handler(){  
+        public void handleMessage(Message msg){  
+            switch (msg.what) {  
+            case 0:  
+            	coverFlow.setAdapter(coverImageAdapter);
+        		scoverFlow.setAdapter(scoverImageAdapter);
+        		coverFlow.setSpacing(-25);
+        		scoverFlow.setSpacing(-25);
+        		coverFlow.setSelection(0, true);
+        		scoverFlow.setSelection(0, true);
+        		coverFlow.setAnimationDuration(1000);
+        		scoverFlow.setAnimationDuration(1000);
+            	progressDialog.dismiss();   
+                break;    
+            }  
+        }
+    };
 	public class ImageAdapter extends BaseAdapter {
 		int mGalleryItemBackground;
 		Context mContext;
@@ -293,7 +330,7 @@ public class MyGallery extends Activity {
 	}
 
 	private Drawable LoadImageFromURL(String url) {
-		try {
+		/*try {
 			URL URL = new URL(url);
 			URLConnection conn = URL.openConnection();
 
@@ -307,16 +344,37 @@ public class MyGallery extends Activity {
 				Bitmap b = BitmapFactory.decodeStream(inputStream);
 				inputStream.close();
 				Drawable d = new BitmapDrawable(b);
+				Log.d("trace","Load image OK");
 				return d;
 				// mImage.setImageBitmap(bitmap);
 			}
 		} catch (MalformedURLException e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			Log.d("trace","MalformedURLException");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.d("trace","IOException");
 		}
 		return null;
+		*/
+		try{
+			InputStream is = (InputStream) new URL(url).getContent();
+			Drawable d = Drawable.createFromStream(is, "src name");
+			return d;
+		}
+		catch (Exception e) {
+			Log.d("trace","Exception");
+			e.printStackTrace();
+			return null;
+		}
 	}
+	private void getIntentData() {
+		Bundle bundle = this.getIntent().getExtras();
+		selections = Integer.parseInt(bundle.getString("selections"));
+		
+		for(int i=0;i<selections;i++){
+			String url=bundle.getString("photo"+i);
+			PhotoURLS.add(url);		
+		}
+	};
 }

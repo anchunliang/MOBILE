@@ -1,51 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+	android:layout_width="fill_parent" android:layout_height="fill_parent">
 
-    <ImageView
-        android:id="@+id/begin_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:src="@drawable/first_page" />
+        <ImageView android:id="@+id/begin_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/first_page" />
 
-    <ImageButton
-        android:id="@+id/begin_logout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="130dp"
-        android:background="@null"
-        android:src="@drawable/logout_fit_little_little" />
+        <ImageButton android:id="@+id/begin_login"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="180dp"
+            android:src="@drawable/arrow_right" />
 
-    <ImageButton
-        android:id="@+id/begin_instruction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/begin_logout"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="21dp"
-        android:background="@null"
-        android:src="@drawable/instruction_fit_little" />
+        
+        <ImageButton
+            android:id="@+id/begin_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="180dp"
+            android:src="@drawable/arrow_right" />
 
-    <ImageButton
-        android:id="@+id/begin_start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/begin_instruction"
-        android:layout_centerHorizontal="true"
-        android:background="@null"
-        android:src="@drawable/start_fit_little" />
+        <ImageButton
+            android:id="@+id/begin_instruction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/begin_login"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="94dp"
+            android:src="@drawable/btn_check_off_disable" />
 
-    <ImageButton
-        android:id="@+id/begin_login"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/begin_start"
-        android:layout_alignTop="@+id/begin_start"
-        android:background="@null"
-        android:src="@drawable/login_fit_little" />
+        <ImageButton
+            android:id="@+id/begin_logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="14dp"
+            android:src="@drawable/btn_check_buttonless_off" />
 
-</RelativeLayout>
+    </RelativeLayout>
