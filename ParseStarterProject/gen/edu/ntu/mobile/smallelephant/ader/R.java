@@ -49,10 +49,19 @@ containing a value of this type.
         public static final int facebook_icon=0x7f020013;
         public static final int first_page=0x7f020014;
         public static final int icon=0x7f020015;
-        public static final int mycheckboxbutton=0x7f020016;
-        public static final int no_image=0x7f020017;
-        public static final int small_elephant=0x7f020018;
-        public static final int wood1=0x7f020019;
+        public static final int instruction_fit=0x7f020016;
+        public static final int instruction_fit_little=0x7f020017;
+        public static final int login_fit=0x7f020018;
+        public static final int login_fit_little=0x7f020019;
+        public static final int logout_fit=0x7f02001a;
+        public static final int logout_fit_little=0x7f02001b;
+        public static final int logout_fit_little_little=0x7f02001c;
+        public static final int mycheckboxbutton=0x7f02001d;
+        public static final int no_image=0x7f02001e;
+        public static final int small_elephant=0x7f02001f;
+        public static final int start_fit=0x7f020020;
+        public static final int start_fit_little=0x7f020021;
+        public static final int wood1=0x7f020022;
     }
     public static final class id {
         public static final int AlbumGrid=0x7f050006;

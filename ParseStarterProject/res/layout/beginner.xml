@@ -16,6 +16,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="180dp"
             android:src="@drawable/arrow_right" />
+
         
         <ImageButton
             android:id="@+id/begin_start"

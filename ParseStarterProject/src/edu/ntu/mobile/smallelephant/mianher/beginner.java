@@ -39,18 +39,14 @@ public class beginner extends Activity {
 	ImageButton instruction;
 	ImageButton start;
 	ImageButton logout;
-	private String myId;
-	private String myName;
 	public static final String PREF = "SMALL_ELEPHANT_PREF";
 	public static final String PREF_USER_ID = "PARSE_USER_id";
-	private String parse_user_id = null;
 
 	
 	@Override
 	public void onStop() {
-		Log.d("fbSession", "onStop");
+		Log.d("fbSession", "beginner_onStop");
 		super.onStop();
-		logoutParse();
 	}
 
 	
@@ -128,7 +124,7 @@ public class beginner extends Activity {
 
 							public void onComplete(Bundle values) {
 								// TODO Auto-generated method stub
-								ParseStarterProjectActivity.fbAsyncRunner.request("me", myProfileListener);
+									pass_to_ader();
 							}
 
 							public void onCancel() {
@@ -170,7 +166,6 @@ public class beginner extends Activity {
 
 		public void onComplete(String response, Object state) {
 			// TODO Auto-generated method stub
-			logoutParse();
 			beginner.this.runOnUiThread(new Runnable() {
 				public void run() {
 					start.setVisibility(View.INVISIBLE);
@@ -181,27 +176,6 @@ public class beginner extends Activity {
 		}
 	};
 	
-	private void logoutParse() {
-		if (parse_user_id != null) {
-			Log.d("shrPref", "logoutParse:  parse_user_id = " + parse_user_id);
-			ParseQuery query = new ParseQuery("User");
-			query.getInBackground(parse_user_id, new GetCallback() {
-				public void done(ParseObject object, ParseException e) {
-					if (e == null) {
-						// The count request succeeded. Log the
-						// count
-						object.put("online", false);
-						object.saveInBackground();
-
-					} else {
-						// The request failed
-						Log.d("Parse", e.getMessage());
-					}
-				}
-			});
-			parse_user_id = null;
-		}
-	}
 	
 	void pass_to_ader(){
 		Intent intent = new Intent(
@@ -209,133 +183,8 @@ public class beginner extends Activity {
 				ParseStarterProjectActivity.class);
 		Bundle bundle = new Bundle();
 		bundle.putString("accessToken", ParseStarterProjectActivity.facebook.getAccessToken());
-	//	bundle.putString("myId", myId);
-	//	Log.d("facebookURL", "myId was: " + myId);
-	//	bundle.putString("myName", myName);
-	//	bundle.putString("friendId", vc.id);
 		intent.putExtras(bundle);
 		startActivity(intent);
-	
 	}
 
-	private RequestListener myProfileListener = new RequestListener() {
-
-		public void onMalformedURLException(MalformedURLException e,
-				Object state) {
-			// TODO Auto-generated method stub
-
-		}
-
-		public void onIOException(IOException e, Object state) {
-			// TODO Auto-generated method stub
-
-		}
-
-		public void onFileNotFoundException(FileNotFoundException e,
-				Object state) {
-			// TODO Auto-generated method stub
-
-		}
-
-		public void onFacebookError(FacebookError e, Object state) {
-			// TODO Auto-generated method stub
-
-		}
-
-		public void onComplete(String response, Object state) {
-			// TODO Auto-generated method stub
-			JSONObject myProfile;
-			try {
-				myProfile = new JSONObject(response);
-				myId = myProfile.getString("id");
-				myName = myProfile.getString("name");
-
-				final String queryId = myId;
-				final String queryName = myName;
-
-				beginner.this.runOnUiThread(new Runnable() {
-
-					public void run() {
-						// TODO Auto-generated method stub
-						ParseQuery query = new ParseQuery("User");
-
-						SharedPreferences settings = getSharedPreferences(PREF,
-								0);
-						parse_user_id = settings.getString(myId, "");
-						if (!"".equals(parse_user_id)) {
-							Log.d("shrPref", "get " + parse_user_id);
-							query.getInBackground(parse_user_id,
-									new GetCallback() {
-
-										@Override
-										public void done(ParseObject object,
-												ParseException e) {
-											// TODO Auto-generated method stub
-											if (e != null) {
-												object.put("online", true);
-												object.saveInBackground();
-											}
-										}
-									});
-						} else {
-							Log.d("shrPref", "parse_user_id not found");
-							query.whereEqualTo("idNumber", queryId);
-							// query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
-							query.findInBackground(new FindCallback() {
-								public void done(List<ParseObject> friendList,
-										ParseException e) {
-									if (e == null) {
-										// The count request succeeded. Log the
-										// count
-										if (friendList.size() == 0) {
-											ParseObject myPost = new ParseObject(
-													"User");
-											myPost.put("idNumber", queryId);
-											myPost.put("name", queryName);
-											myPost.put("online", true);
-											myPost.saveInBackground();
-											parse_user_id = myPost
-													.getObjectId();
-											Log.d("shrPref",
-													"parse_user_id stored "
-															+ parse_user_id);
-											SharedPreferences settings = getSharedPreferences(
-													PREF, 0);
-											settings.edit()
-													.putString(queryId,
-															parse_user_id)
-													.commit();
-										} else {
-											ParseObject myPost = friendList
-													.get(0);
-											myPost.put("online", true);
-											myPost.saveInBackground();
-											parse_user_id = myPost
-													.getObjectId();
-											Log.d("shrPref",
-													"parse_user_id stored "
-															+ parse_user_id);
-											SharedPreferences settings = getSharedPreferences(
-													PREF, 0);
-											settings.edit()
-													.putString(queryId,
-															parse_user_id)
-													.commit();
-										}
-									} else {
-										parse_user_id = null;
-										// The request failed
-									}
-								}
-							});
-						}
-					}
-				});
-				pass_to_ader();
-
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		}
-	};
 }
