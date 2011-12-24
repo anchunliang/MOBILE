@@ -766,7 +766,7 @@ public class ChoosingPhoto extends FragmentActivity {
 		for( PhotoUnit p : album){
 			p.photoselection = false;
 		}
-		
+		selections = 0;
 		photogrid.invalidateViews();
 	}
 	
