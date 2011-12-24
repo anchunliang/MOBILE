@@ -21,6 +21,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import edu.ntu.mobile.smallelephant.ader.CONSTANT;
 import edu.ntu.mobile.smallelephant.ader.ParseStarterProjectActivity;
 import edu.ntu.mobile.smallelephant.ader.R;
 
@@ -45,7 +46,7 @@ public class beginner extends Activity {
 	
 	@Override
 	public void onStop() {
-		Log.d("fbSession", "beginner_onStop");
+		Log.d(CONSTANT.ERROR_FACEBOOK, "beginner_onStop");
 		super.onStop();
 	}
 

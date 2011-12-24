@@ -114,9 +114,9 @@ public class ImageAndTextListAdapter extends ArrayAdapter<ImageAndText> {
 				+ (item.isOnline() ? "online" : "offline"));
 		viewCache.getButton().setChecked(item.isOnline());
 		if (!item.isOnline())
-			viewCache.getTextView().setTextColor(Color.GRAY);
+			viewCache.getTextView().setTextColor(0xff808080);
 		else
-			viewCache.getTextView().setTextColor(0xffCC6600);
+			viewCache.getTextView().setTextColor(0xffff69b4);
 		viewCache.getButton().refreshDrawableState();
 		return rowView;
 	}

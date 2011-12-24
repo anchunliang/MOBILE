@@ -21,15 +21,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.Menu;
+import android.support.v4.view.MenuItem;
+import android.support.v4.view.Window;
+import android.support.v4.view.MenuItem.OnMenuItemClickListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
@@ -56,15 +59,15 @@ import com.parse.ParseQuery;
 
 import edu.ntu.mobile.smallelephant.mianher.ChoosingPhoto;
 
-public class ParseStarterProjectActivity extends Activity {
+public class ParseStarterProjectActivity extends FragmentActivity {
 	/** Called when the activity is first created. */
 	public static Facebook facebook = new Facebook("255313284527691");
 	public static AsyncFacebookRunner fbAsyncRunner = new AsyncFacebookRunner(
 			facebook);
-	private Button loginout;
-	private Button btnRefresh;
-	private Button btnInvite;
-	private TextView mainTitle;
+	// private Button loginout;
+	// private Button btnRefresh;
+	// private Button btnInvite;
+	// private TextView mainTitle;
 	private ListView listViewFriends;
 	private String myId;
 	private String myName;
@@ -77,8 +80,48 @@ public class ParseStarterProjectActivity extends Activity {
 	private String[] friendsName;
 	public static final String PREF = "SMALL_ELEPHANT_PREF";
 	public static final String PREF_USER_ID = "PARSE_USER_id";
+	private static final int CHOOSING_PHOTO = 0;
 	private String parse_user_id = null;
 	ImageAndTextListAdapter adapter = null;
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+
+		menu.add("Logout")
+				.setIcon(R.drawable.ic_menu_set_as)
+				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+					@Override
+					public boolean onMenuItemClick(MenuItem item) {
+						// TODO Auto-generated method stub
+						// item.setActionView(R.layout.indeterminate_progress_action);
+						Toast.makeText(getApplicationContext(),
+								"logout button clicked!", Toast.LENGTH_SHORT)
+								.show();
+						logoutReset();
+						return false;
+					}
+				})
+				.setShowAsAction(
+						MenuItem.SHOW_AS_ACTION_ALWAYS
+								);
+
+		menu.add("Refresh").setIcon(R.drawable.ic_refresh)
+				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+					@Override
+					public boolean onMenuItemClick(MenuItem item) {
+						// TODO Auto-generated method stub
+						Toast.makeText(getApplicationContext(),
+								"Refresh button clicked!", Toast.LENGTH_SHORT)
+								.show();
+						refreshFriendStatus();
+						return false;
+					}
+				}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+		return super.onCreateOptionsMenu(menu);
+	}
 
 	@Override
 	public void onStop() {
@@ -96,32 +139,30 @@ public class ParseStarterProjectActivity extends Activity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		getContactsName();
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		// getContactsName();
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
+		setProgressBarIndeterminateVisibility(Boolean.FALSE);
 		findViews();
-		setVisibilities();
-		setListener();
 		// Add your initialization code here
 		// Parse.initialize(this, "your application id goes here",
 		// "your client key goes here");
 		Parse.initialize(this, "L6Qx3IQVB2zNv3bHrUzTwNbak0MF1xHQHqE2BVCc",
 				"ksAA2JMvQVhQwnWLV8ZanZIChJlpsGIRUfKo3GIX");
 		if (facebook.isSessionValid()) {
+			getSupportActionBar().setTitle("朋友名單");
 			Log.d(CONSTANT.DEBUG_FACEBOOK, "oncreate: session valid");
-			mainTitle.setText("session Valid!");
 			changeToFriendSelectPage();
 		}
 	}
 
-	private void setVisibilities() {
-		btnRefresh.setVisibility(View.INVISIBLE);
-		btnInvite.setVisibility(View.INVISIBLE);
-	}
+	// private void setVisibilities() {
+	// btnRefresh.setVisibility(View.INVISIBLE);
+	// btnInvite.setVisibility(View.INVISIBLE);
+	// }
 
 	private void findViews() {
-		loginout = (Button) findViewById(R.id.loginout);
-		mainTitle = (TextView) findViewById(R.id.mainTitle);
 		listViewFriends = (ListView) findViewById(R.id.listView1);
 		listViewFriends.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		listViewFriends.setOnItemClickListener(new OnItemClickListener() {
@@ -141,7 +182,7 @@ public class ParseStarterProjectActivity extends Activity {
 					bundle.putString("friendId", vc.id);
 					bundle.putString("friendIp", vc.ip);
 					intent.putExtras(bundle);
-					startActivity(intent);
+					startActivityForResult(intent, CHOOSING_PHOTO);
 				} else {
 					Toast.makeText(ParseStarterProjectActivity.this,
 							"the person you selected is offline!",
@@ -153,13 +194,22 @@ public class ParseStarterProjectActivity extends Activity {
 		adapter = new ImageAndTextListAdapter(ParseStarterProjectActivity.this,
 				list, listViewFriends);
 		listViewFriends.setAdapter(adapter);
-		btnRefresh = (Button) findViewById(R.id.refresh);
-		btnInvite = (Button) findViewById(R.id.invite);
 	}
 
-	private void setListener() {
-		loginout.setOnClickListener(loginListener);
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == CHOOSING_PHOTO) {
+			if (resultCode == CONSTANT.RESULT_LOGOUT) {
+				// A contact was picked. Here we will just display it
+				// to the user.
+				logoutReset();
+			}
+		}
 	}
+
+	// private void setListener() {
+	// loginout.setOnClickListener(loginListener);
+	// }
 
 	private OnClickListener loginListener = new OnClickListener() {
 
@@ -205,7 +255,6 @@ public class ParseStarterProjectActivity extends Activity {
 						});
 			} else {
 				Log.d(CONSTANT.DEBUG_FACEBOOK, "login onclick: session valid");
-				mainTitle.setText("session Valid!");
 				changeToFriendSelectPage();
 			}
 		}
@@ -412,15 +461,15 @@ public class ParseStarterProjectActivity extends Activity {
 				// TODO: handle exception
 				e.printStackTrace();
 			}
-			loginout.setOnClickListener(new OnClickListener() {
-
-				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					fbAsyncRunner.logout(ParseStarterProjectActivity.this,
-							logoutListener);
-
-				}
-			});
+			// loginout.setOnClickListener(new OnClickListener() {
+			//
+			// public void onClick(View v) {
+			// // TODO Auto-generated method stub
+			// fbAsyncRunner.logout(ParseStarterProjectActivity.this,
+			// logoutListener);
+			//
+			// }
+			// });
 		}
 	};
 	private RequestListener logoutListener = new RequestListener() {
@@ -454,17 +503,7 @@ public class ParseStarterProjectActivity extends Activity {
 	};
 
 	private void logoutReset() {
-		loginout.setOnClickListener(loginListener);
 		logoutParse();
-		ParseStarterProjectActivity.this.runOnUiThread(new Runnable() {
-			public void run() {
-				mainTitle.setText(R.string.hello);
-				loginout.setText("login");
-				listViewFriends.setVisibility(View.GONE);
-				btnRefresh.setVisibility(View.INVISIBLE);
-				btnInvite.setVisibility(View.INVISIBLE);
-			}
-		});
 		myId = null;
 		myName = null;
 		FBfriendsId = null;
@@ -476,7 +515,7 @@ public class ParseStarterProjectActivity extends Activity {
 		parse_user_id = null;
 		adapter.clear();
 		adapter.notifyDataSetChanged();
-
+		finish();
 	}
 
 	private void refreshFriendStatus() {
@@ -492,25 +531,13 @@ public class ParseStarterProjectActivity extends Activity {
 
 	private void changeToFriendSelectPage() {
 		Toast.makeText(getApplicationContext(), "complete!", Toast.LENGTH_SHORT);
-		mainTitle.setText("朋友名單");
 		// //Parse.initialize(ParseStarterProjectActivity.this,
 		// "L6Qx3IQVB2zNv3bHrUzTwNbak0MF1xHQHqE2BVCc",
 		// "ksAA2JMvQVhQwnWLV8ZanZIChJlpsGIRUfKo3GIX");
 		listViewFriends.setVisibility(View.VISIBLE);
-		btnRefresh.setVisibility(View.VISIBLE);
 		// btnInvite.setVisibility(View.VISIBLE);
 		fbAsyncRunner.request("me", myProfileListener);
 		fbAsyncRunner.request("me/friends", friendsRequestListener);
-		loginout.setText("logout");
-		btnRefresh.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				Toast.makeText(getApplicationContext(),
-						"Refresh button clicked!", Toast.LENGTH_SHORT).show();
-				refreshFriendStatus();
-			}
-		});
 
 		// for test
 		// btnInvite.setOnClickListener(new OnClickListener() {
@@ -566,7 +593,8 @@ public class ParseStarterProjectActivity extends Activity {
 
 			public void run() {
 				// TODO Auto-generated method stub
-
+				setProgressBarIndeterminateVisibility(Boolean.TRUE);
+				setProgress(0);
 				ParseQuery query = new ParseQuery("User");
 				query.whereContainedIn("facebookId",
 						Arrays.asList(queryFriendsId));
@@ -574,6 +602,7 @@ public class ParseStarterProjectActivity extends Activity {
 				query.findInBackground(new FindCallback() {
 					public void done(List<ParseObject> friendList,
 							ParseException e) {
+						setProgressBarIndeterminateVisibility(Boolean.FALSE);
 						if (e == null) {
 							Log.d(CONSTANT.DEBUG_PARSE, "parse find:");
 							friendsName = new String[friendList.size()];
@@ -725,21 +754,20 @@ public class ParseStarterProjectActivity extends Activity {
 		// 取得內容解析器
 		ContentResolver contentResolver = this.getContentResolver();
 		// 設定你要從電話簿取出的欄位
-//		String[] projection = new String[] { Contacts.People.NAME,
-//				Contacts.People.NUMBER };
+		// String[] projection = new String[] { Contacts.People.NAME,
+		// Contacts.People.NUMBER };
 		Uri uri = Uri.parse("content://contacts/myContactCard");
 		// 取得所有聯絡人
-		Cursor cursor = contentResolver.query( uri,
-				null, null, null, null);
-//		String[] contactsName = new String[cursor.getCount()];
-		Log.d(CONSTANT.DEBUG_TAG,"htc count: "+cursor.getCount());
+		Cursor cursor = contentResolver.query(uri, null, null, null, null);
+		// String[] contactsName = new String[cursor.getCount()];
+		Log.d(CONSTANT.DEBUG_TAG, "htc count: " + cursor.getCount());
 		for (int i = 0; i < cursor.getCount(); i++) {
 			// 移到指定位置
 			cursor.moveToPosition(i);
 			// 取得第一個欄位
-//			contactsName[i] = cursor.getString(0);
-			Log.d(CONSTANT.DEBUG_TAG,"htc content: "+cursor.getString(0));
+			// contactsName[i] = cursor.getString(0);
+			Log.d(CONSTANT.DEBUG_TAG, "htc content: " + cursor.getString(0));
 		}
-//		return contactsName;
+		// return contactsName;
 	}
 }

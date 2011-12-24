@@ -4,45 +4,40 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.Menu;
+import android.support.v4.view.MenuItem;
+import android.support.v4.view.MenuItem.OnMenuItemClickListener;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
+import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
-
 
 import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.AsyncFacebookRunner.RequestListener;
@@ -51,13 +46,10 @@ import com.facebook.android.FacebookError;
 import com.parse.Parse;
 
 import edu.ntu.mobile.smallelephant.ader.CONSTANT;
-import edu.ntu.mobile.smallelephant.ader.ParseStarterProjectActivity;
 import edu.ntu.mobile.smallelephant.ader.R;
-import edu.ntu.mobile.smallelephant.ader.ViewCache;
-import edu.ntu.mobile.smallelephant.ader.R.id;
-import edu.ntu.mobile.smallelephant.ader.R.layout;
 
-public class ChoosingPhoto extends Activity {
+public class ChoosingPhoto extends FragmentActivity {
+	private final int RESET = 2000;
 	public static Facebook facebook = new Facebook("255313284527691");
 	public static AsyncFacebookRunner fbAsyncRunner = new AsyncFacebookRunner(
 			facebook);
@@ -92,6 +84,109 @@ public class ChoosingPhoto extends Activity {
 	int flag=0;
 	int selections=0; 
 	//private ArrayList<String> PhotoURLS = new ArrayList<String>();
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+	    super.onPrepareOptionsMenu(menu);
+	    menu.findItem(RESET).setVisible( flag!=0 );
+	    return true;
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		
+		menu.add(0, RESET, 0,"Reset")
+		.setIcon(R.drawable.ic_menu_revert)
+		.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				// TODO Auto-generated method stub
+				if( flag ==1){
+					resetSelectionByAlbumId(nowalbumid);
+					Toast.makeText(getApplicationContext(),
+							"album "+ nowalbumid + " reset!", Toast.LENGTH_SHORT).show();
+				}
+				return false;
+			}
+		})
+		.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		
+		menu.add("Logout")
+	        .setIcon(R.drawable.ic_menu_set_as)
+	        .setOnMenuItemClickListener(new OnMenuItemClickListener() {
+				
+				@Override
+				public boolean onMenuItemClick(MenuItem item) {
+					// TODO Auto-generated method stub
+//					item.setActionView(R.layout.indeterminate_progress_action);
+					Toast.makeText(getApplicationContext(),
+							"logout button clicked!", Toast.LENGTH_SHORT).show();
+					setResult(CONSTANT.RESULT_LOGOUT);
+					return false;
+				}
+			})
+	        .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+//		
+		menu.add("Start")
+	    .setIcon(R.drawable.ic_title_share_default)
+	    .setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(ChoosingPhoto.this,MyGallery.class);
+				Bundle bundle = new Bundle();
+				
+				int count=0;
+				if(selections==0)
+					Toast.makeText(ChoosingPhoto.this,"Please select some photos.",Toast.LENGTH_SHORT).show();
+				else{
+					for(String albumid: albumIds){
+						ArrayList<PhotoUnit> photounits =photos.get(albumid);
+						for(PhotoUnit p:photounits){
+							if(p.photoselection){
+								bundle.putString("photo"+count,p.photourllarge);
+								count++;
+							}						
+						}
+					}
+					if(count==selections){
+						bundle.putString("selections", ""+selections);
+						intent.putExtras(bundle);
+						startActivity(intent);
+						
+					}
+					else{
+						Log.d("trace","selection count not match!");
+						
+					}
+					
+				}
+				return false;
+			}
+		})
+	    .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS );
+		
+		
+//		menu.add("Refresh")
+//	        .setIcon(R.drawable.ic_refresh)
+//	        .setOnMenuItemClickListener(new OnMenuItemClickListener() {
+//				
+//				@Override
+//				public boolean onMenuItemClick(MenuItem item) {
+//					// TODO Auto-generated method stub
+//					Toast.makeText(getApplicationContext(),
+//							"Refresh button clicked!", Toast.LENGTH_SHORT).show();
+//					refreshFriendStatus();
+//					return false;
+//				}
+//			})
+//	        .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+//		
+		return super.onCreateOptionsMenu(menu);
+	}
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -99,6 +194,7 @@ public class ChoosingPhoto extends Activity {
 		AlbumprogressDialog = ProgressDialog.show(ChoosingPhoto.this, "讀取相簿列表中", "請稍候...", true, false); 
 		AlbumprogressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		
+		getSupportActionBar().setTitle("相簿列表");
 		mimage=(ImageView) findViewById(R.id.arrow);
 		albumgrid = (GridView) findViewById(R.id.AlbumGrid);
 		photogrid = (GridView) findViewById(R.id.PhotoGrid);
@@ -193,9 +289,10 @@ public class ChoosingPhoto extends Activity {
             case 1:
             	Log.d("time","handler begin Tid="+getTaskId());
             	albumgrid.setVisibility(View.GONE);
+            	getSupportActionBar().setTitle("勾選分享照片");
 				photogrid.setVisibility(View.VISIBLE);
             	photogrid.setAdapter(photoAdapter);
-            	PhotoprogressDialog.dismiss();   
+            	PhotoprogressDialog.dismiss();
             	Log.d("time","handler finish Tid="+getTaskId());
             	
                 break;   
@@ -209,7 +306,9 @@ public class ChoosingPhoto extends Activity {
 			ChoosingPhoto.this.runOnUiThread(new Runnable() {
 			    public void run() {
 			    	albumgrid.setVisibility(View.VISIBLE);
+			    	getSupportActionBar().setTitle("相簿列表");
 					photogrid.setVisibility(View.GONE);
+					invalidateOptionsMenu();
 					
 					
 			    }
@@ -281,9 +380,11 @@ public class ChoosingPhoto extends Activity {
 				
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
+					flag=1;//select photo
 					photoAdapter = new PhotoAdapter();
 					PhotoprogressDialog = ProgressDialog.show(ChoosingPhoto.this, "讀取相片中", "請稍候...", true, false); 
 					PhotoprogressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+					invalidateOptionsMenu();
 					final int id=((ImageView)v).getId();
 					Thread mThread = new Thread(new Runnable() {  
 			            
@@ -292,7 +393,6 @@ public class ChoosingPhoto extends Activity {
 			            	Log.d("time","onclick begin Tid=");
 							
 							nowalbumid=albumIds.get(id);
-							flag=1;//select photo
 							/*ChoosingPhoto.this.runOnUiThread(new Runnable() {
 							    public void run() {*/
 							    	
@@ -660,6 +760,14 @@ public class ChoosingPhoto extends Activity {
 		p.photoselection=select;
 		photounit.set(index, p);
 		
+	}
+	void resetSelectionByAlbumId(String albumId){
+		ArrayList<PhotoUnit> album = photos.get( albumId);
+		for( PhotoUnit p : album){
+			p.photoselection = false;
+		}
+		
+		photogrid.invalidateViews();
 	}
 	
 	
