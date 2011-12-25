@@ -112,6 +112,9 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 					@Override
 					public boolean onMenuItemClick(MenuItem item) {
 						// TODO Auto-generated method stub
+						setProgressBarVisibility(true);
+						setProgressBarIndeterminateVisibility(Boolean.TRUE);
+						setProgress(2000);
 						Toast.makeText(getApplicationContext(),
 								"Refresh button clicked!", Toast.LENGTH_SHORT)
 								.show();
@@ -139,11 +142,13 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		requestWindowFeature(Window.FEATURE_PROGRESS);
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		// getContactsName();
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
-		setProgressBarIndeterminateVisibility(Boolean.FALSE);
+		setProgressBarIndeterminateVisibility(Boolean.TRUE);
+		setProgressBarVisibility(true);
 		findViews();
 		// Add your initialization code here
 		// Parse.initialize(this, "your application id goes here",
@@ -594,7 +599,6 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 			public void run() {
 				// TODO Auto-generated method stub
 				setProgressBarIndeterminateVisibility(Boolean.TRUE);
-				setProgress(0);
 				ParseQuery query = new ParseQuery("User");
 				query.whereContainedIn("facebookId",
 						Arrays.asList(queryFriendsId));
