@@ -413,10 +413,10 @@ containing a value of this type.
         public static final int abs__up=0x7f040010;
         public static final int arrow=0x7f040025;
         public static final int begin_image=0x7f040026;
-        public static final int begin_instruction=0x7f040029;
-        public static final int begin_login=0x7f040027;
-        public static final int begin_logout=0x7f04002a;
-        public static final int begin_start=0x7f040028;
+        public static final int begin_instruction=0x7f040028;
+        public static final int begin_login=0x7f04002a;
+        public static final int begin_logout=0x7f040027;
+        public static final int begin_start=0x7f040029;
         public static final int homeAsUp=0x7f040006;
         public static final int instruction_back=0x7f04002e;
         public static final int itemCheckBox=0x7f040021;

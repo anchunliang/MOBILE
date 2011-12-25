@@ -21,7 +21,6 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
-import edu.ntu.mobile.smallelephant.ader.CONSTANT;
 import edu.ntu.mobile.smallelephant.ader.ParseStarterProjectActivity;
 import edu.ntu.mobile.smallelephant.ader.R;
 
@@ -43,14 +42,14 @@ public class beginner extends Activity {
 	public static final String PREF = "SMALL_ELEPHANT_PREF";
 	public static final String PREF_USER_ID = "PARSE_USER_id";
 
-	
+
 	@Override
 	public void onStop() {
-		Log.d(CONSTANT.ERROR_FACEBOOK, "beginner_onStop");
+		Log.d("fbSession", "beginner_onStop");
 		super.onStop();
 	}
 
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -62,9 +61,9 @@ public class beginner extends Activity {
 		logout = (ImageButton)findViewById(R.id.begin_logout);
 		instruction = (ImageButton)findViewById(R.id.begin_instruction);
 		start = (ImageButton)findViewById(R.id.begin_start);
-		
+
 		Log.e("yaya", "yayaya");
-		
+
 		if (ParseStarterProjectActivity.facebook.isSessionValid()) {
 			Log.d("fbSession", "session valid 1");
 			login.setVisibility(View.INVISIBLE);
@@ -77,8 +76,15 @@ public class beginner extends Activity {
 			login.setVisibility(View.VISIBLE);
 			logout.setVisibility(View.INVISIBLE);
 		}
-		
+
 		login.setOnClickListener(loginListener);
+		start.setOnClickListener(new OnClickListener(){
+
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				pass_to_ader();
+			}
+		});
 		logout.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
@@ -99,7 +105,7 @@ public class beginner extends Activity {
 			}
 		});
 	}
-	
+
 	private OnClickListener loginListener = new OnClickListener() {
 
 		public void onClick(View v) {
@@ -125,6 +131,9 @@ public class beginner extends Activity {
 
 							public void onComplete(Bundle values) {
 								// TODO Auto-generated method stub
+								login.setVisibility(View.INVISIBLE);
+								logout.setVisibility(View.VISIBLE);
+								start.setVisibility(View.VISIBLE);
 									pass_to_ader();
 							}
 
@@ -140,7 +149,7 @@ public class beginner extends Activity {
 			}
 		}
 	};
-	
+
 	private RequestListener logoutListener = new RequestListener() {
 
 		public void onMalformedURLException(MalformedURLException e,
@@ -176,8 +185,8 @@ public class beginner extends Activity {
 			});
 		}
 	};
-	
-	
+
+
 	void pass_to_ader(){
 		Intent intent = new Intent(
 				beginner.this,
