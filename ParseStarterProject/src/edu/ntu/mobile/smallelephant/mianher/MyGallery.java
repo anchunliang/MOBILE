@@ -80,7 +80,7 @@ public class MyGallery extends Activity {
         		scoverFlow.setOnItemClickListener(new OnItemClickListener() {
         			public void onItemClick(AdapterView<?> parent, View v,
         					int position, long id) {
-        				//coverFlow.setSelection(position, true);
+        				coverFlow.setSelection(position, true);
         				//coverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT, null);
         			}
         		});
