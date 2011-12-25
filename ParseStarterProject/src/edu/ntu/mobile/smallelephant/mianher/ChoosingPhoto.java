@@ -49,7 +49,10 @@ import edu.ntu.mobile.smallelephant.ader.CONSTANT;
 import edu.ntu.mobile.smallelephant.ader.R;
 
 public class ChoosingPhoto extends FragmentActivity {
+	// the menu button's Id
 	private final int RESET = 2000;
+	private final int SELECTALL = 2001;
+	
 	public static Facebook facebook = new Facebook("255313284527691");
 	public static AsyncFacebookRunner fbAsyncRunner = new AsyncFacebookRunner(
 			facebook);
@@ -89,11 +92,30 @@ public class ChoosingPhoto extends FragmentActivity {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 	    super.onPrepareOptionsMenu(menu);
 	    menu.findItem(RESET).setVisible( flag!=0 );
+//	    menu.findItem(SELECTALL).setVisible(flag!=0);
 	    return true;
 	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		
+//		menu.add(0, SELECTALL, 0,"All")
+////		.setIcon(R.drawable.ic_menu_revert)
+//		.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+//			
+//			@Override
+//			public boolean onMenuItemClick(MenuItem item) {
+//				// TODO Auto-generated method stub
+//				if( flag ==1){
+//					selectAllSelectionByAlbumId(nowalbumid);
+//					Toast.makeText(getApplicationContext(),
+//							"album "+ nowalbumid + " all selected!", Toast.LENGTH_SHORT).show();
+//				}
+//				return false;
+//			}
+//		})
+//		.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+//		
 		
 		menu.add(0, RESET, 0,"Reset")
 		.setIcon(R.drawable.ic_menu_revert)
@@ -103,9 +125,17 @@ public class ChoosingPhoto extends FragmentActivity {
 			public boolean onMenuItemClick(MenuItem item) {
 				// TODO Auto-generated method stub
 				if( flag ==1){
-					resetSelectionByAlbumId(nowalbumid);
-					Toast.makeText(getApplicationContext(),
-							"album "+ nowalbumid + " reset!", Toast.LENGTH_SHORT).show();
+					if( isNoSelectionInAlbum(nowalbumid)){
+						selectAllSelectionByAlbumId(nowalbumid);
+						Toast.makeText(getApplicationContext(),
+								"album "+ nowalbumid + " all selected!", Toast.LENGTH_SHORT).show();
+					}
+					else{
+						resetSelectionByAlbumId(nowalbumid);
+						Toast.makeText(getApplicationContext(),
+								"album "+ nowalbumid + " reset!", Toast.LENGTH_SHORT).show();
+					}
+					
 				}
 				return false;
 			}
@@ -129,7 +159,7 @@ public class ChoosingPhoto extends FragmentActivity {
 	        .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 //		
 		menu.add("Start")
-	    .setIcon(R.drawable.ic_title_share_default)
+	    .setIcon(R.drawable.ic_menu_forward)
 	    .setOnMenuItemClickListener(new OnMenuItemClickListener() {
 			
 			@Override
@@ -754,6 +784,17 @@ public class ChoosingPhoto extends FragmentActivity {
 		else
 			return false;
 	}
+	
+	private boolean isNoSelectionInAlbum(String albumId){
+		ArrayList<PhotoUnit> album = photos.get( albumId);
+		for( PhotoUnit p : album){
+			if( p.photoselection == true){
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	void setselectionbyalbumandposition(String albumid,int index,boolean select){
 		ArrayList<PhotoUnit> photounit=photos.get(albumid);
 		PhotoUnit p =photounit.get(index);
@@ -761,12 +802,23 @@ public class ChoosingPhoto extends FragmentActivity {
 		photounit.set(index, p);
 		
 	}
-	void resetSelectionByAlbumId(String albumId){
+	
+	private void resetSelectionByAlbumId(String albumId){
+		setAllSelectionByAlbumId(albumId, false);
+	}
+	
+	private void selectAllSelectionByAlbumId(String albumId){
+		setAllSelectionByAlbumId(albumId, true);
+	}
+	
+	private void setAllSelectionByAlbumId(String albumId, boolean select){
 		ArrayList<PhotoUnit> album = photos.get( albumId);
 		for( PhotoUnit p : album){
-			p.photoselection = false;
+			if( p.photoselection == !select){
+				p.photoselection = select;
+				selections = selections + (select ? 1: -1);
+			}
 		}
-		selections = 0;
 		photogrid.invalidateViews();
 	}
 	
