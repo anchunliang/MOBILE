@@ -8,7 +8,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.json.JSONArray;
@@ -61,7 +63,7 @@ public class ChoosingPhoto extends FragmentActivity {
 	//albums�d
 	private ArrayList<String> albumIds;
 	private ArrayList<String> albumNames;
-	
+	private Map<String,PhotoAdapter> photoadaptermap;
 	//albums�over photo�rl
 	private ArrayList<String> albumCoverUrls;
 	//������url: 摮�pair ( albumId, album銝剔�����貊��rl)
@@ -224,7 +226,7 @@ public class ChoosingPhoto extends FragmentActivity {
 		setContentView(R.layout.album_main);
 		AlbumprogressDialog = ProgressDialog.show(ChoosingPhoto.this, "讀取相簿列表中", "請稍候...", true, false); 
 		AlbumprogressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		
+		photoadaptermap = new HashMap<String,PhotoAdapter>();
 		getSupportActionBar().setTitle("相簿列表");
 		mimage=(ImageView) findViewById(R.id.arrow);
 		albumgrid = (GridView) findViewById(R.id.AlbumGrid);
@@ -412,12 +414,23 @@ public class ChoosingPhoto extends FragmentActivity {
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
 					flag=1;//select photo
-					photoAdapter = new PhotoAdapter();
-					PhotoprogressDialog = ProgressDialog.show(ChoosingPhoto.this, "讀取相片中", "請稍候...", true, false); 
-					PhotoprogressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-					invalidateOptionsMenu();
 					final int id=((ImageView)v).getId();
-					Thread mThread = new Thread(new Runnable() {  
+					invalidateOptionsMenu();
+					if(photoadaptermap.containsKey(albumIds.get(id))){
+						nowalbumid=albumIds.get(id);
+						photoAdapter=photoadaptermap.get(albumIds.get(id));
+						albumgrid.setVisibility(View.GONE);
+		            	getSupportActionBar().setTitle("勾選分享照片");
+						photogrid.setVisibility(View.VISIBLE);
+		            	photogrid.setAdapter(photoAdapter);
+					}
+					else{
+						photoAdapter = new PhotoAdapter();
+						PhotoprogressDialog = ProgressDialog.show(ChoosingPhoto.this, "讀取相片中", "請稍候...", true, false); 
+						PhotoprogressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+						//invalidateOptionsMenu();
+					
+						Thread mThread = new Thread(new Runnable() {  
 			            
 			            public void run() {  
 			                  
@@ -437,17 +450,18 @@ public class ChoosingPhoto extends FragmentActivity {
 							    	}
 							    	//photoAdapter.notifyDataSetChanged();
 							    	Log.d("time","onclick finish Tid="+getTaskId());
+							    	photoadaptermap.put(nowalbumid,photoAdapter);
 							    	Message msg = new Message();  
 					                msg.what = 1;  
 					                mHandler.sendMessage(msg);  
 							   // }
 							//});
-							Log.d("trace","image onclick"); 
-			            }  
-			        });  
-			        mThread.start();  
+					                Log.d("trace","image onclick"); 
+			            	}  
+			        	});  
+			        	mThread.start();  
 					//photoAdapter = new PhotoAdapter();
-					
+					}
 					
 				}
 			});
