@@ -153,6 +153,7 @@ public class ChoosingPhoto extends FragmentActivity {
 					Toast.makeText(getApplicationContext(),
 							"logout button clicked!", Toast.LENGTH_SHORT).show();
 					setResult(CONSTANT.RESULT_LOGOUT);
+					finish();
 					return false;
 				}
 			})
