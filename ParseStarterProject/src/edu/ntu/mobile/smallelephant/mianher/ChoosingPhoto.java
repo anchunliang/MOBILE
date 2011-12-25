@@ -519,7 +519,7 @@ public class ChoosingPhoto extends FragmentActivity {
 			holder.checkbox.setId(position);
 			holder.imageview.setId(position);
 			holder.mtextview.setId(position);
-			holder.mtextview.setVisibility(View.INVISIBLE);
+			holder.mtextview.setVisibility(View.GONE);
 			if (getselectionbyalbumandposition(nowalbumid,position)){
 				holder.checkbox.setChecked(true);
 				//Toast.makeText(MyCustomActivity.this, "onClick", Toast.LENGTH_SHORT).show();
@@ -769,6 +769,8 @@ public class ChoosingPhoto extends FragmentActivity {
 					p.photoselection=false;
 					p.photourlsmall="https://graph.facebook.com/" + photoId+ "/picture?type=thumbnail&access_token=" + accessToken;
 					p.photourllarge="https://graph.facebook.com/" + photoId+ "/picture?type=normal&access_token=" + accessToken;
+					//p.photourllarge="https://graph.facebook.com/" + photoId+ "/picture?type=album&access_token=" + accessToken;
+					
 					albumPhotos.add(p);
 					Log.d("facebookURL","album "+ (String)state+"  photo: "+ i +"  https://graph.facebook.com/" + photoId
 							+ "/picture?type=thumbnail&access_token=" + accessToken);

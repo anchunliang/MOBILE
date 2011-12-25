@@ -58,12 +58,12 @@ public class MyGallery extends Activity {
 	static sImageAdapter scoverImageAdapter; 
 	private ProgressDialog progressDialog;
 	int selections;
-	
+	ArrayList<Drawable> drawablesFromUrl;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.gallery);
-		
+		drawablesFromUrl = new ArrayList<Drawable>();	
 		coverImageAdapter = new ImageAdapter(this);
 		scoverImageAdapter= new sImageAdapter(this);
 		coverFlow = (CoverFlow) findViewById(R.id.Gallery);
@@ -144,8 +144,9 @@ public class MyGallery extends Activity {
         		 * scoverImageAdapter.notifyDataSetChanged(); } });
         		 */
         		for (String url : PhotoURLS) {
-        			coverImageAdapter.addItem(LoadImageFromURL(url));
-        			scoverImageAdapter.addItem(LoadImageFromURL(url));
+        			Drawable d=LoadImageFromURL(url);
+        			coverImageAdapter.addItem(d);
+        			//scoverImageAdapter.addItem(d);
         		}
         		coverImageAdapter.notifyDataSetChanged();
         		scoverImageAdapter.notifyDataSetChanged();
@@ -184,10 +185,10 @@ public class MyGallery extends Activity {
 	public class ImageAdapter extends BaseAdapter {
 		int mGalleryItemBackground;
 		Context mContext;
-		ArrayList<Drawable> drawablesFromUrl = new ArrayList<Drawable>();
 		FileInputStream fis;
 
 		public ImageAdapter(Context c) {
+			
 			mContext = c;
 
 		}
@@ -281,8 +282,8 @@ public class MyGallery extends Activity {
 			i.setScaleType(ImageView.ScaleType.FIT_CENTER/* CENTER_INSIDE */);
 
 			// Make sure we set anti-aliasing otherwise we get jaggies
-			BitmapDrawable drawable = (BitmapDrawable) i.getDrawable();
-			drawable.setAntiAlias(true);
+			/*BitmapDrawable drawable = (BitmapDrawable) i.getDrawable();
+			drawable.setAntiAlias(true);*/
 			return i;
 
 			// return mImages[position];
@@ -320,8 +321,8 @@ public class MyGallery extends Activity {
 			// i.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
 			// Make sure we set anti-aliasing otherwise we get jaggies
-			BitmapDrawable drawable = (BitmapDrawable) i.getDrawable();
-			drawable.setAntiAlias(true);
+			//BitmapDrawable drawable = (BitmapDrawable) i.getDrawable();
+			//drawable.setAntiAlias(true);
 			return i;
 
 			// return mImages[position];
@@ -357,9 +358,12 @@ public class MyGallery extends Activity {
 		}
 		return null;
 		*/
+		
 		try{
 			InputStream is = (InputStream) new URL(url).getContent();
 			Drawable d = Drawable.createFromStream(is, "src name");
+			//d.setBounds(0, 0, 800, 480);
+			//System.gc();
 			return d;
 		}
 		catch (Exception e) {

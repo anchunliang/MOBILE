@@ -5,7 +5,7 @@
 	<GridView
 	    android:id="@+id/AlbumGrid"
 	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
+	    android:layout_height="fill_parent"
 	    android:columnWidth="90dp"
 	    android:gravity="center"
 	    android:horizontalSpacing="10dp"
@@ -15,7 +15,7 @@
 	<GridView
 	    android:id="@+id/PhotoGrid"
 	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
+	    android:layout_height="fill_parent"
 	    android:columnWidth="90dp"
 	    android:gravity="center"
 	    android:horizontalSpacing="10dp"
