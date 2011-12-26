@@ -244,30 +244,6 @@ public class ChoosingPhoto extends FragmentActivity {
 		albumgrid = (GridView) findViewById(R.id.AlbumGrid);
 		photogrid = (GridView) findViewById(R.id.PhotoGrid);
 		mimage.setOnClickListener(new OnClickListener() {
-			/*public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				Log.d(CONSTANT.DEBUG_TAG, "findViews: item clicked");
-				ViewCache vc = (ViewCache) view.getTag();
-				if (vc.getButton().isChecked()) {
-					Intent intent = new Intent(
-							ParseStarterProjectActivity.this,
-							ChoosingPhoto.class);
-					Bundle bundle = new Bundle();
-					bundle.putString("accessToken", facebook.getAccessToken());
-					bundle.putString("myId", myId);
-					Log.d(CONSTANT.DEBUG_FACEBOOK, "myId was: " + myId);
-					bundle.putString("myName", myName);
-					bundle.putString("friendId", vc.id);
-					bundle.putString("friendIp", vc.ip);
-					intent.putExtras(bundle);
-					startActivity(intent);
-				} else {
-					Toast.makeText(ParseStarterProjectActivity.this,
-							"the person you selected is offline!",
-							Toast.LENGTH_SHORT).show();
-				}
-			}*/
-
 			public void onClick(View arg0) {
 				
 				

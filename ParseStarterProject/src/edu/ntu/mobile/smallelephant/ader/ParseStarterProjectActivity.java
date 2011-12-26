@@ -88,7 +88,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 	private static final int CHOOSING_PHOTO = 0;
 	private String parse_user_id = null;
 	ImageAndTextListAdapter adapter = null;
-	private static int serverport = 5055;
+	private static int serverport = 5050;
 	private static ServerSocket serverSocket;
 	private static Socket remoteSocket;
 
@@ -280,8 +280,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 				Log.d(CONSTANT.DEBUG_FACEBOOK,
 						"login onclick : session invalid");
 				facebook.authorize(ParseStarterProjectActivity.this,
-						new String[] { "read_friendlists", "user_about_me",
-								"user_photos", "friends_photos" },
+						new String[] { "read_friendlists", "user_about_me","user_photos", "friends_photos" },
 						Facebook.FORCE_DIALOG_AUTH, new DialogListener() {
 
 							public void onFacebookError(final FacebookError e) {
