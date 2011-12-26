@@ -1,10 +1,16 @@
 package edu.ntu.mobile.smallelephant.mianher;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,6 +79,7 @@ public class ChoosingPhoto extends FragmentActivity {
 	String myId;
 	String myName;
 	String friendId;
+	String friendIp;
 	String nowalbumid;
 //	String friendIds[];
 	private int count;
@@ -88,6 +95,9 @@ public class ChoosingPhoto extends FragmentActivity {
 	private ProgressDialog PhotoprogressDialog;
 	int flag=0;
 	int selections=0; 
+	Socket clientSocket;
+	Intent intent1;
+	Bundle bundle1;
 	//private ArrayList<String> PhotoURLS = new ArrayList<String>();
 	
 	@Override
@@ -226,6 +236,8 @@ public class ChoosingPhoto extends FragmentActivity {
 		setContentView(R.layout.album_main);
 		AlbumprogressDialog = ProgressDialog.show(ChoosingPhoto.this, "讀取相簿列表中", "請稍候...", true, false); 
 		AlbumprogressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		intent1 = new Intent(ChoosingPhoto.this,MyGallery.class);
+		bundle1 = new Bundle();
 		photoadaptermap = new HashMap<String,PhotoAdapter>();
 		getSupportActionBar().setTitle("相簿列表");
 		mimage=(ImageView) findViewById(R.id.arrow);
@@ -257,23 +269,56 @@ public class ChoosingPhoto extends FragmentActivity {
 			}*/
 
 			public void onClick(View arg0) {
-				Intent intent = new Intent(ChoosingPhoto.this,MyGallery.class);
-				Bundle bundle = new Bundle();
 				
-				int count=0;
+				
 				if(selections==0)
 					Toast.makeText(ChoosingPhoto.this,"Please select some photos.",Toast.LENGTH_SHORT).show();
 				else{
-					for(String albumid: albumIds){
-						ArrayList<PhotoUnit> photounits =photos.get(albumid);
-						for(PhotoUnit p:photounits){
-							if(p.photoselection){
-								bundle.putString("photo"+count,p.photourllarge);
-								count++;
-							}						
+					Thread t = new Thread(new Runnable() {
+						public void run() {
+					try{
+						
+						InetAddress serverIp;
+						int count=0;
+						serverIp = InetAddress.getByName(friendIp);
+						int serverPort = 5055;
+						clientSocket = new Socket(serverIp, serverPort);
+						BufferedWriter bw;
+						bw = new BufferedWriter( new OutputStreamWriter(clientSocket.getOutputStream()));
+						
+						// �g�J�T��
+						//bw.write(EditText01.getText()+":"+EditText02.getText()+"\n");
+						
+						// �ߧY�o�e
+						//bw.flush();
+						for(String albumid: albumIds){
+							ArrayList<PhotoUnit> photounits =photos.get(albumid);
+							for(PhotoUnit p:photounits){
+								if(p.photoselection){
+									bundle1.putString("photo"+count,p.photourllarge);
+									bw.write(p.photourllarge+"\n");
+									bw.flush();
+									Log.d("network","write: "+p.photourllarge+"\n");
+									count++;
+								}						
+							}
+							
 						}
+						bw.write("end\n");
+						bw.flush();
+						Log.d("network","end"+"\n");
+						Message msg = new Message();  
+		                msg.what = 2;  
+		                mHandler.sendMessage(msg);  
 					}
-					if(count==selections){
+					
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+					}
+					});
+					t.start();
+					/*if(count==selections){
 						bundle.putString("selections", ""+selections);
 						intent.putExtras(bundle);
 						startActivity(intent);
@@ -282,7 +327,7 @@ public class ChoosingPhoto extends FragmentActivity {
 					else{
 						Log.d("trace","selection count not match!");
 						
-					}
+					}*/
 					
 				}
 					
@@ -327,7 +372,11 @@ public class ChoosingPhoto extends FragmentActivity {
             	photogrid.setAdapter(photoAdapter);
             	PhotoprogressDialog.dismiss();
             	Log.d("time","handler finish Tid="+getTaskId());
-            	
+            	break; 
+            case 2:
+            	bundle1.putString("selections", ""+selections);
+				intent1.putExtras(bundle1);
+				startActivity(intent1);
                 break;   
             }  
         }  
@@ -635,6 +684,7 @@ public class ChoosingPhoto extends FragmentActivity {
 		Log.d("facebookURL","myId is: "+myId);
 		myName = bundle.getString("myName");
 		friendId = bundle.getString("friendId");
+		friendIp = bundle.getString("friendIp");
 //		Integer count = Integer.valueOf(bundle.getString("numSelectedFriends"));
 //		friendIds = new String[count];
 //		for (int i = 0; i < count; i++) {

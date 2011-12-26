@@ -51,11 +51,11 @@ public class MyGallery extends Activity {
 	/** Called when the activity is first created. */
 	//public static Facebook facebook = new Facebook("255313284527691");
 	//public static AsyncFacebookRunner fbAsyncRunner = new AsyncFacebookRunner(facebook);
-	static CoverFlow coverFlow;
-	static CoverFlow scoverFlow;
+	CoverFlow coverFlow;
+	CoverFlow scoverFlow;
 	private ArrayList<String> PhotoURLS = new ArrayList<String>();
-	static ImageAdapter coverImageAdapter;
-	static sImageAdapter scoverImageAdapter; 
+	ImageAdapter coverImageAdapter;
+	sImageAdapter scoverImageAdapter; 
 	private ProgressDialog progressDialog;
 	int selections;
 	ArrayList<Drawable> drawablesFromUrl;
@@ -381,4 +381,16 @@ public class MyGallery extends Activity {
 			PhotoURLS.add(url);		
 		}
 	};
+	/*public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+			// do something on back.
+			coverImageAdapter=null;
+			scoverImageAdapter=null;
+			System.gc();
+			return super.onKeyDown(keyCode, event);
+		}
+			
+
+		return super.onKeyDown(keyCode, event);
+	}*/
 }
