@@ -113,7 +113,7 @@ public class MyGallery extends Activity {
 		scoverImageAdapter= new sImageAdapter(this);
 		coverFlow = (CoverFlow) findViewById(R.id.Gallery);
 		scoverFlow = (CoverFlow) findViewById(R.id.sGallery);
-		progressDialog = ProgressDialog.show(MyGallery.this, "�?��?��?Gallery", "請�?�?.", true, false); 
+		progressDialog = ProgressDialog.show(MyGallery.this, "正在生成Gallery中", "請稍候...", true, false); 
 		progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		coverFlow.setAdapter(coverImageAdapter);
 		scoverFlow.setAdapter(scoverImageAdapter);
@@ -537,7 +537,7 @@ public class MyGallery extends Activity {
 //								friendPhotosToShare.add(i, data.getString("photo"+i));
 							}
 						}
-						Toast.makeText(MyGallery.this, friendName+ "?�好了照??",
+						Toast.makeText(MyGallery.this, friendName+ " 選好了照片",
 								Toast.LENGTH_SHORT).show();
 					} catch (Exception e) {
 						// TODO: handle exception
