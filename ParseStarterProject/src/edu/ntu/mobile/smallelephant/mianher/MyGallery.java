@@ -521,7 +521,12 @@ public class MyGallery extends Activity {
 //						friendPhotosToShare = new ArrayList<String>();
 						if( count != null && count >0){
 							for( int i = 0; i < count; i++){
-									PhotoURLS.add(data.getString("photo"+i));		
+								Drawable d=LoadImageFromURL(data.getString("photo"+i));
+			        			coverImageAdapter.addItem(d);
+			        			Message msg = new Message(); 
+			    				msg.what = 1;  
+			    				mHandler.sendMessage(msg);
+									//PhotoURLS.add(data.getString("photo"+i));		
 //								friendPhotosToShare.add(i, data.getString("photo"+i));
 							}
 						}
