@@ -508,6 +508,8 @@ public class MyGallery extends Activity {
 					e.getStackTrace();
 				}
 				if( title.equals("cancel")){
+					Toast.makeText(MyGallery.this, friendName+ "離開",
+							Toast.LENGTH_SHORT).show();
 					onFriendAbortAlert();
 					finish();
 				}
@@ -521,6 +523,8 @@ public class MyGallery extends Activity {
 //								friendPhotosToShare.add(i, data.getString("photo"+i));
 							}
 						}
+						Toast.makeText(MyGallery.this, friendName+ "選好了照片!",
+								Toast.LENGTH_SHORT).show();
 					} catch (Exception e) {
 						// TODO: handle exception
 						e.getStackTrace();
@@ -549,7 +553,9 @@ public class MyGallery extends Activity {
 					e.getStackTrace();
 				}
 				if( title.equals("cancel")){
-					onFriendAbortAlert();					
+					onFriendAbortAlert();
+					Toast.makeText(MyGallery.this, friendName+ "離開",
+							Toast.LENGTH_SHORT).show();
 				}
 				else if ( title.equals("scover")){
 					String message = null;

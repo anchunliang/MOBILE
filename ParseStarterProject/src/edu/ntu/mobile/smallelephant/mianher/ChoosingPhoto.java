@@ -1048,9 +1048,13 @@ public class ChoosingPhoto extends FragmentActivity {
 					e.getStackTrace();
 				}
 				if( title.equals("cancel")){
+					Toast.makeText(ChoosingPhoto.this, friendName+ "離開!",
+							Toast.LENGTH_SHORT).show();
 					onFriendAbortAlert();
 				}
 				if( title.equals("finish")){
+					Toast.makeText(ChoosingPhoto.this, friendName+ "選好了照片!",
+					Toast.LENGTH_SHORT).show();
 					try {
 						Integer count = data.getInt("count");
 						friendPhotosToShare = new ArrayList<String>();
