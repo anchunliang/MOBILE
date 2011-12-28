@@ -509,6 +509,7 @@ public class MyGallery extends Activity {
 					// TODO: handle exception
 					e.getStackTrace();
 				}
+				Log.d(CONSTANT.DEBUG_BROADCAST, "choosing Listener >>" +  data.toString());
 				if( title.equals("cancel")){
 					Toast.makeText(MyGallery.this, friendName+ "離開",
 							Toast.LENGTH_SHORT).show();
@@ -554,6 +555,7 @@ public class MyGallery extends Activity {
 					// TODO: handle exception
 					e.getStackTrace();
 				}
+				Log.d(CONSTANT.DEBUG_BROADCAST, "choosing Listener >>" +  data.toString());
 				if( title.equals("cancel")){
 					onFriendAbortAlert();
 					Toast.makeText(MyGallery.this, friendName+ "離開",
