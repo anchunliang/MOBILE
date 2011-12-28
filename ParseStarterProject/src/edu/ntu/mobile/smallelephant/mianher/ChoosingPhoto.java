@@ -149,13 +149,13 @@ public class ChoosingPhoto extends FragmentActivity {
 								selectAllSelectionByAlbumId(nowalbumid);
 								Toast.makeText(
 										getApplicationContext(),
-										"album " + nowalbumid
-												+ " all selected!",
+										"Album \"" + albumNames.get(albumIds.indexOf(nowalbumid))
+												+ "\" all selected!",
 										Toast.LENGTH_SHORT).show();
 							} else {
 								resetSelectionByAlbumId(nowalbumid);
 								Toast.makeText(getApplicationContext(),
-										"album " + nowalbumid + " reset!",
+										"Album \"" + albumNames.get(albumIds.indexOf(nowalbumid)) + "\" reset!",
 										Toast.LENGTH_SHORT).show();
 							}
 
@@ -208,6 +208,7 @@ public class ChoosingPhoto extends FragmentActivity {
 								}
 							}
 							if (count == selections) {
+								Log.d("trace", "selections="+selections);
 								bundle.putString("selections", "" + selections);
 								intent.putExtras(bundle);
 								startActivity(intent);
@@ -245,12 +246,12 @@ public class ChoosingPhoto extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.album_main);
 		AlbumprogressDialog = ProgressDialog.show(ChoosingPhoto.this,
-				"=(", "=(", true, false);
+				"讀取相簿列表中", "請稍候...", true, false);
 		AlbumprogressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		intent1 = new Intent(ChoosingPhoto.this,MyGallery.class);
 		bundle1 = new Bundle();
 		photoadaptermap = new HashMap<String,PhotoAdapter>();
-		getSupportActionBar().setTitle("?�簿?�表");
+		getSupportActionBar().setTitle("相簿列表");
 		mimage = (ImageView) findViewById(R.id.arrow);
 		mimage.setVisibility(View.GONE);
 		albumgrid = (GridView) findViewById(R.id.AlbumGrid);
@@ -355,7 +356,7 @@ public class ChoosingPhoto extends FragmentActivity {
 			case 1:
 				Log.d("time", "handler begin Tid=" + getTaskId());
 				albumgrid.setVisibility(View.GONE);
-				getSupportActionBar().setTitle("?�選?�享?��?");
+				getSupportActionBar().setTitle("勾選分享相片");
 				photogrid.setVisibility(View.VISIBLE);
             	photogrid.setAdapter(photoAdapter);
             	PhotoprogressDialog.dismiss();
@@ -377,7 +378,7 @@ public class ChoosingPhoto extends FragmentActivity {
 			ChoosingPhoto.this.runOnUiThread(new Runnable() {
 				public void run() {
 					albumgrid.setVisibility(View.VISIBLE);
-					getSupportActionBar().setTitle("?�簿?�表");
+					getSupportActionBar().setTitle("相簿列表");
 					photogrid.setVisibility(View.GONE);
 					invalidateOptionsMenu();
 
@@ -458,13 +459,13 @@ public class ChoosingPhoto extends FragmentActivity {
 						nowalbumid = albumIds.get(id);
 						photoAdapter = photoadaptermap.get(albumIds.get(id));
 						albumgrid.setVisibility(View.GONE);
-						getSupportActionBar().setTitle("?�選?�享?��?");
+						getSupportActionBar().setTitle("勾選分享相片");
 						photogrid.setVisibility(View.VISIBLE);
 						photogrid.setAdapter(photoAdapter);
 					} else {
 						photoAdapter = new PhotoAdapter();
 						PhotoprogressDialog = ProgressDialog.show(
-								ChoosingPhoto.this, " =((", "=(((", true,
+								ChoosingPhoto.this, "讀取相片中", "請稍候...", true,
 								false);
 						PhotoprogressDialog
 								.setProgressStyle(ProgressDialog.STYLE_SPINNER);

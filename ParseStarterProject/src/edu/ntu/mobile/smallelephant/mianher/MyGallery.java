@@ -68,7 +68,7 @@ public class MyGallery extends Activity {
 		scoverImageAdapter= new sImageAdapter(this);
 		coverFlow = (CoverFlow) findViewById(R.id.Gallery);
 		scoverFlow = (CoverFlow) findViewById(R.id.sGallery);
-		progressDialog = ProgressDialog.show(MyGallery.this, "正在生成Gallery", "請稍候...", true, false); 
+		progressDialog = ProgressDialog.show(MyGallery.this, "正在生成Gallery中", "請稍候...", true, false); 
 		progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
        // mThread.start();  
         Thread mThread = new Thread(new Runnable() {  
