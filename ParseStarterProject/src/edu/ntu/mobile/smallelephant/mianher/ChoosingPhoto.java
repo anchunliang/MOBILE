@@ -142,9 +142,9 @@ public class ChoosingPhoto extends FragmentActivity {
 			// TODO: handle exception
 			e.getStackTrace();
 		}
-		Toast.makeText(ChoosingPhoto.this,
-				"cancel >> data : "+ data.toString(),
-				Toast.LENGTH_SHORT).show();
+//		Toast.makeText(ChoosingPhoto.this,
+//				"cancel >> data : "+ data.toString(),
+//				Toast.LENGTH_SHORT).show();
 		push.setData(data);
 		push.sendInBackground();
 		super.onDestroy();
@@ -259,6 +259,7 @@ public class ChoosingPhoto extends FragmentActivity {
 										count++;
 									}
 								}
+								
 							}
 							if (count == selections) {
 								ParsePush push = new ParsePush();
@@ -277,9 +278,9 @@ public class ChoosingPhoto extends FragmentActivity {
 									// TODO: handle exception
 									e.getStackTrace();
 								}
-								Toast.makeText(ChoosingPhoto.this,
-										"finish >> data : "+ data.toString(),
-										Toast.LENGTH_SHORT).show();
+//								Toast.makeText(ChoosingPhoto.this,
+//										"finish >> data : "+ data.toString(),
+//										Toast.LENGTH_SHORT).show();
 								push.setData(data);
 								push.sendInBackground();
 								
