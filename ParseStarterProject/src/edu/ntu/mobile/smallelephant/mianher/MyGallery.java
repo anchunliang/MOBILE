@@ -578,7 +578,8 @@ public class MyGallery extends Activity {
 					}
 					
 				}
-				else if ( title.equals("coverflip")){
+				else if ( title.equals("coversetposition")){
+				
 					int position = coverFlow.getSelectedItemPosition();
 					try{
 						position = data.getInt("message");
@@ -587,7 +588,7 @@ public class MyGallery extends Activity {
 					}
 					coverFlow.setSelection(position);
 				}
-				else if ( title.equals("coversetposition")){
+				else if ( title.equals("coverflip")){
 					int position = coverFlow.getSelectedItemPosition();
 					try{
 						position = data.getInt("message");
