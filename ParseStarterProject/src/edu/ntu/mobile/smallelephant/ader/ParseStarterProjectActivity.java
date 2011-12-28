@@ -287,6 +287,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 				ViewCache vc = (ViewCache) view.getTag();
 				if (vc.getButton().isChecked()) {
 					// push notification
+					myStatus = CONSTANT.STATE_WAITING;
 					ParsePush push = new ParsePush();
 					push.setChannel(PARSE_CHANNEL_TAG+vc.id);
 					JSONObject data = new JSONObject();
@@ -686,6 +687,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 	}
 
 	private void refreshFriendStatus() {
+		myStatus = CONSTANT.STATE_FREE;
 		setUserList(FBfriendsId);
 		// if (listViewFriends != null && listViewFriends.getAdapter() != null)
 		// {

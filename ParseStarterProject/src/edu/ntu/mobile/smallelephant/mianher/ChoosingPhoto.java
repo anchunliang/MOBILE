@@ -935,21 +935,20 @@ public class ChoosingPhoto extends FragmentActivity {
 //	private void onInvitationAlert(final String friendId)
 //    {
 //        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setMessage( friendId+" wants to share photo with you!").setCancelable(
-//                false).setPositiveButton("Share",
-//                new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                    	myStatus = CONSTANT.STATE_SHARING;
-//                    	goChoosingPhoto(friendId);
-//                        dialog.cancel();
-//                    }
-//                }).setNegativeButton("Cancel",
-//                new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                    	myStatus = CONSTANT.STATE_FREE;
-//                        dialog.cancel();
-//                    }
-//                });
+//        builder.setMessage( friendName+" wants to share photo with you!").setCancelable(
+//                false).set
+//                
+////                .setsetPositiveButton("Share",
+////                new DialogInterface.OnClickListener() {
+////                    public void onClick(DialogInterface dialog, int id) {
+////                        dialog.cancel();
+////                    }
+////                }).setNegativeButton("Cancel",
+////                new DialogInterface.OnClickListener() {
+////                    public void onClick(DialogInterface dialog, int id) {
+////                        dialog.cancel();
+////                    }
+////                });
 //        AlertDialog alert = builder.create();
 //        alert.show();
 //    }
