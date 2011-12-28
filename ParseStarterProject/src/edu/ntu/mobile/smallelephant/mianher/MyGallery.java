@@ -62,6 +62,8 @@ public class MyGallery extends Activity {
 		scoverFlow = (CoverFlow) findViewById(R.id.sGallery);
 		progressDialog = ProgressDialog.show(MyGallery.this, "正在生成Gallery", "請稍候...", true, false); 
 		progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		coverFlow.setAdapter(coverImageAdapter);
+		scoverFlow.setAdapter(scoverImageAdapter);
        // mThread.start();  
         Thread mThread = new Thread(new Runnable() {  
             
@@ -135,16 +137,38 @@ public class MyGallery extends Activity {
         		 * coverImageAdapter.notifyDataSetChanged();
         		 * scoverImageAdapter.notifyDataSetChanged(); } });
         		 */
+        		coverFlow.setSpacing(-25);
+        		scoverFlow.setSpacing(-25);
+        		coverFlow.setSelection(0, true);
+        		scoverFlow.setSelection(0, true);
+        		coverFlow.setAnimationDuration(1000);
+        		scoverFlow.setAnimationDuration(1000);
+                int i=0;
         		for (String url : PhotoURLS) {
+        			
         			Drawable d=LoadImageFromURL(url);
         			coverImageAdapter.addItem(d);
-        			//scoverImageAdapter.addItem(d);
+        			
+        			if(i%10==9){
+        				Message msg = new Message(); 
+        				msg.what = 1;  
+        				mHandler.sendMessage(msg);
+        			}
+                    if(i==4){
+                    	Message msg = new Message(); 
+        				msg.what = 1;  
+        				mHandler.sendMessage(msg);
+                    	msg = new Message(); 
+                		msg.what = 0;  
+                        mHandler.sendMessage(msg);
+                    }
+                    i++;
         		}
-        		coverImageAdapter.notifyDataSetChanged();
-        		scoverImageAdapter.notifyDataSetChanged();
-        		Message msg = new Message();  
-                msg.what = 0;  
-                mHandler.sendMessage(msg);
+        		Message msg = new Message(); 
+				msg.what = 1;  
+				mHandler.sendMessage(msg);
+        		
+        		
            }  
              
         });  
@@ -161,16 +185,12 @@ public class MyGallery extends Activity {
         public void handleMessage(Message msg){  
             switch (msg.what) {  
             case 0:  
-            	coverFlow.setAdapter(coverImageAdapter);
-        		scoverFlow.setAdapter(scoverImageAdapter);
-        		coverFlow.setSpacing(-25);
-        		scoverFlow.setSpacing(-25);
-        		coverFlow.setSelection(0, true);
-        		scoverFlow.setSelection(0, true);
-        		coverFlow.setAnimationDuration(1000);
-        		scoverFlow.setAnimationDuration(1000);
             	progressDialog.dismiss();   
                 break;    
+            case 1:
+            	coverImageAdapter.notifyDataSetChanged();
+    			scoverImageAdapter.notifyDataSetChanged();
+            	break;
             }  
         }
     };
