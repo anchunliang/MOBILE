@@ -1,10 +1,16 @@
 package edu.ntu.mobile.smallelephant.mianher;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,21 +64,22 @@ public class ChoosingPhoto extends FragmentActivity {
 	public static Facebook facebook = new Facebook("255313284527691");
 	public static AsyncFacebookRunner fbAsyncRunner = new AsyncFacebookRunner(
 			facebook);
-	// ï¿½è²Šå€ï¿½ï„“ï¿½ï¿½ï¿½everyone, custom, private...
+	// ï¿½è??ï¿½?“ï¿½ï¿½ï¿½everyone, custom, private...
 	private List<String> ALBUMPRIVACY = Arrays.asList("everyone");
 	// albumsï¿½ï‚¸d
 	private ArrayList<String> albumIds;
 	private ArrayList<String> albumNames;
 	private Map<String, PhotoAdapter> photoadaptermap;
-	// albumsï¿½ï‚²over photoï¿½ïƒ„rl
+	// albumsï¿½ï‚²over photoï¿½ï?rl
 	private ArrayList<String> albumCoverUrls;
-	// ï¿½ï¿½ï¿½ï¿½ï„”î­ ï¿½ï‹«ï¿½url: æ‘®î¦¹ï¿½pair ( albumId, albuméŠå‰”ï¿½ï¿½ï¿½ï¿½ï¿½è²Šï¿½ï¿½ïƒ„rl)
+	// ï¿½ï¿½ï¿½ï¿½?”î?ï¿½ï‹«ï¿½url: ?®î¦¹ï¿½pair ( albumId, album?å?ï¿½ï¿½ï¿½ï¿½ï¿½è?ï¿½ï¿½?„rl)
 	private TreeMap<String, ArrayList<PhotoUnit>> photos;
 	// private TreeMap<String,ArrayList<Boolean>> photoselection;
 	String accessToken;
 	String myId;
 	String myName;
 	String friendId;
+	String friendIp;
 	String nowalbumid;
 	// String friendIds[];
 	private int count;
@@ -86,11 +93,13 @@ public class ChoosingPhoto extends FragmentActivity {
 	ImageView mimage;
 	private ProgressDialog AlbumprogressDialog;
 	private ProgressDialog PhotoprogressDialog;
-	int flag = 0;
-	int selections = 0;
-
-	// private ArrayList<String> PhotoURLS = new ArrayList<String>();
-
+	int flag=0;
+	int selections=0; 
+	Socket clientSocket;
+	Intent intent1;
+	Bundle bundle1;
+	//private ArrayList<String> PhotoURLS = new ArrayList<String>();
+	
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
@@ -236,62 +245,80 @@ public class ChoosingPhoto extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.album_main);
 		AlbumprogressDialog = ProgressDialog.show(ChoosingPhoto.this,
-				"è®€å–ç›¸ç°¿åˆ—è¡¨ä¸­", "è«‹ç¨å€™...", true, false);
+				"è®???¸ç°¿?—è¡¨ä¸?, "è«‹ç???..", true, false);
 		AlbumprogressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		photoadaptermap = new HashMap<String, PhotoAdapter>();
-		getSupportActionBar().setTitle("ç›¸ç°¿åˆ—è¡¨");
+		intent1 = new Intent(ChoosingPhoto.this,MyGallery.class);
+		bundle1 = new Bundle();
+		photoadaptermap = new HashMap<String,PhotoAdapter>();
+		getSupportActionBar().setTitle("?¸ç°¿?—è¡¨");
 		mimage = (ImageView) findViewById(R.id.arrow);
 		mimage.setVisibility(View.GONE);
 		albumgrid = (GridView) findViewById(R.id.AlbumGrid);
 		photogrid = (GridView) findViewById(R.id.PhotoGrid);
 		mimage.setOnClickListener(new OnClickListener() {
-			/*
-			 * public void onItemClick(AdapterView<?> parent, View view, int
-			 * position, long id) { Log.d(CONSTANT.DEBUG_TAG,
-			 * "findViews: item clicked"); ViewCache vc = (ViewCache)
-			 * view.getTag(); if (vc.getButton().isChecked()) { Intent intent =
-			 * new Intent( ParseStarterProjectActivity.this,
-			 * ChoosingPhoto.class); Bundle bundle = new Bundle();
-			 * bundle.putString("accessToken", facebook.getAccessToken());
-			 * bundle.putString("myId", myId); Log.d(CONSTANT.DEBUG_FACEBOOK,
-			 * "myId was: " + myId); bundle.putString("myName", myName);
-			 * bundle.putString("friendId", vc.id); bundle.putString("friendIp",
-			 * vc.ip); intent.putExtras(bundle); startActivity(intent); } else {
-			 * Toast.makeText(ParseStarterProjectActivity.this,
-			 * "the person you selected is offline!",
-			 * Toast.LENGTH_SHORT).show(); } }
-			 */
-
 			public void onClick(View arg0) {
-				Intent intent = new Intent(ChoosingPhoto.this, MyGallery.class);
-				Bundle bundle = new Bundle();
-
-				int count = 0;
-				if (selections == 0)
-					Toast.makeText(ChoosingPhoto.this,
-							"Please select some photos.", Toast.LENGTH_SHORT)
-							.show();
-				else {
-					for (String albumid : albumIds) {
-						ArrayList<PhotoUnit> photounits = photos.get(albumid);
-						for (PhotoUnit p : photounits) {
-							if (p.photoselection) {
-								bundle.putString("photo" + count,
-										p.photourllarge);
-								count++;
+				
+				
+				if(selections==0)
+					Toast.makeText(ChoosingPhoto.this,"Please select some photos.",Toast.LENGTH_SHORT).show();
+				else{
+					Thread t = new Thread(new Runnable() {
+						public void run() {
+					try{
+						
+						InetAddress serverIp;
+						int count=0;
+						serverIp = InetAddress.getByName(friendIp);
+						int serverPort = 5055;
+						clientSocket = new Socket(serverIp, serverPort);
+						BufferedWriter bw;
+						bw = new BufferedWriter( new OutputStreamWriter(clientSocket.getOutputStream()));
+						
+						// ï¿½gï¿½Jï¿½Tï¿½ï¿½
+						//bw.write(EditText01.getText()+":"+EditText02.getText()+"\n");
+						
+						// ï¿½ß§Yï¿½oï¿½e
+						//bw.flush();
+						for(String albumid: albumIds){
+							ArrayList<PhotoUnit> photounits =photos.get(albumid);
+							for(PhotoUnit p:photounits){
+								if(p.photoselection){
+									bundle1.putString("photo"+count,p.photourllarge);
+									bw.write(p.photourllarge+"\n");
+									bw.flush();
+									Log.d("network","write: "+p.photourllarge+"\n");
+									count++;
+								}						
 							}
+							
 						}
+						bw.write("end\n");
+						bw.flush();
+						Log.d("network","end"+"\n");
+						Message msg = new Message();  
+		                msg.what = 2;  
+		                mHandler.sendMessage(msg);  
 					}
-					if (count == selections) {
-						bundle.putString("selections", "" + selections);
+					
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+					}
+					});
+					t.start();
+					/*if(count==selections){
+						bundle.putString("selections", ""+selections);
 						intent.putExtras(bundle);
 						startActivity(intent);
-
-					} else {
-						Log.d("trace", "selection count not match!");
-
+						
 					}
-
+					else{
+						Log.d("trace","selection count not match!");
+						
+					}*/
+					
+				}
+					
 				}
 
 			}
@@ -328,17 +355,20 @@ public class ChoosingPhoto extends FragmentActivity {
 			case 1:
 				Log.d("time", "handler begin Tid=" + getTaskId());
 				albumgrid.setVisibility(View.GONE);
-				getSupportActionBar().setTitle("å‹¾é¸åˆ†äº«ç…§ç‰‡");
+				getSupportActionBar().setTitle("?¾é¸?†äº«?§ç?");
 				photogrid.setVisibility(View.VISIBLE);
-				photogrid.setAdapter(photoAdapter);
-				PhotoprogressDialog.dismiss();
-				Log.d("time", "handler finish Tid=" + getTaskId());
-
-				break;
-			}
-		}
-	};
-
+            	photogrid.setAdapter(photoAdapter);
+            	PhotoprogressDialog.dismiss();
+            	Log.d("time","handler finish Tid="+getTaskId());
+            	break; 
+            case 2:
+            	bundle1.putString("selections", ""+selections);
+				intent1.putExtras(bundle1);
+				startActivity(intent1);
+                break;   
+            }  
+        }  
+    };  
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0
 				&& flag == 1) {
@@ -347,7 +377,7 @@ public class ChoosingPhoto extends FragmentActivity {
 			ChoosingPhoto.this.runOnUiThread(new Runnable() {
 				public void run() {
 					albumgrid.setVisibility(View.VISIBLE);
-					getSupportActionBar().setTitle("ç›¸ç°¿åˆ—è¡¨");
+					getSupportActionBar().setTitle("?¸ç°¿?—è¡¨");
 					photogrid.setVisibility(View.GONE);
 					invalidateOptionsMenu();
 
@@ -428,13 +458,13 @@ public class ChoosingPhoto extends FragmentActivity {
 						nowalbumid = albumIds.get(id);
 						photoAdapter = photoadaptermap.get(albumIds.get(id));
 						albumgrid.setVisibility(View.GONE);
-						getSupportActionBar().setTitle("å‹¾é¸åˆ†äº«ç…§ç‰‡");
+						getSupportActionBar().setTitle("?¾é¸?†äº«?§ç?");
 						photogrid.setVisibility(View.VISIBLE);
 						photogrid.setAdapter(photoAdapter);
 					} else {
 						photoAdapter = new PhotoAdapter();
 						PhotoprogressDialog = ProgressDialog.show(
-								ChoosingPhoto.this, "è®€å–ç›¸ç‰‡ä¸­", "è«‹ç¨å€™...", true,
+								ChoosingPhoto.this, "è®???¸ç?ä¸?, "è«‹ç???..", true,
 								false);
 						PhotoprogressDialog
 								.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -541,8 +571,8 @@ public class ChoosingPhoto extends FragmentActivity {
 			holder.checkbox.setId(position);
 			holder.imageview.setId(position);
 			holder.mtextview.setId(position);
-			holder.mtextview.setVisibility(View.INVISIBLE);
-			if (getselectionbyalbumandposition(nowalbumid, position)) {
+			holder.mtextview.setVisibility(View.GONE);
+			if (getselectionbyalbumandposition(nowalbumid,position)){
 				holder.checkbox.setChecked(true);
 				// Toast.makeText(MyCustomActivity.this, "onClick",
 				// Toast.LENGTH_SHORT).show();
@@ -652,12 +682,12 @@ public class ChoosingPhoto extends FragmentActivity {
 		Log.d("facebookURL", "myId is: " + myId);
 		myName = bundle.getString("myName");
 		friendId = bundle.getString("friendId");
-		// Integer count =
-		// Integer.valueOf(bundle.getString("numSelectedFriends"));
-		// friendIds = new String[count];
-		// for (int i = 0; i < count; i++) {
-		// friendIds[i] = bundle.getString("friend" + i);
-		// }
+		friendIp = bundle.getString("friendIp");
+//		Integer count = Integer.valueOf(bundle.getString("numSelectedFriends"));
+//		friendIds = new String[count];
+//		for (int i = 0; i < count; i++) {
+//			friendIds[i] = bundle.getString("friend" + i);
+//		}
 	};
 
 	RequestListener albumsRequestListener = new RequestListener() {
@@ -689,7 +719,7 @@ public class ChoosingPhoto extends FragmentActivity {
 			JSONObject result;
 			JSONArray albumList;
 			try {
-				// ï¿½è¸¹ï‘ï¿½ï¿½ï¿½album ï¿½ï¿½id
+				// ï¿½è¸¹?‘ï¿½ï¿½ï¿½album ï¿½ï¿½id
 				result = new JSONObject(response);
 				albumList = result.getJSONArray("data");
 				albumIds = new ArrayList<String>();
@@ -736,7 +766,7 @@ public class ChoosingPhoto extends FragmentActivity {
 				Message msg = new Message();
 				msg.what = 0;
 				mHandler.sendMessage(msg);
-				// albumï¿½ï„’ï¿½ï¿½ï¿½ } catch (JSONException e) {
+				// albumï¿½ï?ï¿½ï¿½ï¿?} catch (JSONException e) {
 				// TODO: handle exception
 				// e.printStackTrace();
 			} catch (Exception e) {
@@ -775,7 +805,7 @@ public class ChoosingPhoto extends FragmentActivity {
 			JSONObject result;
 			JSONArray photoList;
 			try {
-				// ï¿½è¸¹ï‘ï¿½ï¿½ï¿½album ï¿½ï¿½id
+				// ï¿½è¸¹?‘ï¿½ï¿½ï¿½album ï¿½ï¿½id
 				Log.d("facebookURL", "album " + (String) state);
 				result = new JSONObject(response);
 				photoList = result.getJSONArray("data");
@@ -815,7 +845,7 @@ public class ChoosingPhoto extends FragmentActivity {
 					photos.put((String) state, albumPhotos);
 				} else
 					Log.d("facebookURL", "state not correct");
-				// albumï¿½ï„’ï¿½ï¿½ï¿½ } catch (JSONException e) {
+				// albumï¿½ï?ï¿½ï¿½ï¿?} catch (JSONException e) {
 				// TODO: handle exception
 				// e.printStackTrace();
 			} catch (Exception e) {

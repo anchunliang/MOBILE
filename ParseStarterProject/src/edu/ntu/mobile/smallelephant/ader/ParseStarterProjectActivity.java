@@ -1,10 +1,14 @@
 package edu.ntu.mobile.smallelephant.ader;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +62,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import edu.ntu.mobile.smallelephant.mianher.ChoosingPhoto;
+import edu.ntu.mobile.smallelephant.mianher.MyGallery;
 
 public class ParseStarterProjectActivity extends FragmentActivity {
 	/** Called when the activity is first created. */
@@ -83,6 +88,9 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 	private static final int CHOOSING_PHOTO = 0;
 	private String parse_user_id = null;
 	ImageAndTextListAdapter adapter = null;
+	private static int serverport = 5050;
+	private static ServerSocket serverSocket;
+	private static Socket remoteSocket;
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -167,13 +175,12 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		requestWindowFeature(Window.FEATURE_PROGRESS);
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		// getContactsName();
-		super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);	
 		setContentView(R.layout.login);
-		setProgressBarIndeterminateVisibility(Boolean.TRUE);
-		setProgressBarVisibility(true);
+		threadforaccept();
+		setProgressBarIndeterminateVisibility(Boolean.FALSE);
 		findViews();
 		// Add your initialization code here
 		// Parse.initialize(this, "your application id goes here",
@@ -185,6 +192,52 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 			Log.d(CONSTANT.DEBUG_FACEBOOK, "oncreate: session valid");
 			changeToFriendSelectPage();
 		}
+	}
+
+	private void threadforaccept() {
+		try{
+			serverSocket = new ServerSocket(serverport);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		Thread t = new Thread(new Runnable() {
+			public void run() {
+				//while(true){
+					int count=0;
+					try {
+						Log.d("network",""+InetAddress.getLocalHost().getHostAddress());
+						
+						Log.d("network","wait for accept");
+						remoteSocket = serverSocket.accept();
+						Log.d("network","acceptted");
+						BufferedReader br = new BufferedReader(new InputStreamReader(remoteSocket.getInputStream()));
+						Intent intent = new Intent(ParseStarterProjectActivity.this,MyGallery.class);
+						Bundle bundle = new Bundle();
+						while (remoteSocket.isConnected()) {
+							String msg= br.readLine();
+							if (msg=="end")
+								break;
+							bundle.putString("photo"+count,msg);
+							Log.d("network",msg);
+							count++;
+							 
+							
+							
+						}
+						bundle.putString("selections", ""+count);
+						intent.putExtras(bundle);
+						startActivity(intent);
+					}	
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+				//}
+			}
+		});
+		
+		t.start();
+		
 	}
 
 	// private void setVisibilities() {
@@ -212,6 +265,12 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 					bundle.putString("friendId", vc.id);
 					bundle.putString("friendIp", vc.ip);
 					intent.putExtras(bundle);
+					try {
+						serverSocket.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					startActivityForResult(intent, CHOOSING_PHOTO);
 				} else {
 					Toast.makeText(ParseStarterProjectActivity.this,
@@ -249,8 +308,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 				Log.d(CONSTANT.DEBUG_FACEBOOK,
 						"login onclick : session invalid");
 				facebook.authorize(ParseStarterProjectActivity.this,
-						new String[] { "read_friendlists", "user_about_me",
-								"user_photos", "friends_photos" },
+						new String[] { "read_friendlists", "user_about_me","user_photos", "friends_photos" },
 						Facebook.FORCE_DIALOG_AUTH, new DialogListener() {
 
 							public void onFacebookError(final FacebookError e) {
@@ -624,6 +682,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 			public void run() {
 				// TODO Auto-generated method stub
 				setProgressBarIndeterminateVisibility(Boolean.TRUE);
+				setProgress(0);
 				ParseQuery query = new ParseQuery("User");
 				query.whereContainedIn("facebookId",
 						Arrays.asList(queryFriendsId));
