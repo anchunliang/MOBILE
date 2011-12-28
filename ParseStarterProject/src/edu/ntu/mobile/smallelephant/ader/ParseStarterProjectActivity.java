@@ -102,6 +102,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 	@Override
 	public void onResume(){
 		super.onResume();
+		changeStateOnline();
 		myStatus = CONSTANT.STATE_FREE;
 		IntentFilter filter = new IntentFilter( CONSTANT.ACTION_INVITE);
 		registerReceiver(receiver, filter);
