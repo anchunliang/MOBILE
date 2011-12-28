@@ -470,15 +470,19 @@ public class MyGallery extends Activity {
 		myName = bundle.getString("myName");
 		selections = Integer.parseInt(bundle.getString("selections"));
 		friend_selections = Integer.parseInt(bundle.getString("friend_selections"));
-		for(int i=0;i<selections;i++){
-			String url=bundle.getString("photo"+i);
-			PhotoURLS.add(url);		
-		}
-		
 		for(int i=0;i<friend_selections;i++){
 			String url=bundle.getString("friend_photo"+i);
 			PhotoURLS.add(url);		
 		}
+		for(int i=0;i<selections;i++){
+			String url=bundle.getString("photo"+i);
+			PhotoURLS.add(url);		
+		}
+//		
+//		for(int i=0;i<friend_selections;i++){
+//			String url=bundle.getString("friend_photo"+i);
+//			PhotoURLS.add(url);		
+//		}
 	};
 	/*public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
