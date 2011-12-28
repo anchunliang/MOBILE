@@ -84,18 +84,11 @@ public class MyGallery extends Activity {
         		coverFlow.setOnItemSelectedListener(new OnItemSelectedListener() 
                 {
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long i){
-                    	//int diff=scoverFlow.getSelectedItemPosition()-position;
                     	if(scoverFlow.getSelectedItemPosition()>position){
                     		int diff=scoverFlow.getSelectedItemPosition()-position;
                     		for(int j=0;j<diff;j++){
                     			scoverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_LEFT, null);
-                    			/*Handler handler = new Handler(); 
-                    		    handler.postDelayed(new Runnable() { 
-                    		         public void run() { 
-                    		              //my_button.setBackgroundResource(R.drawable.defaultcard); 
-                    		         } 
-                    		    }, 1000); */
-                    		}
+                      		}
                     		
                     	}
                     	else if(scoverFlow.getSelectedItemPosition()<position){

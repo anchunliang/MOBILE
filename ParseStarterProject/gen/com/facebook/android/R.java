@@ -390,11 +390,12 @@ containing a value of this type.
         public static final int logout_fit_little_little=0x7f020055;
         public static final int mycheckboxbutton=0x7f020056;
         public static final int no_image=0x7f020057;
-        public static final int small_elephant=0x7f020058;
-        public static final int start=0x7f020059;
-        public static final int start_fit=0x7f02005a;
-        public static final int start_fit_little=0x7f02005b;
-        public static final int start_press=0x7f02005c;
+        public static final int question=0x7f020058;
+        public static final int small_elephant=0x7f020059;
+        public static final int start=0x7f02005a;
+        public static final int start_fit=0x7f02005b;
+        public static final int start_fit_little=0x7f02005c;
+        public static final int start_press=0x7f02005d;
     }
     public static final class id {
         public static final int AlbumGrid=0x7f040023;

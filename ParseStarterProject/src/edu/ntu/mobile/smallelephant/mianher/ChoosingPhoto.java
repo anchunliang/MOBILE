@@ -370,6 +370,12 @@ public class ChoosingPhoto extends FragmentActivity {
 				intent1.putExtras(bundle1);
 				startActivity(intent1);
                 break;   
+            case 3:
+            	albumAdapter.notifyDataSetChanged();
+				break;
+            case 4:
+            	photoAdapter.notifyDataSetChanged();
+				break;
             }  
         }  
     };  
@@ -414,7 +420,9 @@ public class ChoosingPhoto extends FragmentActivity {
 		public long getItemId(int position) {
 			return position;
 		}
-
+		public void setItem(int index,Drawable item) {
+			drawablesFromUrl.set(index,item);
+		}
 		public void addItem(Drawable item) {
 			drawablesFromUrl.add(item);
 		}
@@ -488,21 +496,33 @@ public class ChoosingPhoto extends FragmentActivity {
 
 								ArrayList<PhotoUnit> photo = photos
 										.get(albumIds.get(id));
+								for(int i=0;i<photo.size();i++){
+									photoAdapter.addItem(getResources().getDrawable(R.drawable.question));	
+								}
+								Message msg = new Message();
+								msg.what = 1;
+								mHandler.sendMessage(msg);
+								int i=0;
 								for (PhotoUnit photounit : photo) {
+									
 									photoAdapter
-											.addItem(LoadImageFromURL(photounit.photourlsmall));
+											.setItem(i,LoadImageFromURL(photounit.photourlsmall));
+									i++;
 									Log.d("trace",
 											"photoadapter after addItem, url="
 													+ photounit.photourlsmall);
+									msg = new Message();
+									msg.what = 4;
+									mHandler.sendMessage(msg);
 
 								}
 								// photoAdapter.notifyDataSetChanged();
 								Log.d("time", "onclick finish Tid="
 										+ getTaskId());
 								photoadaptermap.put(nowalbumid, photoAdapter);
-								Message msg = new Message();
+								/*msg = new Message();
 								msg.what = 1;
-								mHandler.sendMessage(msg);
+								mHandler.sendMessage(msg);*/
 								// }
 								// });
 								Log.d("trace", "image onclick");
@@ -516,7 +536,14 @@ public class ChoosingPhoto extends FragmentActivity {
 			});
 			// holder.imageview.setImageBitmap(thumbnails[position]);
 			holder.imageview.setImageDrawable(drawablesFromUrl.get(position));
-			holder.mtextview.setText(albumNames.get(position));
+			try{
+				String s=albumNames.get(position);
+				holder.mtextview.setText(s);
+			}
+			catch(Exception e){
+				holder.mtextview.setText("");
+				e.printStackTrace();
+			}
 			// holder.imageview.setImageResource(R.drawable.ic_launcher);
 			// holder.imageview.setLayoutParams(new CoverFlow.LayoutParams(100,
 			// 100));
@@ -552,7 +579,9 @@ public class ChoosingPhoto extends FragmentActivity {
 		public long getItemId(int position) {
 			return position;
 		}
-
+		public void setItem(int index,Drawable item) {
+			drawablesFromUrl.set(index,item);
+		}
 		public void addItem(Drawable item) {
 			drawablesFromUrl.add(item);
 		}
@@ -732,19 +761,40 @@ public class ChoosingPhoto extends FragmentActivity {
 				albumCoverUrls = new ArrayList<String>();
 				photos = new TreeMap<String, ArrayList<PhotoUnit>>();
 				Log.d("trace", "albumList.length=" + albumList.length());
+				Message msg;
+				for (int i = 0; i < albumList.length(); i++) {
+					if (ALBUMPRIVACY.contains(albumList.getJSONObject(i).getString("privacy"))) {
+						albumAdapter.addItem(getResources().getDrawable(R.drawable.question));	
+						
+					}
+				}
+				msg = new Message();
+				msg.what = 0;
+				mHandler.sendMessage(msg);
+				int j=0;
 				for (int i = 0; i < albumList.length(); i++) {
 					Log.d("facebookURL", "album " + i);
+					
 					if (ALBUMPRIVACY.contains(albumList.getJSONObject(i)
 							.getString("privacy"))) {
+						
 						String albumId = albumList.getJSONObject(i).getString(
 								"id");
 						String albumName = albumList.getJSONObject(i)
 								.getString("name");
 						albumIds.add(albumId);
 						albumNames.add(albumName);
+						
 						albumCoverUrls.add("https://graph.facebook.com/"
 								+ albumId + "/picture?type=small&access_token="
 								+ accessToken);
+						albumAdapter.setItem(j,LoadImageFromURL("https://graph.facebook.com/"	+ albumId + "/picture?type=small&access_token="	+ accessToken));
+						j++;
+						msg = new Message();
+						msg.what = 3;
+						mHandler.sendMessage(msg);
+						
+						
 						Log.d("trace_album", "https://graph.facebook.com/"
 								+ albumId + "/picture?type=small&access_token="
 								+ accessToken);
@@ -759,18 +809,18 @@ public class ChoosingPhoto extends FragmentActivity {
 				 * run() {
 				 */
 
-				for (String url : albumCoverUrls) {
+				/*for (String url : albumCoverUrls) {
 					albumAdapter.addItem(LoadImageFromURL(url));
 					Log.d("trace", "after addItem, url=" + url);
 					Log.d("trace", "after addItem");
 
-				}
+				}*/
 				// albumAdapter.notifyDataSetChanged();
 				// }
 				// });
-				Message msg = new Message();
+				/*Message msg = new Message();
 				msg.what = 0;
-				mHandler.sendMessage(msg);
+				mHandler.sendMessage(msg);*/
 				// album��?���?} catch (JSONException e) {
 				// TODO: handle exception
 				// e.printStackTrace();
