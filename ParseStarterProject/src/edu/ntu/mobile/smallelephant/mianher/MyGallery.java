@@ -1,27 +1,17 @@
 package edu.ntu.mobile.smallelephant.mianher;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-
-import com.facebook.android.AsyncFacebookRunner;
-import com.facebook.android.Facebook;
-
-import edu.ntu.mobile.smallelephant.ader.R;
-import edu.ntu.mobile.smallelephant.ader.R.id;
-import edu.ntu.mobile.smallelephant.ader.R.layout;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.LinearGradient;
 import android.graphics.Matrix;
@@ -33,8 +23,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -46,6 +36,8 @@ import android.widget.BaseAdapter;
 import android.widget.Gallery.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
+import edu.ntu.mobile.smallelephant.ader.CONSTANT;
+import edu.ntu.mobile.smallelephant.ader.R;
 
 public class MyGallery extends Activity {
 	/** Called when the activity is first created. */
@@ -393,4 +385,6 @@ public class MyGallery extends Activity {
 
 		return super.onKeyDown(keyCode, event);
 	}*/
+
+
 }

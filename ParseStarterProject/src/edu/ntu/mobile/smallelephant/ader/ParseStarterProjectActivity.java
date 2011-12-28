@@ -13,6 +13,7 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -25,27 +26,26 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.ContentResolver;
+import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.Menu;
 import android.support.v4.view.MenuItem;
-import android.support.v4.view.Window;
 import android.support.v4.view.MenuItem.OnMenuItemClickListener;
+import android.support.v4.view.Window;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.android.AsyncFacebookRunner;
@@ -59,6 +59,7 @@ import com.parse.GetCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 
 import edu.ntu.mobile.smallelephant.mianher.ChoosingPhoto;
@@ -73,11 +74,13 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 	// private Button btnRefresh;
 	// private Button btnInvite;
 	// private TextView mainTitle;
+	private int state;
 	private ListView listViewFriends;
 	private String myId;
 	private String myName;
+	private HashMap<String,String> friendsNameById;
 	private String[] FBfriendsId;
-	private String[] friendsId;
+	private ArrayList<String> friendsId;
 	private String[] friendsIp;
 	private Boolean[] friendsOnline;
 	// private SimpleAdapter adapter;
@@ -92,28 +95,57 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 	private static ServerSocket serverSocket;
 	private static Socket remoteSocket;
 
+	// broadcast receiver
+	
+	@Override
+	public void onResume(){
+		super.onResume();
+		state = CONSTANT.STATE_FREE;
+		IntentFilter filter = new IntentFilter( CONSTANT.ACTION_INVITE);
+		registerReceiver(receiver, filter);
+	}
+	
+	@Override
+	public void onPause(){
+		unregisterReceiver(receiver);
+		super.onPause();
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-
 		menu.add("lookMyself").setIcon(R.drawable.ic_menu_view)
 		.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
 				// TODO Auto-generated method stub
-				Intent intent = new Intent(
-						ParseStarterProjectActivity.this,
-						ChoosingPhoto.class);
-				Bundle bundle = new Bundle();
-				bundle.putString("accessToken", facebook.getAccessToken());
-				bundle.putString("myId", myId);
-				Log.d(CONSTANT.DEBUG_FACEBOOK, "myId was: " + myId);
-				bundle.putString("myName", myName);
-//				bundle.putString("friendId", "");
-//				bundle.putString("friendIp", "");
-				intent.putExtras(bundle);
-				startActivityForResult(intent, CHOOSING_PHOTO);
+				ParsePush push = new ParsePush();
+				push.setChannel("");
+				JSONObject data = new JSONObject();
+				try {
+					data.put("action", CONSTANT.ACTION_INVITE);
+					data.put("message", "testMessage");
+				} catch (Exception e) {
+					// TODO: handle exception
+					e.getStackTrace();
+				}
+				push.setData(data);
+//				push.setMessage("hello");
+				push.sendInBackground();
 				return false;
+//				Intent intent = new Intent(
+//						ParseStarterProjectActivity.this,
+//						ChoosingPhoto.class);
+//				Bundle bundle = new Bundle();
+//				bundle.putString("accessToken", facebook.getAccessToken());
+//				bundle.putString("myId", myId);
+//				Log.d(CONSTANT.DEBUG_FACEBOOK, "myId was: " + myId);
+//				bundle.putString("myName", myName);
+////				bundle.putString("friendId", "");
+////				bundle.putString("friendIp", "");
+//				intent.putExtras(bundle);
+//				startActivityForResult(intent, CHOOSING_PHOTO);
+//				return false;
 			}
 		}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
@@ -221,9 +253,6 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 							bundle.putString("photo"+count,msg);
 							Log.d("network",msg);
 							count++;
-							 
-							
-							
 						}
 						bundle.putString("selections", ""+count);
 						intent.putExtras(bundle);
@@ -254,24 +283,25 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 				Log.d(CONSTANT.DEBUG_TAG, "findViews: item clicked");
 				ViewCache vc = (ViewCache) view.getTag();
 				if (vc.getButton().isChecked()) {
-					Intent intent = new Intent(
-							ParseStarterProjectActivity.this,
-							ChoosingPhoto.class);
-					Bundle bundle = new Bundle();
-					bundle.putString("accessToken", facebook.getAccessToken());
-					bundle.putString("myId", myId);
-					Log.d(CONSTANT.DEBUG_FACEBOOK, "myId was: " + myId);
-					bundle.putString("myName", myName);
-					bundle.putString("friendId", vc.id);
-					bundle.putString("friendIp", vc.ip);
-					intent.putExtras(bundle);
-					try {
-						serverSocket.close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					startActivityForResult(intent, CHOOSING_PHOTO);
+					goChoosingPhoto(vc.id);
+//					Intent intent = new Intent(
+//							ParseStarterProjectActivity.this,
+//							ChoosingPhoto.class);
+//					Bundle bundle = new Bundle();
+//					bundle.putString("accessToken", facebook.getAccessToken());
+//					bundle.putString("myId", myId);
+//					Log.d(CONSTANT.DEBUG_FACEBOOK, "myId was: " + myId);
+//					bundle.putString("myName", myName);
+//					bundle.putString("friendId", vc.id);
+//					bundle.putString("friendIp", vc.ip);
+//					intent.putExtras(bundle);
+//					try {
+//						serverSocket.close();
+//					} catch (IOException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//					startActivityForResult(intent, CHOOSING_PHOTO);
 				} else {
 					Toast.makeText(ParseStarterProjectActivity.this,
 							"the person you selected is offline!",
@@ -283,6 +313,27 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 		adapter = new ImageAndTextListAdapter(ParseStarterProjectActivity.this,
 				list, listViewFriends);
 		listViewFriends.setAdapter(adapter);
+	}
+	
+	private void goChoosingPhoto(String id){
+		Intent intent = new Intent(
+				ParseStarterProjectActivity.this,
+				ChoosingPhoto.class);
+		Bundle bundle = new Bundle();
+		bundle.putString("accessToken", facebook.getAccessToken());
+		bundle.putString("myId", myId);
+		Log.d(CONSTANT.DEBUG_FACEBOOK, "myId was: " + myId);
+		bundle.putString("myName", myName);
+		bundle.putString("friendId", id);
+		bundle.putString("friendIp", "");
+		intent.putExtras(bundle);
+		try {
+			serverSocket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		startActivityForResult(intent, CHOOSING_PHOTO);
 	}
 
 	@Override
@@ -596,6 +647,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 		myName = null;
 		FBfriendsId = null;
 		friendsId = null;
+		friendsNameById = null;
 		friendsIp = null;
 		friendsOnline = null;
 		list.clear();
@@ -694,7 +746,8 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 						if (e == null) {
 							Log.d(CONSTANT.DEBUG_PARSE, "parse find:");
 							friendsName = new String[friendList.size()];
-							friendsId = new String[friendList.size()];
+							friendsId = new ArrayList<String>();
+							friendsNameById = new HashMap<String,String>();
 							friendsIp = new String[friendList.size()];
 							friendsOnline = new Boolean[friendList.size()];
 							Log.d(CONSTANT.DEBUG_PARSE, "Retrieved "
@@ -702,22 +755,24 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 							int i = 0;
 							for (ParseObject friend : friendList) {
 								friendsName[i] = friend.getString("name");
-								friendsId[i] = friend.getString("facebookId");
+								friendsId.add(i,friend.getString("facebookId"));
+								if( friendsId.get(i) !=null)
+									friendsNameById.put(friendsId.get(i),friendsName[i]);
 								friendsOnline[i] = friend.getBoolean("online");
 								friendsIp[i] = friend.getString("ip");
 								Log.d(CONSTANT.DEBUG_PARSE, "Id "
-										+ friendsId[i] + "name\t"
+										+ friendsId.get(i) + "name\t"
 										+ friendsName[i]);
 								i++;
 							}
 							adapter.clear();
-							for (i = 0; i < friendsId.length; i++) {
+							for (i = 0; i < friendsId.size(); i++) {
 
 								String img_url = "http://graph.facebook.com/"
-										+ friendsId[i] + "/picture?type=small";
+										+ friendsId.get(i) + "/picture?type=small";
 								ImageAndText item = new ImageAndText(img_url,
 										friendsName[i], friendsOnline[i],
-										friendsId[i]);
+										friendsId.get(i));
 								if (friendsOnline[i]) {
 									item.ip = friendsIp[i];
 								}
@@ -835,27 +890,106 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 					"get ipaddress: (Exception) " + e.getMessage());
 			return null;
 		}
-
 	}
+	private void onInvitationAlert(final String friendId)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage( friendsNameById.get(friendId)+" wants to share photo with you!").setCancelable(
+                false).setPositiveButton("Share",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    	state = CONSTANT.STATE_SHARING;
+                    	goChoosingPhoto(friendId);
+                        dialog.cancel();
+                    }
+                }).setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    	state = CONSTANT.STATE_FREE;
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+	
+	private void onInvitationAcceptedAlert(final String friendId)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage( friendsNameById.get(friendId)+" has accept your invitation!").setCancelable(
+                false).setPositiveButton("Share",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    	state = CONSTANT.STATE_SHARING;
+                    	goChoosingPhoto(friendId);
+                        dialog.cancel();
+                    }
+                }).setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    	state = CONSTANT.STATE_FREE;
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+	//deprecated
+//	public void getContactsName() {
+//		// 取得內容解析器
+//		ContentResolver contentResolver = this.getContentResolver();
+//		// 設定你要從電話簿取出的欄位
+//		// String[] projection = new String[] { Contacts.People.NAME,
+//		// Contacts.People.NUMBER };
+//		Uri uri = Uri.parse("content://contacts/myContactCard");
+//		// 取得所有聯絡人
+//		Cursor cursor = contentResolver.query(uri, null, null, null, null);
+//		// String[] contactsName = new String[cursor.getCount()];
+//		Log.d(CONSTANT.DEBUG_TAG, "htc count: " + cursor.getCount());
+//		for (int i = 0; i < cursor.getCount(); i++) {
+//			// 移到指定位置
+//			cursor.moveToPosition(i);
+//			// 取得第一個欄位
+//			// contactsName[i] = cursor.getString(0);
+//			Log.d(CONSTANT.DEBUG_TAG, "htc content: " + cursor.getString(0));
+//		}
+//		// return contactsName;
+//	}
+	public BroadcastReceiver receiver = new BroadcastReceiver() {
 
-	public void getContactsName() {
-		// 取得內容解析器
-		ContentResolver contentResolver = this.getContentResolver();
-		// 設定你要從電話簿取出的欄位
-		// String[] projection = new String[] { Contacts.People.NAME,
-		// Contacts.People.NUMBER };
-		Uri uri = Uri.parse("content://contacts/myContactCard");
-		// 取得所有聯絡人
-		Cursor cursor = contentResolver.query(uri, null, null, null, null);
-		// String[] contactsName = new String[cursor.getCount()];
-		Log.d(CONSTANT.DEBUG_TAG, "htc count: " + cursor.getCount());
-		for (int i = 0; i < cursor.getCount(); i++) {
-			// 移到指定位置
-			cursor.moveToPosition(i);
-			// 取得第一個欄位
-			// contactsName[i] = cursor.getString(0);
-			Log.d(CONSTANT.DEBUG_TAG, "htc content: " + cursor.getString(0));
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Bundle extras = intent.getExtras();
+			if (extras != null) {
+				JSONObject data = null;
+				String action = null;
+				String title = null;
+				String message = null;
+				try {
+					data = new JSONObject(extras.getString("com.parse.Data"));
+					action = data.getString("action");
+					title = data.getString("title");
+					message = data.getString("message");
+				} catch (Exception e) {
+					// TODO: handle exception
+					e.getStackTrace();
+				}
+				Log.d(CONSTANT.DEBUG_BROADCAST, "Invitation >> action: "+ action+"\ttitle: "+title +"\tmessage: "+ message );
+				
+				if( title.equals("invite")&& state == CONSTANT.STATE_FREE){
+					String friendId = message;
+					if( friendsId.contains(friendId)){
+						onInvitationAlert(friendId);
+						goChoosingPhoto(friendId);
+					}
+				}
+				if( title.equals("accept")&& state == CONSTANT.STATE_WAITING){
+					String friendId = message;
+					onInvitationAcceptedAlert(friendId);
+					goChoosingPhoto(friendId);
+				}
+				
+			}
 		}
-		// return contactsName;
-	}
+	};
 }
