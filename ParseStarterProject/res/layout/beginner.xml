@@ -18,7 +18,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="130dp"
         android:background="@null"
-        android:src="@drawable/logout_fit_little_little" />
+        android:src="@drawable/logout" />
 
     <ImageButton
         android:id="@+id/begin_instruction"
@@ -28,7 +28,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="21dp"
         android:background="@null"
-        android:src="@drawable/instruction_fit_little" />
+        android:src="@drawable/instruction" />
 
     <ImageButton
         android:id="@+id/begin_start"
@@ -37,7 +37,7 @@
         android:layout_above="@+id/begin_instruction"
         android:layout_centerHorizontal="true"
         android:background="@null"
-        android:src="@drawable/start_fit_little" />
+        android:src="@drawable/start" />
 
     <ImageButton
         android:id="@+id/begin_login"
@@ -46,6 +46,7 @@
         android:layout_alignLeft="@+id/begin_start"
         android:layout_alignTop="@+id/begin_start"
         android:background="@null"
-        android:src="@drawable/login_fit_little" />
+        android:src="@drawable/login" />
+
 
 </RelativeLayout>

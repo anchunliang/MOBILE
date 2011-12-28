@@ -2,4 +2,7 @@
 <resources>
     <string name="hello">Hello World, ParseStarterProjectActivity!</string>
     <string name="app_name">PhoShare</string>
+      <string name="name" >Name:</string>
+      <string name="number" >Phone Number:</string>
+      <string name="sentence" >Do you want to make or receive a phone call from friends during sharing? Please enter your phone number if you allow this!</string>
 </resources>

@@ -9,7 +9,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:src="@drawable/first_page" />
+            android:src="@drawable/instruction_page" />
 
         <ImageButton
             android:id="@+id/instruction_back"

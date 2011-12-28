@@ -3,6 +3,7 @@ package edu.ntu.mobile.smallelephant.mianher;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -24,14 +25,19 @@ import com.parse.ParseQuery;
 import edu.ntu.mobile.smallelephant.ader.ParseStarterProjectActivity;
 import edu.ntu.mobile.smallelephant.ader.R;
 
+
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 
 public class beginner extends Activity {
@@ -134,6 +140,7 @@ public class beginner extends Activity {
 								login.setVisibility(View.INVISIBLE);
 								logout.setVisibility(View.VISIBLE);
 								start.setVisibility(View.VISIBLE);
+						 							    
 									pass_to_ader();
 							}
 

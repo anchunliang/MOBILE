@@ -87,6 +87,47 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 
+		menu.add("lookMyself").setIcon(R.drawable.ic_menu_view)
+		.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(
+						ParseStarterProjectActivity.this,
+						ChoosingPhoto.class);
+				Bundle bundle = new Bundle();
+				bundle.putString("accessToken", facebook.getAccessToken());
+				bundle.putString("myId", myId);
+				Log.d(CONSTANT.DEBUG_FACEBOOK, "myId was: " + myId);
+				bundle.putString("myName", myName);
+//				bundle.putString("friendId", "");
+//				bundle.putString("friendIp", "");
+				intent.putExtras(bundle);
+				startActivityForResult(intent, CHOOSING_PHOTO);
+				return false;
+			}
+		}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+
+		menu.add("Refresh").setIcon(R.drawable.ic_refresh)
+				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+					@Override
+					public boolean onMenuItemClick(MenuItem item) {
+						// TODO Auto-generated method stub
+						setProgressBarVisibility(true);
+						setProgressBarIndeterminateVisibility(Boolean.TRUE);
+						setProgress(2000);
+						Toast.makeText(getApplicationContext(),
+								"Refresh button clicked!", Toast.LENGTH_SHORT)
+								.show();
+						refreshFriendStatus();
+						return false;
+					}
+				}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+		
 		menu.add("Logout")
 				.setIcon(R.drawable.ic_menu_set_as)
 				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
@@ -106,23 +147,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 						MenuItem.SHOW_AS_ACTION_ALWAYS
 								);
 
-		menu.add("Refresh").setIcon(R.drawable.ic_refresh)
-				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-
-					@Override
-					public boolean onMenuItemClick(MenuItem item) {
-						// TODO Auto-generated method stub
-						setProgressBarVisibility(true);
-						setProgressBarIndeterminateVisibility(Boolean.TRUE);
-						setProgress(2000);
-						Toast.makeText(getApplicationContext(),
-								"Refresh button clicked!", Toast.LENGTH_SHORT)
-								.show();
-						refreshFriendStatus();
-						return false;
-					}
-				}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
+		
 		return super.onCreateOptionsMenu(menu);
 	}
 

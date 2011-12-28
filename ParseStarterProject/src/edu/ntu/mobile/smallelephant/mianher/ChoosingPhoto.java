@@ -101,8 +101,7 @@ public class ChoosingPhoto extends FragmentActivity {
 			} else {
 				menu.findItem(RESET).setIcon(R.drawable.ic_menu_clear_playlist);
 			}
-		}
-		else{
+		} else {
 			menu.findItem(RESET).setIcon(R.drawable.ic_menu_mark);
 		}
 		return true;
