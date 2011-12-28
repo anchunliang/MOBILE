@@ -241,7 +241,9 @@ public class MyGallery extends Activity {
         		Message msg = new Message(); 
 				msg.what = 1;  
 				mHandler.sendMessage(msg);
-        		
+				msg = new Message(); 
+        		msg.what = 0;  
+                mHandler.sendMessage(msg);
         		
            }  
              

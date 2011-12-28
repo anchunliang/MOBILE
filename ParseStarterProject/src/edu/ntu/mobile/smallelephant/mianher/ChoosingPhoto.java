@@ -481,8 +481,13 @@ public class ChoosingPhoto extends FragmentActivity {
 					// TODO Auto-generated method stub
 					flag = 1;// select photo
 					final int id = ((ImageView) v).getId();
-					nowalbumid = albumIds.get(id);
-					invalidateOptionsMenu();
+					try{
+						nowalbumid = albumIds.get(id);
+					}
+					catch(Exception e){
+						e.printStackTrace();
+					}
+						invalidateOptionsMenu();
 					if (photoadaptermap.containsKey(albumIds.get(id))) {
 						nowalbumid = albumIds.get(id);
 						photoAdapter = photoadaptermap.get(albumIds.get(id));
