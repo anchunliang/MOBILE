@@ -632,6 +632,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 		parse_user_id = null;
 		adapter.clear();
 		adapter.notifyDataSetChanged();
+		setResult(CONSTANT.RESULT_LOGOUT);
 		finish();
 	}
 

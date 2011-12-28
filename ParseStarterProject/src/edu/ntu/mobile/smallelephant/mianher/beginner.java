@@ -1,5 +1,7 @@
 package edu.ntu.mobile.smallelephant.mianher;
 
+
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -21,6 +23,7 @@ import com.facebook.android.FacebookError;
 import com.parse.Parse;
 import com.parse.PushService;
 
+import edu.ntu.mobile.smallelephant.ader.CONSTANT;
 import edu.ntu.mobile.smallelephant.ader.ParseStarterProjectActivity;
 import edu.ntu.mobile.smallelephant.ader.R;
 
@@ -32,10 +35,35 @@ public class beginner extends Activity {
 	public static final String PREF = "SMALL_ELEPHANT_PREF";
 	public static final String PREF_USER_ID = "PARSE_USER_id";
 
+	@Override
+	public void onResume(){
+		Log.e("beginner", "beginner_onResume");
+
+		beginner.this.runOnUiThread(new Runnable() {
+			public void run() {
+				// TODO Auto-generated method stub
+				if (ParseStarterProjectActivity.facebook.isSessionValid()) {
+					Log.e("beginner", "beginner_login");
+					login.setVisibility(View.INVISIBLE);
+					logout.setVisibility(View.VISIBLE);
+					start.setVisibility(View.VISIBLE);
+					//先load名單進來了!!!
+				}
+				else{
+					Log.e("beginner", "beginner_logout");
+					start.setVisibility(View.INVISIBLE);
+					login.setVisibility(View.VISIBLE);
+					logout.setVisibility(View.INVISIBLE);
+				}
+			}
+		});
+		super.onResume();
+	}
 
 	@Override
 	public void onStop() {
 		Log.d("fbSession", "beginner_onStop");
+		
 		super.onStop();
 	}
 	@Override
@@ -197,7 +225,19 @@ public class beginner extends Activity {
 		Bundle bundle = new Bundle();
 		bundle.putString("accessToken", ParseStarterProjectActivity.facebook.getAccessToken());
 		intent.putExtras(bundle);
-		startActivity(intent);
+		startActivityForResult(intent, 0);
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == 0) {
+			if (resultCode == CONSTANT.RESULT_LOGOUT) {
+				// A contact was picked. Here we will just display it
+				// to the user.
+				ParseStarterProjectActivity.fbAsyncRunner.logout(beginner.this,
+						logoutListener);
+			}
+		}
 	}
 
 }
