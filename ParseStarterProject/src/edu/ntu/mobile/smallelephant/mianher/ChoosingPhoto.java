@@ -64,15 +64,15 @@ public class ChoosingPhoto extends FragmentActivity {
 	public static Facebook facebook = new Facebook("255313284527691");
 	public static AsyncFacebookRunner fbAsyncRunner = new AsyncFacebookRunner(
 			facebook);
-	// ï¿½è??ï¿½?“ï¿½ï¿½ï¿½everyone, custom, private...
+	// ï¿½ï¿½??ï¿½ï¿½?ï¿½ï¿½ï¿½ï¿½everyone, custom, private...
 	private List<String> ALBUMPRIVACY = Arrays.asList("everyone");
 	// albumsï¿½ï‚¸d
 	private ArrayList<String> albumIds;
 	private ArrayList<String> albumNames;
 	private Map<String, PhotoAdapter> photoadaptermap;
-	// albumsï¿½ï‚²over photoï¿½ï?rl
+	// albumsï¿½ï‚²over photoï¿½ï¿½?rl
 	private ArrayList<String> albumCoverUrls;
-	// ï¿½ï¿½ï¿½ï¿½?”î?ï¿½ï‹«ï¿½url: ?®î¦¹ï¿½pair ( albumId, album?å?ï¿½ï¿½ï¿½ï¿½ï¿½è?ï¿½ï¿½?„rl)
+	// ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½?ï¿½ï‹«ï¿½url: ?ï¿½î¦¹ï¿½pair ( albumId, album?ï¿½ï¿½?ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½?ï¿½rl)
 	private TreeMap<String, ArrayList<PhotoUnit>> photos;
 	// private TreeMap<String,ArrayList<Boolean>> photoselection;
 	String accessToken;
@@ -245,12 +245,12 @@ public class ChoosingPhoto extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.album_main);
 		AlbumprogressDialog = ProgressDialog.show(ChoosingPhoto.this,
-				"è®???¸ç°¿?—è¡¨ä¸?, "è«‹ç???..", true, false);
+				"=(", "=(", true, false);
 		AlbumprogressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		intent1 = new Intent(ChoosingPhoto.this,MyGallery.class);
 		bundle1 = new Bundle();
 		photoadaptermap = new HashMap<String,PhotoAdapter>();
-		getSupportActionBar().setTitle("?¸ç°¿?—è¡¨");
+		getSupportActionBar().setTitle("?ï¿½ç°¿?ï¿½è¡¨");
 		mimage = (ImageView) findViewById(R.id.arrow);
 		mimage.setVisibility(View.GONE);
 		albumgrid = (GridView) findViewById(R.id.AlbumGrid);
@@ -319,7 +319,7 @@ public class ChoosingPhoto extends FragmentActivity {
 					
 				}
 					
-				}
+				
 
 			}
 		});
@@ -355,7 +355,7 @@ public class ChoosingPhoto extends FragmentActivity {
 			case 1:
 				Log.d("time", "handler begin Tid=" + getTaskId());
 				albumgrid.setVisibility(View.GONE);
-				getSupportActionBar().setTitle("?¾é¸?†äº«?§ç?");
+				getSupportActionBar().setTitle("?ï¿½é¸?ï¿½äº«?ï¿½ï¿½?");
 				photogrid.setVisibility(View.VISIBLE);
             	photogrid.setAdapter(photoAdapter);
             	PhotoprogressDialog.dismiss();
@@ -377,7 +377,7 @@ public class ChoosingPhoto extends FragmentActivity {
 			ChoosingPhoto.this.runOnUiThread(new Runnable() {
 				public void run() {
 					albumgrid.setVisibility(View.VISIBLE);
-					getSupportActionBar().setTitle("?¸ç°¿?—è¡¨");
+					getSupportActionBar().setTitle("?ï¿½ç°¿?ï¿½è¡¨");
 					photogrid.setVisibility(View.GONE);
 					invalidateOptionsMenu();
 
@@ -458,13 +458,13 @@ public class ChoosingPhoto extends FragmentActivity {
 						nowalbumid = albumIds.get(id);
 						photoAdapter = photoadaptermap.get(albumIds.get(id));
 						albumgrid.setVisibility(View.GONE);
-						getSupportActionBar().setTitle("?¾é¸?†äº«?§ç?");
+						getSupportActionBar().setTitle("?ï¿½é¸?ï¿½äº«?ï¿½ï¿½?");
 						photogrid.setVisibility(View.VISIBLE);
 						photogrid.setAdapter(photoAdapter);
 					} else {
 						photoAdapter = new PhotoAdapter();
 						PhotoprogressDialog = ProgressDialog.show(
-								ChoosingPhoto.this, "è®???¸ç?ä¸?, "è«‹ç???..", true,
+								ChoosingPhoto.this, " =((", "=(((", true,
 								false);
 						PhotoprogressDialog
 								.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -719,7 +719,7 @@ public class ChoosingPhoto extends FragmentActivity {
 			JSONObject result;
 			JSONArray albumList;
 			try {
-				// ï¿½è¸¹?‘ï¿½ï¿½ï¿½album ï¿½ï¿½id
+				// ï¿½è¸¹?ï¿½ï¿½ï¿½ï¿½album ï¿½ï¿½id
 				result = new JSONObject(response);
 				albumList = result.getJSONArray("data");
 				albumIds = new ArrayList<String>();
@@ -766,7 +766,7 @@ public class ChoosingPhoto extends FragmentActivity {
 				Message msg = new Message();
 				msg.what = 0;
 				mHandler.sendMessage(msg);
-				// albumï¿½ï?ï¿½ï¿½ï¿?} catch (JSONException e) {
+				// albumï¿½ï¿½?ï¿½ï¿½ï¿½?} catch (JSONException e) {
 				// TODO: handle exception
 				// e.printStackTrace();
 			} catch (Exception e) {
@@ -805,7 +805,7 @@ public class ChoosingPhoto extends FragmentActivity {
 			JSONObject result;
 			JSONArray photoList;
 			try {
-				// ï¿½è¸¹?‘ï¿½ï¿½ï¿½album ï¿½ï¿½id
+				// ï¿½è¸¹?ï¿½ï¿½ï¿½ï¿½album ï¿½ï¿½id
 				Log.d("facebookURL", "album " + (String) state);
 				result = new JSONObject(response);
 				photoList = result.getJSONArray("data");
@@ -845,7 +845,7 @@ public class ChoosingPhoto extends FragmentActivity {
 					photos.put((String) state, albumPhotos);
 				} else
 					Log.d("facebookURL", "state not correct");
-				// albumï¿½ï?ï¿½ï¿½ï¿?} catch (JSONException e) {
+				// albumï¿½ï¿½?ï¿½ï¿½ï¿½?} catch (JSONException e) {
 				// TODO: handle exception
 				// e.printStackTrace();
 			} catch (Exception e) {
