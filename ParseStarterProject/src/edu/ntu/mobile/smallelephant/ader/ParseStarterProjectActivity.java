@@ -287,7 +287,6 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 				if (vc.getButton().isChecked()) {
 					// push notification
 					ParsePush push = new ParsePush();
-					PushService.subscribe(ParseStarterProjectActivity.this, PARSE_CHANNEL_TAG+vc.id, ParseStarterProjectActivity.class);
 					push.setChannel(PARSE_CHANNEL_TAG+vc.id);
 					JSONObject data = new JSONObject();
 					try {
@@ -346,6 +345,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 		bundle.putString("myName", myName);
 		bundle.putString("friendId", id);
 		bundle.putString("friendIp", "");
+		bundle.putString("friendName", friendsNameById.get(id));
 		intent.putExtras(bundle);
 		try {
 			serverSocket.close();
@@ -932,6 +932,22 @@ public class ParseStarterProjectActivity extends FragmentActivity {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                     	myStatus = CONSTANT.STATE_SHARING;
+                    	ParsePush push = new ParsePush();
+    					push.setChannel(PARSE_CHANNEL_TAG+friendId);
+    					JSONObject data = new JSONObject();
+    					try {
+    						data.put("action", CONSTANT.ACTION_INVITE);
+    						data.put("title", "accept");
+    						data.put("message", myId);
+    					} catch (Exception e) {
+    						// TODO: handle exception
+    						e.getStackTrace();
+    					}
+    					Toast.makeText(ParseStarterProjectActivity.this,
+    							"invitation data : "+ data.toString(),
+    							Toast.LENGTH_SHORT).show();
+    					push.setData(data);
+    					push.sendInBackground();
                     	goChoosingPhoto(friendId);
                         dialog.cancel();
                     }

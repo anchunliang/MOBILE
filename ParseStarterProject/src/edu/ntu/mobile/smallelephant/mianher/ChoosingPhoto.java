@@ -22,9 +22,11 @@ import java.util.TreeMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -81,6 +83,7 @@ public class ChoosingPhoto extends FragmentActivity {
 	String myName;
 	String friendId;
 	String friendIp;
+	String friendName;
 	String nowalbumid;
 	// String friendIds[];
 	private int count;
@@ -683,6 +686,7 @@ public class ChoosingPhoto extends FragmentActivity {
 		Log.d("facebookURL", "myId is: " + myId);
 		myName = bundle.getString("myName");
 		friendId = bundle.getString("friendId");
+		friendName = bundle.getString("friendName");
 		friendIp = bundle.getString("friendIp");
 //		Integer count = Integer.valueOf(bundle.getString("numSelectedFriends"));
 //		friendIds = new String[count];
@@ -927,6 +931,29 @@ public class ChoosingPhoto extends FragmentActivity {
 		invalidateOptionsMenu();
 		photogrid.invalidateViews();
 	}
+	
+//	private void onInvitationAlert(final String friendId)
+//    {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setMessage( friendId+" wants to share photo with you!").setCancelable(
+//                false).setPositiveButton("Share",
+//                new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                    	myStatus = CONSTANT.STATE_SHARING;
+//                    	goChoosingPhoto(friendId);
+//                        dialog.cancel();
+//                    }
+//                }).setNegativeButton("Cancel",
+//                new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                    	myStatus = CONSTANT.STATE_FREE;
+//                        dialog.cancel();
+//                    }
+//                });
+//        AlertDialog alert = builder.create();
+//        alert.show();
+//    }
+	
 	public BroadcastReceiver receiver = new BroadcastReceiver() {
 
 		@Override
@@ -945,6 +972,9 @@ public class ChoosingPhoto extends FragmentActivity {
 				} catch (Exception e) {
 					// TODO: handle exception
 					e.getStackTrace();
+				}
+				if( title.equals("cancel")){
+					
 				}
 			}
 		}
