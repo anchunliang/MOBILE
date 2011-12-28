@@ -112,7 +112,7 @@ public class MyGallery extends Activity {
 		scoverImageAdapter= new sImageAdapter(this);
 		coverFlow = (CoverFlow) findViewById(R.id.Gallery);
 		scoverFlow = (CoverFlow) findViewById(R.id.sGallery);
-		progressDialog = ProgressDialog.show(MyGallery.this, "æ­?œ¨?Ÿæ?Gallery", "è«‹ç???..", true, false); 
+		progressDialog = ProgressDialog.show(MyGallery.this, "æ­£åœ¨ç”ŸæˆGallery", "è«‹ç¨å¾Œ..", true, false); 
 		progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		coverFlow.setAdapter(coverImageAdapter);
 		scoverFlow.setAdapter(scoverImageAdapter);
