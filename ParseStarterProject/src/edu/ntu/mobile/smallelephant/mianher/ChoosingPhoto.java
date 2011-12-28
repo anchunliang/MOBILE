@@ -152,13 +152,13 @@ public class ChoosingPhoto extends FragmentActivity {
 								selectAllSelectionByAlbumId(nowalbumid);
 								Toast.makeText(
 										getApplicationContext(),
-										"album " + nowalbumid
-												+ " all selected!",
+										"相簿 \"" + albumNames.get(albumIds.indexOf(nowalbumid))
+												+ " \"已全部選取",
 										Toast.LENGTH_SHORT).show();
 							} else {
 								resetSelectionByAlbumId(nowalbumid);
 								Toast.makeText(getApplicationContext(),
-										"album " + nowalbumid + " reset!",
+										"相簿 \"" +  albumNames.get(albumIds.indexOf(nowalbumid)) + " \"已全部取消",
 										Toast.LENGTH_SHORT).show();
 							}
 
