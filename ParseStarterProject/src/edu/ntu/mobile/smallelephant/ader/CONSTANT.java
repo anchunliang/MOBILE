@@ -12,6 +12,11 @@ public final class CONSTANT {
 	//broadcast action
 	public static final String SHARING_COMMUNICATION = "edu.ntu.mobile.smallelephant.ader.communication";
 	public static final String ACTION_INVITE = "edu.ntu.mobile.smallelephant.ader.invitation";
+	public static final String ACTION_CHOOSING = "edu.ntu.mobile.smallelephant.ader.choosingphoto";
+	public static final String ACTION_SHARING = "edu.ntu.mobile.smallelephant.ader.sharingphoto";
+	
+	//broadcast channel
+	public static final String PARSE_CHANNEL_TAG = "facebookId_";
 	
 	//state of the user
 	public static final int STATE_FREE = 0;

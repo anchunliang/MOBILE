@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,6 +29,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -55,8 +57,10 @@ import com.facebook.android.AsyncFacebookRunner.RequestListener;
 import com.facebook.android.Facebook;
 import com.facebook.android.FacebookError;
 import com.parse.Parse;
+import com.parse.ParsePush;
 
 import edu.ntu.mobile.smallelephant.ader.CONSTANT;
+import edu.ntu.mobile.smallelephant.ader.ParseStarterProjectActivity;
 import edu.ntu.mobile.smallelephant.ader.R;
 
 public class ChoosingPhoto extends FragmentActivity {
@@ -77,6 +81,8 @@ public class ChoosingPhoto extends FragmentActivity {
 	private ArrayList<String> albumCoverUrls;
 	// ����?��?��url: ?��pair ( albumId, album?��?������?��?�rl)
 	private TreeMap<String, ArrayList<PhotoUnit>> photos;
+	
+	private ArrayList<String> friendPhotosToShare = null;
 	// private TreeMap<String,ArrayList<Boolean>> photoselection;
 	String accessToken;
 	String myId;
@@ -103,6 +109,47 @@ public class ChoosingPhoto extends FragmentActivity {
 	Intent intent1;
 	Bundle bundle1;
 	//private ArrayList<String> PhotoURLS = new ArrayList<String>();
+	
+	@Override
+	public void onRestart(){
+		super.onRestart();
+		friendPhotosToShare = null;
+	}
+	
+	@Override
+	public void onResume(){
+		super.onResume();
+		IntentFilter filter = new IntentFilter( CONSTANT.ACTION_CHOOSING);
+		registerReceiver(receiver, filter);
+	}
+	
+	@Override
+	public void onPause(){
+		unregisterReceiver(receiver);
+		super.onPause();
+	}
+	
+	
+	@Override
+	public void onDestroy(){
+		ParsePush push = new ParsePush();
+		push.setChannel(CONSTANT.PARSE_CHANNEL_TAG + friendId);
+		JSONObject data = new JSONObject();
+		try {
+			data.put("action", CONSTANT.ACTION_CHOOSING);
+			data.put("title", "cancel");
+			data.put("message", myId);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.getStackTrace();
+		}
+		Toast.makeText(ChoosingPhoto.this,
+				"cancel >> data : "+ data.toString(),
+				Toast.LENGTH_SHORT).show();
+		push.setData(data);
+		push.sendInBackground();
+		super.onDestroy();
+	}
 	
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
@@ -200,11 +247,14 @@ public class ChoosingPhoto extends FragmentActivity {
 									"Please select some photos.",
 									Toast.LENGTH_SHORT).show();
 						else {
+							ArrayList<String> chosenPhotos = new ArrayList<String>();
 							for (String albumid : albumIds) {
 								ArrayList<PhotoUnit> photounits = photos
 										.get(albumid);
 								for (PhotoUnit p : photounits) {
 									if (p.photoselection) {
+										chosenPhotos.add(count,
+												p.photourllarge);
 										bundle.putString("photo" + count,
 												p.photourllarge);
 										count++;
@@ -212,7 +262,43 @@ public class ChoosingPhoto extends FragmentActivity {
 								}
 							}
 							if (count == selections) {
+								ParsePush push = new ParsePush();
+								push.setChannel(CONSTANT.PARSE_CHANNEL_TAG + friendId);
+								JSONObject data = new JSONObject();
+								try {
+									data.put("action", CONSTANT.ACTION_CHOOSING);
+									data.put("title", "finish");
+									data.put("message", myId);
+									data.put("count", count);
+									for( int i = 0; i < count; i++){
+										data.put("photo" + count,
+												chosenPhotos.get(i));
+									}
+								} catch (Exception e) {
+									// TODO: handle exception
+									e.getStackTrace();
+								}
+								Toast.makeText(ChoosingPhoto.this,
+										"finish >> data : "+ data.toString(),
+										Toast.LENGTH_SHORT).show();
+								push.setData(data);
+								push.sendInBackground();
+								
+								int count_friend = 0;
+								
+								if( friendPhotosToShare!=null){
+									for( int i = 0; i < friendPhotosToShare.size(); i++){
+										bundle.putString("friend_photo" + count_friend,
+												friendPhotosToShare.get(i));
+										count_friend++;
+									}
+								}
 								bundle.putString("selections", "" + selections);
+								bundle.putString("friend_selections", "" + count_friend);
+								bundle.putString("friendId",friendId);
+								bundle.putString("friendName",friendName);
+								bundle.putString("myId",myId);
+								bundle.putString("myName",myName);
 								intent.putExtras(bundle);
 								startActivity(intent);
 
@@ -932,26 +1018,34 @@ public class ChoosingPhoto extends FragmentActivity {
 		photogrid.invalidateViews();
 	}
 	
-//	private void onInvitationAlert(final String friendId)
-//    {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setMessage( friendName+" wants to share photo with you!").setCancelable(
-//                false).set
-//                
-////                .setsetPositiveButton("Share",
-////                new DialogInterface.OnClickListener() {
-////                    public void onClick(DialogInterface dialog, int id) {
-////                        dialog.cancel();
-////                    }
-////                }).setNegativeButton("Cancel",
-////                new DialogInterface.OnClickListener() {
-////                    public void onClick(DialogInterface dialog, int id) {
-////                        dialog.cancel();
-////                    }
-////                });
-//        AlertDialog alert = builder.create();
-//        alert.show();
-//    }
+	private void onFriendAbortAlert()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage( friendName+" aborted!").setCancelable(
+                false).setNeutralButton("Ok",
+                		new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								// TODO Auto-generated method stub
+								setResult(RESULT_OK);
+								finish();
+								dialog.cancel();
+							}
+						});
+                
+//                .setsetPositiveButton("Share",
+//                new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        dialog.cancel();
+//                    }
+//                }).setNegativeButton("Cancel",
+//                new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        dialog.cancel();
+//                    }
+//                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
 	
 	public BroadcastReceiver receiver = new BroadcastReceiver() {
 
@@ -973,10 +1067,26 @@ public class ChoosingPhoto extends FragmentActivity {
 					e.getStackTrace();
 				}
 				if( title.equals("cancel")){
+					onFriendAbortAlert();
+				}
+				if( title.equals("finish")){
+					try {
+						Integer count = data.getInt("count");
+						friendPhotosToShare = new ArrayList<String>();
+						if( count != null && count >0){
+							for( int i = 0; i < count; i++){
+								friendPhotosToShare.add(i, data.getString("photo"+i));
+							}
+						}
+					} catch (Exception e) {
+						// TODO: handle exception
+						e.getStackTrace();
+					}
 					
 				}
 			}
 		}
 	};
+	
 
 }
