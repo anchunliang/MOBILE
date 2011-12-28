@@ -3,42 +3,25 @@ package edu.ntu.mobile.smallelephant.mianher;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.HashMap;
-import java.util.List;
 
-import org.json.JSONObject;
-import org.json.JSONException;
-import org.json.JSONArray;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageButton;
 
+import com.facebook.android.AsyncFacebookRunner.RequestListener;
 import com.facebook.android.DialogError;
 import com.facebook.android.Facebook;
-import com.facebook.android.FacebookError;
-import com.facebook.android.AsyncFacebookRunner.RequestListener;
 import com.facebook.android.Facebook.DialogListener;
-import com.parse.GetCallback;
-import com.parse.FindCallback;
+import com.facebook.android.FacebookError;
 import com.parse.Parse;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
+import com.parse.PushService;
 
 import edu.ntu.mobile.smallelephant.ader.ParseStarterProjectActivity;
 import edu.ntu.mobile.smallelephant.ader.R;
-
-
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
 
 public class beginner extends Activity {
 	ImageButton login;
@@ -63,6 +46,7 @@ public class beginner extends Activity {
 		Log.d("trace","beginner");
 		Parse.initialize(this, "L6Qx3IQVB2zNv3bHrUzTwNbak0MF1xHQHqE2BVCc",
 				"ksAA2JMvQVhQwnWLV8ZanZIChJlpsGIRUfKo3GIX");
+		PushService.subscribe(this, "", ChoosingPhoto.class);
 		login = (ImageButton)findViewById(R.id.begin_login);
 		logout = (ImageButton)findViewById(R.id.begin_logout);
 		instruction = (ImageButton)findViewById(R.id.begin_instruction);

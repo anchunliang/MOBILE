@@ -376,16 +376,25 @@ containing a value of this type.
         public static final int ic_title_share_default=0x7f020047;
         public static final int icon=0x7f020048;
         public static final int instruction=0x7f020049;
-        public static final int instruction_page=0x7f02004a;
-        public static final int instruction_press=0x7f02004b;
-        public static final int login=0x7f02004c;
-        public static final int login_press=0x7f02004d;
-        public static final int logout=0x7f02004e;
-        public static final int mycheckboxbutton=0x7f02004f;
-        public static final int no_image=0x7f020050;
-        public static final int small_elephant=0x7f020051;
-        public static final int start=0x7f020052;
-        public static final int start_press=0x7f020053;
+        public static final int instruction_fit=0x7f02004a;
+        public static final int instruction_fit_little=0x7f02004b;
+        public static final int instruction_page=0x7f02004c;
+        public static final int instruction_press=0x7f02004d;
+        public static final int login=0x7f02004e;
+        public static final int login_fit=0x7f02004f;
+        public static final int login_fit_little=0x7f020050;
+        public static final int login_press=0x7f020051;
+        public static final int logout=0x7f020052;
+        public static final int logout_fit=0x7f020053;
+        public static final int logout_fit_little=0x7f020054;
+        public static final int logout_fit_little_little=0x7f020055;
+        public static final int mycheckboxbutton=0x7f020056;
+        public static final int no_image=0x7f020057;
+        public static final int small_elephant=0x7f020058;
+        public static final int start=0x7f020059;
+        public static final int start_fit=0x7f02005a;
+        public static final int start_fit_little=0x7f02005b;
+        public static final int start_press=0x7f02005c;
     }
     public static final class id {
         public static final int AlbumGrid=0x7f040023;
