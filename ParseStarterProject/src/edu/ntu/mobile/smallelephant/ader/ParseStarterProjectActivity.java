@@ -89,7 +89,6 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 	private String[] friendsName;
 	public static final String PREF = "SMALL_ELEPHANT_PREF";
 	public static final String PREF_USER_ID = "PARSE_USER_id";
-	private static final String PARSE_CHANNEL_TAG = "facebookId_";
 	private static final int CHOOSING_PHOTO = 0;
 	private String parse_user_id = null;
 	ImageAndTextListAdapter adapter = null;
@@ -244,7 +243,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 					// push notification
 					myStatus = CONSTANT.STATE_WAITING;
 					ParsePush push = new ParsePush();
-					push.setChannel(PARSE_CHANNEL_TAG+vc.id);
+					push.setChannel(CONSTANT.PARSE_CHANNEL_TAG+vc.id);
 					JSONObject data = new JSONObject();
 					try {
 						data.put("action", CONSTANT.ACTION_INVITE);
@@ -402,7 +401,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 				myId = myProfile.getString("id");
 				myName = myProfile.getString("name");
 				
-				PushService.subscribe(ParseStarterProjectActivity.this, PARSE_CHANNEL_TAG+myId, ParseStarterProjectActivity.class);
+				PushService.subscribe(ParseStarterProjectActivity.this, CONSTANT.PARSE_CHANNEL_TAG+myId, ParseStarterProjectActivity.class);
 				
 				final String queryId = myId;
 				final String queryName = myName;
@@ -886,7 +885,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
                     public void onClick(DialogInterface dialog, int id) {
                     	myStatus = CONSTANT.STATE_SHARING;
                     	ParsePush push = new ParsePush();
-    					push.setChannel(PARSE_CHANNEL_TAG+friendId);
+    					push.setChannel(CONSTANT.PARSE_CHANNEL_TAG+friendId);
     					JSONObject data = new JSONObject();
     					try {
     						data.put("action", CONSTANT.ACTION_INVITE);
@@ -908,6 +907,22 @@ public class ParseStarterProjectActivity extends FragmentActivity {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                     	myStatus = CONSTANT.STATE_FREE;
+                    	ParsePush push = new ParsePush();
+    					push.setChannel(CONSTANT.PARSE_CHANNEL_TAG+friendId);
+    					JSONObject data = new JSONObject();
+    					try {
+    						data.put("action", CONSTANT.ACTION_INVITE);
+    						data.put("title", "cancel");
+    						data.put("message", myId);
+    					} catch (Exception e) {
+    						// TODO: handle exception
+    						e.getStackTrace();
+    					}
+    					Toast.makeText(ParseStarterProjectActivity.this,
+    							"cancel >> data : "+ data.toString(),
+    							Toast.LENGTH_SHORT).show();
+    					push.setData(data);
+    					push.sendInBackground();
                         dialog.cancel();
                     }
                 });
@@ -930,6 +945,22 @@ public class ParseStarterProjectActivity extends FragmentActivity {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                     	myStatus = CONSTANT.STATE_FREE;
+                    	ParsePush push = new ParsePush();
+                		push.setChannel(CONSTANT.PARSE_CHANNEL_TAG + friendId);
+                		JSONObject data = new JSONObject();
+                		try {
+                			data.put("action", CONSTANT.ACTION_CHOOSING);
+                			data.put("title", "cancel");
+                			data.put("message", myId);
+                		} catch (Exception e) {
+                			// TODO: handle exception
+                			e.getStackTrace();
+                		}
+                		Toast.makeText(ParseStarterProjectActivity.this,
+                				"cancel >> data : "+ data.toString(),
+                				Toast.LENGTH_SHORT).show();
+                		push.setData(data);
+                		push.sendInBackground();
                         dialog.cancel();
                     }
                 });
@@ -988,6 +1019,9 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 				if( title.equals("accept")&& myStatus == CONSTANT.STATE_WAITING){
 					String friendId = message;
 					onInvitationAcceptedAlert(friendId);
+				}
+				if( title.equals("cancel")&& myStatus == CONSTANT.STATE_WAITING){
+					myStatus = CONSTANT.STATE_FREE;
 				}
 				
 			}
