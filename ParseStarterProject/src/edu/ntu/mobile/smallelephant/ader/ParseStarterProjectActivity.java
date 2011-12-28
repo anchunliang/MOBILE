@@ -253,9 +253,9 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 						// TODO: handle exception
 						e.getStackTrace();
 					}
-//					Toast.makeText(ParseStarterProjectActivity.this,
-//							"invitation data : "+ data.toString(),
-//							Toast.LENGTH_SHORT).show();
+					Toast.makeText(ParseStarterProjectActivity.this,
+							"invites "+vc.getTextView(),
+							Toast.LENGTH_SHORT).show();
 					push.setData(data);
 					push.sendInBackground();
 //					goChoosingPhoto(vc.id);
@@ -896,9 +896,9 @@ public class ParseStarterProjectActivity extends FragmentActivity {
     						// TODO: handle exception
     						e.getStackTrace();
     					}
-    					Toast.makeText(ParseStarterProjectActivity.this,
-    							"invitation data : "+ data.toString(),
-    							Toast.LENGTH_SHORT).show();
+//    					Toast.makeText(ParseStarterProjectActivity.this,
+//    							"invitation data : "+ data.toString(),
+//    							Toast.LENGTH_SHORT).show();
     					push.setData(data);
     					push.sendInBackground();
                     	goChoosingPhoto(friendId);
@@ -919,9 +919,9 @@ public class ParseStarterProjectActivity extends FragmentActivity {
     						// TODO: handle exception
     						e.getStackTrace();
     					}
-    					Toast.makeText(ParseStarterProjectActivity.this,
-    							"cancel >> data : "+ data.toString(),
-    							Toast.LENGTH_SHORT).show();
+//    					Toast.makeText(ParseStarterProjectActivity.this,
+//    							"cancel >> data : "+ data.toString(),
+//    							Toast.LENGTH_SHORT).show();
     					push.setData(data);
     					push.sendInBackground();
                         dialog.cancel();
@@ -957,9 +957,9 @@ public class ParseStarterProjectActivity extends FragmentActivity {
                 			// TODO: handle exception
                 			e.getStackTrace();
                 		}
-                		Toast.makeText(ParseStarterProjectActivity.this,
-                				"cancel >> data : "+ data.toString(),
-                				Toast.LENGTH_SHORT).show();
+//                		Toast.makeText(ParseStarterProjectActivity.this,
+//                				"cancel >> data : "+ data.toString(),
+//                				Toast.LENGTH_SHORT).show();
                 		push.setData(data);
                 		push.sendInBackground();
                         dialog.cancel();

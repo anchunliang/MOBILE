@@ -537,7 +537,7 @@ public class MyGallery extends Activity {
 //								friendPhotosToShare.add(i, data.getString("photo"+i));
 							}
 						}
-						Toast.makeText(MyGallery.this, friendName+ "?�好了照??",
+						Toast.makeText(MyGallery.this, friendName+ "已經選好照片",
 								Toast.LENGTH_SHORT).show();
 					} catch (Exception e) {
 						// TODO: handle exception
