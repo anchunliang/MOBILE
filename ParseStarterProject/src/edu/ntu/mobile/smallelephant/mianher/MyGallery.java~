@@ -241,9 +241,13 @@ public class MyGallery extends Activity {
         		Message msg = new Message(); 
 				msg.what = 1;  
 				mHandler.sendMessage(msg);
+<<<<<<< HEAD
+        		
+=======
 				msg = new Message(); 
         		msg.what = 0;  
                 mHandler.sendMessage(msg);
+>>>>>>> 0b5fc1732858d8e7aa95f9f37ea33627e194d309
         		
            }  
              
