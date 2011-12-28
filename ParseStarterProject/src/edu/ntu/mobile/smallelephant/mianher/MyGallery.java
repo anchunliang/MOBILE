@@ -113,7 +113,7 @@ public class MyGallery extends Activity {
 		scoverImageAdapter= new sImageAdapter(this);
 		coverFlow = (CoverFlow) findViewById(R.id.Gallery);
 		scoverFlow = (CoverFlow) findViewById(R.id.sGallery);
-		progressDialog = ProgressDialog.show(MyGallery.this, "æ­?œ¨?Ÿæ?Gallery", "è«‹ç?å¾?.", true, false); 
+		progressDialog = ProgressDialog.show(MyGallery.this, "ï¿½?ï¿½ï¿½?ï¿½ï¿½?Gallery", "è«‹ï¿½?ï¿½?.", true, false); 
 		progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		coverFlow.setAdapter(coverImageAdapter);
 		scoverFlow.setAdapter(scoverImageAdapter);
@@ -511,12 +511,10 @@ public class MyGallery extends Activity {
 					// TODO: handle exception
 					e.getStackTrace();
 				}
-<<<<<<< HEAD
 				Log.d(CONSTANT.DEBUG_BROADCAST, "gallery Listener >>" +  data.toString());
 				if( title.equals("cancel")){
-					Toast.makeText(MyGallery.this, friendName+ "?¢é?",
+					Toast.makeText(MyGallery.this, friendName+ "abort!",
 							Toast.LENGTH_SHORT).show();
->>>>>>> 0b5fc1732858d8e7aa95f9f37ea33627e194d309
 					onFriendAbortAlert();
 					finish();
 				}
@@ -535,7 +533,7 @@ public class MyGallery extends Activity {
 //								friendPhotosToShare.add(i, data.getString("photo"+i));
 							}
 						}
-						Toast.makeText(MyGallery.this, friendName+ "?¸å¥½äº†ç…§??",
+						Toast.makeText(MyGallery.this, friendName+ "?ï¿½å¥½äº†ç…§??",
 								Toast.LENGTH_SHORT).show();
 					} catch (Exception e) {
 						// TODO: handle exception
@@ -564,13 +562,12 @@ public class MyGallery extends Activity {
 					// TODO: handle exception
 					e.getStackTrace();
 				}
-<<<<<<< HEAD
+
 				Log.d(CONSTANT.DEBUG_BROADCAST, "gallery Listener >>" +  data.toString());
 				if( title.equals("cancel")){
 					onFriendAbortAlert();
-					Toast.makeText(MyGallery.this, friendName+ "?¢é?",
+					Toast.makeText(MyGallery.this, friendName+ "abort",
 							Toast.LENGTH_SHORT).show();
->>>>>>> 0b5fc1732858d8e7aa95f9f37ea33627e194d309
 				}
 				else if ( title.equals("scover")){
 					String message = null;
