@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
@@ -37,7 +38,14 @@ public class beginner extends Activity {
 		Log.d("fbSession", "beginner_onStop");
 		super.onStop();
 	}
-
+	@Override
+	public void onPause() {
+		start.setImageResource(R.drawable.start);
+		login.setImageResource(R.drawable.login);
+		instruction.setImageResource(R.drawable.instruction);
+		//start.setImageResource(R.drawable.start_press);
+		super.onPause();
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -72,6 +80,7 @@ public class beginner extends Activity {
 
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
+				start.setImageResource(R.drawable.start_press);
 				pass_to_ader();
 			}
 		});
@@ -88,6 +97,7 @@ public class beginner extends Activity {
 
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+				instruction.setImageResource(R.drawable.instruction_press);
 				Intent instru = new Intent(
 								beginner.this,
 								instruction.class);
@@ -95,13 +105,15 @@ public class beginner extends Activity {
 			}
 		});
 	}
-
+	
 	private OnClickListener loginListener = new OnClickListener() {
 
 		public void onClick(View v) {
 			// TODO Auto-generated method stub
+			login.setImageResource(R.drawable.login_press);
 			if (!ParseStarterProjectActivity.facebook.isSessionValid()) {
 				Log.d("fbSession", "session invalid");
+				
 				ParseStarterProjectActivity.facebook.authorize(beginner.this,
 						new String[] { "read_friendlists", "user_about_me",
 								"user_photos", "friends_photos" },
@@ -131,7 +143,7 @@ public class beginner extends Activity {
 							public void onCancel() {
 								// TODO Auto-generated method stub
 								Log.d("fbSession", "cancel ");
-
+								login.setImageResource(R.drawable.login);
 							}
 						});
 			} else {
