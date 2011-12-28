@@ -23,6 +23,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -926,5 +927,27 @@ public class ChoosingPhoto extends FragmentActivity {
 		invalidateOptionsMenu();
 		photogrid.invalidateViews();
 	}
+	public BroadcastReceiver receiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Bundle extras = intent.getExtras();
+			if (extras != null) {
+				JSONObject data = null;
+				String action = null;
+				String title = null;
+				String message = null;
+				try {
+					data = new JSONObject(extras.getString("com.parse.Data"));
+					action = data.getString("action");
+					title = data.getString("title");
+					message = data.getString("message");
+				} catch (Exception e) {
+					// TODO: handle exception
+					e.getStackTrace();
+				}
+			}
+		}
+	};
 
 }

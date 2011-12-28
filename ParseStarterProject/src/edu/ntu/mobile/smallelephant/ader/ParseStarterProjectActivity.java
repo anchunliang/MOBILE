@@ -61,6 +61,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
 import com.parse.ParseQuery;
+import com.parse.PushService;
 
 import edu.ntu.mobile.smallelephant.mianher.ChoosingPhoto;
 import edu.ntu.mobile.smallelephant.mianher.MyGallery;
@@ -74,12 +75,12 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 	// private Button btnRefresh;
 	// private Button btnInvite;
 	// private TextView mainTitle;
-	private int state;
+	private int myStatus;
 	private ListView listViewFriends;
-	private String myId;
-	private String myName;
+	private String myId = null;
+	private String myName = null;
 	private HashMap<String,String> friendsNameById;
-	private String[] FBfriendsId;
+	private String[] FBfriendsId = null;
 	private ArrayList<String> friendsId;
 	private String[] friendsIp;
 	private Boolean[] friendsOnline;
@@ -88,6 +89,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 	private String[] friendsName;
 	public static final String PREF = "SMALL_ELEPHANT_PREF";
 	public static final String PREF_USER_ID = "PARSE_USER_id";
+	private static final String PARSE_CHANNEL_TAG = "facebookId_";
 	private static final int CHOOSING_PHOTO = 0;
 	private String parse_user_id = null;
 	ImageAndTextListAdapter adapter = null;
@@ -100,7 +102,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 	@Override
 	public void onResume(){
 		super.onResume();
-		state = CONSTANT.STATE_FREE;
+		myStatus = CONSTANT.STATE_FREE;
 		IntentFilter filter = new IntentFilter( CONSTANT.ACTION_INVITE);
 		registerReceiver(receiver, filter);
 	}
@@ -119,33 +121,33 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
 				// TODO Auto-generated method stub
-				ParsePush push = new ParsePush();
-				push.setChannel("");
-				JSONObject data = new JSONObject();
-				try {
-					data.put("action", CONSTANT.ACTION_INVITE);
-					data.put("message", "testMessage");
-				} catch (Exception e) {
-					// TODO: handle exception
-					e.getStackTrace();
-				}
-				push.setData(data);
-//				push.setMessage("hello");
-				push.sendInBackground();
-				return false;
-//				Intent intent = new Intent(
-//						ParseStarterProjectActivity.this,
-//						ChoosingPhoto.class);
-//				Bundle bundle = new Bundle();
-//				bundle.putString("accessToken", facebook.getAccessToken());
-//				bundle.putString("myId", myId);
-//				Log.d(CONSTANT.DEBUG_FACEBOOK, "myId was: " + myId);
-//				bundle.putString("myName", myName);
-////				bundle.putString("friendId", "");
-////				bundle.putString("friendIp", "");
-//				intent.putExtras(bundle);
-//				startActivityForResult(intent, CHOOSING_PHOTO);
+//				ParsePush push = new ParsePush();
+//				push.setChannel("");
+//				JSONObject data = new JSONObject();
+//				try {
+//					data.put("action", CONSTANT.ACTION_INVITE);
+//					data.put("message", "testMessage");
+//				} catch (Exception e) {
+//					// TODO: handle exception
+//					e.getStackTrace();
+//				}
+//				push.setData(data);
+////				push.setMessage("hello");
+//				push.sendInBackground();
 //				return false;
+				Intent intent = new Intent(
+						ParseStarterProjectActivity.this,
+						ChoosingPhoto.class);
+				Bundle bundle = new Bundle();
+				bundle.putString("accessToken", facebook.getAccessToken());
+				bundle.putString("myId", myId);
+				Log.d(CONSTANT.DEBUG_FACEBOOK, "myId was: " + myId);
+				bundle.putString("myName", myName);
+//				bundle.putString("friendId", "");
+//				bundle.putString("friendIp", "");
+				intent.putExtras(bundle);
+				startActivityForResult(intent, CHOOSING_PHOTO);
+				return false;
 			}
 		}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
@@ -283,7 +285,25 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 				Log.d(CONSTANT.DEBUG_TAG, "findViews: item clicked");
 				ViewCache vc = (ViewCache) view.getTag();
 				if (vc.getButton().isChecked()) {
-					goChoosingPhoto(vc.id);
+					// push notification
+					ParsePush push = new ParsePush();
+					PushService.subscribe(ParseStarterProjectActivity.this, PARSE_CHANNEL_TAG+vc.id, ParseStarterProjectActivity.class);
+					push.setChannel(PARSE_CHANNEL_TAG+vc.id);
+					JSONObject data = new JSONObject();
+					try {
+						data.put("action", CONSTANT.ACTION_INVITE);
+						data.put("title", "invite");
+						data.put("message", myId);
+					} catch (Exception e) {
+						// TODO: handle exception
+						e.getStackTrace();
+					}
+					Toast.makeText(ParseStarterProjectActivity.this,
+							"invitation data : "+ data.toString(),
+							Toast.LENGTH_SHORT).show();
+					push.setData(data);
+					push.sendInBackground();
+//					goChoosingPhoto(vc.id);
 //					Intent intent = new Intent(
 //							ParseStarterProjectActivity.this,
 //							ChoosingPhoto.class);
@@ -429,126 +449,17 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 				myProfile = new JSONObject(response);
 				myId = myProfile.getString("id");
 				myName = myProfile.getString("name");
-
+				
+				PushService.subscribe(ParseStarterProjectActivity.this, PARSE_CHANNEL_TAG+myId, ParseStarterProjectActivity.class);
+				
 				final String queryId = myId;
 				final String queryName = myName;
-
 				ParseStarterProjectActivity.this.runOnUiThread(new Runnable() {
 
 					public void run() {
 						// TODO Auto-generated method stub
-						ParseQuery query = new ParseQuery("User");
-
-						SharedPreferences settings = getSharedPreferences(PREF,
-								0);
-						parse_user_id = settings.getString(myId, "");
-						final String myIpAddress = getCurrentIP();
-						TelephonyManager tMgr = (TelephonyManager) ParseStarterProjectActivity.this
-								.getSystemService(Context.TELEPHONY_SERVICE);
-						String mPhoneNumber = tMgr.getLine1Number();
-						if (mPhoneNumber == null) {
-							Log.d(CONSTANT.DEBUG_TAG, "my PhoneNumber is null");
-							mPhoneNumber = "";
-						} else
-							Log.d(CONSTANT.DEBUG_TAG, "my PhoneNumber is "
-									+ mPhoneNumber);
-						final String finalmPhoneNumber = mPhoneNumber;
-						if (myIpAddress == null) {
-							Log.d(CONSTANT.DEBUG_TAG, "Ip address is null");
-						} else {
-							if (!"".equals(parse_user_id)) {
-								Log.d(CONSTANT.DEBUG_SHAREPREF, "get "
-										+ parse_user_id);
-								query.getInBackground(parse_user_id,
-										new GetCallback() {
-
-											@Override
-											public void done(
-													ParseObject myPost,
-													ParseException e) {
-												// TODO Auto-generated method
-												// stub
-												if (e == null) {
-													Log.d(CONSTANT.DEBUG_SHAREPREF,
-															" parse_user_id  :  "
-																	+ parse_user_id
-																	+ " ipaddress: "
-																	+ myIpAddress);
-													myPost.put("ip",
-															myIpAddress);
-													myPost.put("online", true);
-													myPost.put("phoneNumber",
-															finalmPhoneNumber);
-													myPost.saveInBackground();
-												} else {
-													Log.e("ERROR",
-															e.getMessage());
-												}
-											}
-										});
-							} else {
-								Log.d(CONSTANT.DEBUG_SHAREPREF,
-										"parse_user_id not found");
-								query.whereEqualTo("facebookId", queryId);
-								query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
-								query.findInBackground(new FindCallback() {
-									public void done(
-											List<ParseObject> friendList,
-											ParseException e) {
-										if (e == null) {
-											// The count request succeeded. Log
-											if (friendList.size() == 0) {
-												ParseObject myPost = new ParseObject(
-														"User");
-												myPost.put("facebookId",
-														queryId);
-												myPost.put("name", queryName);
-												myPost.put("online", true);
-												myPost.put("phoneNumber",
-														finalmPhoneNumber);
-												myPost.put("ip", myIpAddress);
-												myPost.saveInBackground();
-												parse_user_id = myPost
-														.getObjectId();
-												Log.d(CONSTANT.DEBUG_SHAREPREF,
-														"User first login: "
-																+ parse_user_id);
-												SharedPreferences settings = getSharedPreferences(
-														PREF, 0);
-												settings.edit()
-														.putString(queryId,
-																parse_user_id)
-														.commit();
-											} else {
-												ParseObject myPost = friendList
-														.get(0);
-												myPost.put("online", true);
-												myPost.put("phoneNumber",
-														finalmPhoneNumber);
-												myPost.saveInBackground();
-												parse_user_id = myPost
-														.getObjectId();
-												Log.d(CONSTANT.DEBUG_SHAREPREF,
-														"parse_user_id stored "
-																+ parse_user_id);
-												SharedPreferences settings = getSharedPreferences(
-														PREF, 0);
-												settings.edit()
-														.putString(queryId,
-																parse_user_id)
-														.commit();
-											}
-										} else {
-											parse_user_id = null;
-											Log.d(CONSTANT.DEBUG_SHAREPREF,
-													"find In background failed : "
-															+ e.getMessage());
-											// The request failed
-										}
-									}
-								});
-							}
-						}
+						changeStateOnline();
+						
 					}
 				});
 
@@ -557,6 +468,122 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 			}
 		}
 	};
+	
+	private void changeStateOnline(){
+		ParseQuery query = new ParseQuery("User");
+
+		SharedPreferences settings = getSharedPreferences(PREF,
+				0);
+		parse_user_id = settings.getString(myId, "");
+		final String myIpAddress = getCurrentIP();
+		TelephonyManager tMgr = (TelephonyManager) ParseStarterProjectActivity.this
+				.getSystemService(Context.TELEPHONY_SERVICE);
+		String mPhoneNumber = tMgr.getLine1Number();
+		if (mPhoneNumber == null) {
+			Log.d(CONSTANT.DEBUG_TAG, "my PhoneNumber is null");
+			mPhoneNumber = "";
+		} else
+			Log.d(CONSTANT.DEBUG_TAG, "my PhoneNumber is "
+					+ mPhoneNumber);
+		final String finalmPhoneNumber = mPhoneNumber;
+		if (myIpAddress == null) {
+			Log.d(CONSTANT.DEBUG_TAG, "Ip address is null");
+		} else {
+			if (!"".equals(parse_user_id)) {
+				Log.d(CONSTANT.DEBUG_SHAREPREF, "get "
+						+ parse_user_id);
+				query.getInBackground(parse_user_id,
+						new GetCallback() {
+
+							@Override
+							public void done(
+									ParseObject myPost,
+									ParseException e) {
+								// TODO Auto-generated method
+								// stub
+								if (e == null) {
+									Log.d(CONSTANT.DEBUG_SHAREPREF,
+											" parse_user_id  :  "
+													+ parse_user_id
+													+ " ipaddress: "
+													+ myIpAddress);
+									myPost.put("ip",
+											myIpAddress);
+									myPost.put("online", true);
+									myPost.put("phoneNumber",
+											finalmPhoneNumber);
+									myPost.saveInBackground();
+								} else {
+									Log.e("ERROR",
+											e.getMessage());
+								}
+							}
+						});
+			} else {
+				Log.d(CONSTANT.DEBUG_SHAREPREF,
+						"parse_user_id not found");
+				query.whereEqualTo("facebookId", myId);
+				query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
+				query.findInBackground(new FindCallback() {
+					public void done(
+							List<ParseObject> friendList,
+							ParseException e) {
+						if (e == null) {
+							// The count request succeeded. Log
+							if (friendList.size() == 0) {
+								ParseObject myPost = new ParseObject(
+										"User");
+								myPost.put("facebookId",
+										myId);
+								myPost.put("name", myName);
+								myPost.put("online", true);
+								myPost.put("phoneNumber",
+										finalmPhoneNumber);
+								myPost.put("ip", myIpAddress);
+								myPost.saveInBackground();
+								parse_user_id = myPost
+										.getObjectId();
+								Log.d(CONSTANT.DEBUG_SHAREPREF,
+										"User first login: "
+												+ parse_user_id);
+								SharedPreferences settings = getSharedPreferences(
+										PREF, 0);
+								settings.edit()
+										.putString(myId,
+												parse_user_id)
+										.commit();
+							} else {
+								ParseObject myPost = friendList
+										.get(0);
+								myPost.put("online", true);
+								myPost.put("phoneNumber",
+										finalmPhoneNumber);
+								myPost.saveInBackground();
+								parse_user_id = myPost
+										.getObjectId();
+								Log.d(CONSTANT.DEBUG_SHAREPREF,
+										"parse_user_id stored "
+												+ parse_user_id);
+								SharedPreferences settings = getSharedPreferences(
+										PREF, 0);
+								settings.edit()
+										.putString(myId,
+												parse_user_id)
+										.commit();
+							}
+						} else {
+							parse_user_id = null;
+							Log.d(CONSTANT.DEBUG_SHAREPREF,
+									"find In background failed : "
+											+ e.getMessage());
+							// The request failed
+						}
+					}
+				});
+			}
+		}
+	}
+	
 	private RequestListener friendsRequestListener = new RequestListener() {
 
 		public void onMalformedURLException(MalformedURLException e,
@@ -593,8 +620,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 					FBfriendsId[i] = friendlist.getJSONObject(i)
 							.getString("id");
 				}
-				final String[] queryFriendsId = FBfriendsId;
-				setUserList(queryFriendsId);
+				setUserList(FBfriendsId);
 
 			} catch (JSONException e) {
 				// TODO: handle exception
@@ -676,8 +702,16 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 		// "ksAA2JMvQVhQwnWLV8ZanZIChJlpsGIRUfKo3GIX");
 		listViewFriends.setVisibility(View.VISIBLE);
 		// btnInvite.setVisibility(View.VISIBLE);
-		fbAsyncRunner.request("me", myProfileListener);
-		fbAsyncRunner.request("me/friends", friendsRequestListener);
+		if( myId == null || myName == null){
+			fbAsyncRunner.request("me", myProfileListener);
+		}else{
+			changeStateOnline();
+		}
+		if( FBfriendsId == null ){
+			fbAsyncRunner.request("me/friends", friendsRequestListener);
+		}else{
+			setUserList(FBfriendsId);
+		}
 
 		// for test
 		// btnInvite.setOnClickListener(new OnClickListener() {
@@ -734,7 +768,6 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 			public void run() {
 				// TODO Auto-generated method stub
 				setProgressBarIndeterminateVisibility(Boolean.TRUE);
-				setProgress(0);
 				ParseQuery query = new ParseQuery("User");
 				query.whereContainedIn("facebookId",
 						Arrays.asList(queryFriendsId));
@@ -898,14 +931,14 @@ public class ParseStarterProjectActivity extends FragmentActivity {
                 false).setPositiveButton("Share",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                    	state = CONSTANT.STATE_SHARING;
+                    	myStatus = CONSTANT.STATE_SHARING;
                     	goChoosingPhoto(friendId);
                         dialog.cancel();
                     }
                 }).setNegativeButton("Cancel",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                    	state = CONSTANT.STATE_FREE;
+                    	myStatus = CONSTANT.STATE_FREE;
                         dialog.cancel();
                     }
                 });
@@ -920,14 +953,14 @@ public class ParseStarterProjectActivity extends FragmentActivity {
                 false).setPositiveButton("Share",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                    	state = CONSTANT.STATE_SHARING;
+                    	myStatus = CONSTANT.STATE_SHARING;
                     	goChoosingPhoto(friendId);
                         dialog.cancel();
                     }
                 }).setNegativeButton("Cancel",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                    	state = CONSTANT.STATE_FREE;
+                    	myStatus = CONSTANT.STATE_FREE;
                         dialog.cancel();
                     }
                 });
@@ -974,19 +1007,18 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 					// TODO: handle exception
 					e.getStackTrace();
 				}
-				Log.d(CONSTANT.DEBUG_BROADCAST, "Invitation >> action: "+ action+"\ttitle: "+title +"\tmessage: "+ message );
+				Log.d(CONSTANT.DEBUG_BROADCAST, "Listener >> action: "+ action+"\ttitle: "+title +"\tmessage: "+ message +" status: "+myStatus);
 				
-				if( title.equals("invite")&& state == CONSTANT.STATE_FREE){
+				if( title.trim().equals("invite")&& myStatus == CONSTANT.STATE_FREE){
 					String friendId = message;
 					if( friendsId.contains(friendId)){
+						Log.d(CONSTANT.DEBUG_BROADCAST,"My friend invites me and I am free ");
 						onInvitationAlert(friendId);
-						goChoosingPhoto(friendId);
 					}
 				}
-				if( title.equals("accept")&& state == CONSTANT.STATE_WAITING){
+				if( title.equals("accept")&& myStatus == CONSTANT.STATE_WAITING){
 					String friendId = message;
 					onInvitationAcceptedAlert(friendId);
-					goChoosingPhoto(friendId);
 				}
 				
 			}
