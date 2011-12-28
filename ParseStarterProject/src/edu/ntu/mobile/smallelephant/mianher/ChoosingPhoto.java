@@ -1052,6 +1052,7 @@ public class ChoosingPhoto extends FragmentActivity {
 					// TODO: handle exception
 					e.getStackTrace();
 				}
+				Log.d(CONSTANT.DEBUG_BROADCAST, "choosing Listener >>" +  data.toString()); 
 				if( title.equals("cancel")){
 					Toast.makeText(ChoosingPhoto.this, friendName+ "離開!",
 							Toast.LENGTH_SHORT).show();
