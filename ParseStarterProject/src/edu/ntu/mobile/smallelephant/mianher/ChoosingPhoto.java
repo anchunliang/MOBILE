@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.Socket;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,13 +18,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -52,8 +57,10 @@ import com.facebook.android.AsyncFacebookRunner.RequestListener;
 import com.facebook.android.Facebook;
 import com.facebook.android.FacebookError;
 import com.parse.Parse;
+import com.parse.ParsePush;
 
 import edu.ntu.mobile.smallelephant.ader.CONSTANT;
+import edu.ntu.mobile.smallelephant.ader.ParseStarterProjectActivity;
 import edu.ntu.mobile.smallelephant.ader.R;
 
 public class ChoosingPhoto extends FragmentActivity {
@@ -74,12 +81,15 @@ public class ChoosingPhoto extends FragmentActivity {
 	private ArrayList<String> albumCoverUrls;
 	// ����?��?��url: ?��pair ( albumId, album?��?������?��?�rl)
 	private TreeMap<String, ArrayList<PhotoUnit>> photos;
+	
+	private ArrayList<String> friendPhotosToShare = null;
 	// private TreeMap<String,ArrayList<Boolean>> photoselection;
 	String accessToken;
 	String myId;
 	String myName;
 	String friendId;
 	String friendIp;
+	String friendName;
 	String nowalbumid;
 	// String friendIds[];
 	private int count;
@@ -95,10 +105,50 @@ public class ChoosingPhoto extends FragmentActivity {
 	private ProgressDialog PhotoprogressDialog;
 	int flag=0;
 	int selections=0; 
-	Socket clientSocket;
 	Intent intent1;
 	Bundle bundle1;
 	//private ArrayList<String> PhotoURLS = new ArrayList<String>();
+	
+	@Override
+	public void onRestart(){
+		super.onRestart();
+		friendPhotosToShare = null;
+	}
+	
+	@Override
+	public void onResume(){
+		super.onResume();
+		IntentFilter filter = new IntentFilter( CONSTANT.ACTION_CHOOSING);
+		registerReceiver(receiver, filter);
+	}
+	
+	@Override
+	public void onPause(){
+		unregisterReceiver(receiver);
+		super.onPause();
+	}
+	
+	
+	@Override
+	public void onDestroy(){
+		ParsePush push = new ParsePush();
+		push.setChannel(CONSTANT.PARSE_CHANNEL_TAG + friendId);
+		JSONObject data = new JSONObject();
+		try {
+			data.put("action", CONSTANT.ACTION_CHOOSING);
+			data.put("title", "cancel");
+			data.put("message", myId);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.getStackTrace();
+		}
+		Toast.makeText(ChoosingPhoto.this,
+				"cancel >> data : "+ data.toString(),
+				Toast.LENGTH_SHORT).show();
+		push.setData(data);
+		push.sendInBackground();
+		super.onDestroy();
+	}
 	
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
@@ -149,13 +199,13 @@ public class ChoosingPhoto extends FragmentActivity {
 								selectAllSelectionByAlbumId(nowalbumid);
 								Toast.makeText(
 										getApplicationContext(),
-										"album " + nowalbumid
-												+ " all selected!",
+										"相簿 \"" + albumNames.get(albumIds.indexOf(nowalbumid))
+												+ " \"已全部選取",
 										Toast.LENGTH_SHORT).show();
 							} else {
 								resetSelectionByAlbumId(nowalbumid);
 								Toast.makeText(getApplicationContext(),
-										"album " + nowalbumid + " reset!",
+										"相簿 \"" +  albumNames.get(albumIds.indexOf(nowalbumid)) + " \"已全部取消",
 										Toast.LENGTH_SHORT).show();
 							}
 
@@ -196,11 +246,14 @@ public class ChoosingPhoto extends FragmentActivity {
 									"Please select some photos.",
 									Toast.LENGTH_SHORT).show();
 						else {
+							ArrayList<String> chosenPhotos = new ArrayList<String>();
 							for (String albumid : albumIds) {
 								ArrayList<PhotoUnit> photounits = photos
 										.get(albumid);
 								for (PhotoUnit p : photounits) {
 									if (p.photoselection) {
+										chosenPhotos.add(count,
+												p.photourllarge);
 										bundle.putString("photo" + count,
 												p.photourllarge);
 										count++;
@@ -208,7 +261,43 @@ public class ChoosingPhoto extends FragmentActivity {
 								}
 							}
 							if (count == selections) {
+								ParsePush push = new ParsePush();
+								push.setChannel(CONSTANT.PARSE_CHANNEL_TAG + friendId);
+								JSONObject data = new JSONObject();
+								try {
+									data.put("action", CONSTANT.ACTION_CHOOSING);
+									data.put("title", "finish");
+									data.put("message", myId);
+									data.put("count", count);
+									for( int i = 0; i < count; i++){
+										data.put("photo" + count,
+												chosenPhotos.get(i));
+									}
+								} catch (Exception e) {
+									// TODO: handle exception
+									e.getStackTrace();
+								}
+								Toast.makeText(ChoosingPhoto.this,
+										"finish >> data : "+ data.toString(),
+										Toast.LENGTH_SHORT).show();
+								push.setData(data);
+								push.sendInBackground();
+								
+								int count_friend = 0;
+								
+								if( friendPhotosToShare!=null){
+									for( int i = 0; i < friendPhotosToShare.size(); i++){
+										bundle.putString("friend_photo" + count_friend,
+												friendPhotosToShare.get(i));
+										count_friend++;
+									}
+								}
 								bundle.putString("selections", "" + selections);
+								bundle.putString("friend_selections", "" + count_friend);
+								bundle.putString("friendId",friendId);
+								bundle.putString("friendName",friendName);
+								bundle.putString("myId",myId);
+								bundle.putString("myName",myName);
 								intent.putExtras(bundle);
 								startActivity(intent);
 
@@ -245,84 +334,16 @@ public class ChoosingPhoto extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.album_main);
 		AlbumprogressDialog = ProgressDialog.show(ChoosingPhoto.this,
-				"=(", "=(", true, false);
+				"讀取相簿列表中", "請稍候...", true, false);
 		AlbumprogressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		intent1 = new Intent(ChoosingPhoto.this,MyGallery.class);
 		bundle1 = new Bundle();
 		photoadaptermap = new HashMap<String,PhotoAdapter>();
-		getSupportActionBar().setTitle("?�簿?�表");
-		mimage = (ImageView) findViewById(R.id.arrow);
-		mimage.setVisibility(View.GONE);
+		getSupportActionBar().setTitle("相簿列表");
+		
 		albumgrid = (GridView) findViewById(R.id.AlbumGrid);
 		photogrid = (GridView) findViewById(R.id.PhotoGrid);
-		mimage.setOnClickListener(new OnClickListener() {
-			public void onClick(View arg0) {
-				
-				
-				if(selections==0)
-					Toast.makeText(ChoosingPhoto.this,"Please select some photos.",Toast.LENGTH_SHORT).show();
-				else{
-					Thread t = new Thread(new Runnable() {
-						public void run() {
-					try{
-						
-						InetAddress serverIp;
-						int count=0;
-						serverIp = InetAddress.getByName(friendIp);
-						int serverPort = 5055;
-						clientSocket = new Socket(serverIp, serverPort);
-						BufferedWriter bw;
-						bw = new BufferedWriter( new OutputStreamWriter(clientSocket.getOutputStream()));
-						
-						// �g�J�T��
-						//bw.write(EditText01.getText()+":"+EditText02.getText()+"\n");
-						
-						// �ߧY�o�e
-						//bw.flush();
-						for(String albumid: albumIds){
-							ArrayList<PhotoUnit> photounits =photos.get(albumid);
-							for(PhotoUnit p:photounits){
-								if(p.photoselection){
-									bundle1.putString("photo"+count,p.photourllarge);
-									bw.write(p.photourllarge+"\n");
-									bw.flush();
-									Log.d("network","write: "+p.photourllarge+"\n");
-									count++;
-								}						
-							}
-							
-						}
-						bw.write("end\n");
-						bw.flush();
-						Log.d("network","end"+"\n");
-						Message msg = new Message();  
-		                msg.what = 2;  
-		                mHandler.sendMessage(msg);  
-					}
-					
-					catch (IOException e) {
-						e.printStackTrace();
-					}
-					}
-					});
-					t.start();
-					/*if(count==selections){
-						bundle.putString("selections", ""+selections);
-						intent.putExtras(bundle);
-						startActivity(intent);
-						
-					}
-					else{
-						Log.d("trace","selection count not match!");
-						
-					}*/
-					
-				}
-					
-				
-
-			}
-		});
+		
 		photogrid.setVisibility(View.GONE);
 		albumAdapter = new AlbumAdapter();
 		albumgrid.setAdapter(albumAdapter);
@@ -355,7 +376,7 @@ public class ChoosingPhoto extends FragmentActivity {
 			case 1:
 				Log.d("time", "handler begin Tid=" + getTaskId());
 				albumgrid.setVisibility(View.GONE);
-				getSupportActionBar().setTitle("?�選?�享?��?");
+				getSupportActionBar().setTitle("勾選分享相片");
 				photogrid.setVisibility(View.VISIBLE);
             	photogrid.setAdapter(photoAdapter);
             	PhotoprogressDialog.dismiss();
@@ -366,6 +387,12 @@ public class ChoosingPhoto extends FragmentActivity {
 				intent1.putExtras(bundle1);
 				startActivity(intent1);
                 break;   
+            case 3:
+            	albumAdapter.notifyDataSetChanged();
+				break;
+            case 4:
+            	photoAdapter.notifyDataSetChanged();
+				break;
             }  
         }  
     };  
@@ -377,7 +404,7 @@ public class ChoosingPhoto extends FragmentActivity {
 			ChoosingPhoto.this.runOnUiThread(new Runnable() {
 				public void run() {
 					albumgrid.setVisibility(View.VISIBLE);
-					getSupportActionBar().setTitle("?�簿?�表");
+					getSupportActionBar().setTitle("相簿列表");
 					photogrid.setVisibility(View.GONE);
 					invalidateOptionsMenu();
 
@@ -410,7 +437,9 @@ public class ChoosingPhoto extends FragmentActivity {
 		public long getItemId(int position) {
 			return position;
 		}
-
+		public void setItem(int index,Drawable item) {
+			drawablesFromUrl.set(index,item);
+		}
 		public void addItem(Drawable item) {
 			drawablesFromUrl.add(item);
 		}
@@ -458,13 +487,13 @@ public class ChoosingPhoto extends FragmentActivity {
 						nowalbumid = albumIds.get(id);
 						photoAdapter = photoadaptermap.get(albumIds.get(id));
 						albumgrid.setVisibility(View.GONE);
-						getSupportActionBar().setTitle("?�選?�享?��?");
+						getSupportActionBar().setTitle("勾選分享相片");
 						photogrid.setVisibility(View.VISIBLE);
 						photogrid.setAdapter(photoAdapter);
 					} else {
 						photoAdapter = new PhotoAdapter();
 						PhotoprogressDialog = ProgressDialog.show(
-								ChoosingPhoto.this, " =((", "=(((", true,
+								ChoosingPhoto.this, "讀取相片中", "請稍候...", true,
 								false);
 						PhotoprogressDialog
 								.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -484,21 +513,33 @@ public class ChoosingPhoto extends FragmentActivity {
 
 								ArrayList<PhotoUnit> photo = photos
 										.get(albumIds.get(id));
+								for(int i=0;i<photo.size();i++){
+									photoAdapter.addItem(getResources().getDrawable(R.drawable.question));	
+								}
+								Message msg = new Message();
+								msg.what = 1;
+								mHandler.sendMessage(msg);
+								int i=0;
 								for (PhotoUnit photounit : photo) {
+									
 									photoAdapter
-											.addItem(LoadImageFromURL(photounit.photourlsmall));
+											.setItem(i,LoadImageFromURL(photounit.photourlsmall));
+									i++;
 									Log.d("trace",
 											"photoadapter after addItem, url="
 													+ photounit.photourlsmall);
+									msg = new Message();
+									msg.what = 4;
+									mHandler.sendMessage(msg);
 
 								}
 								// photoAdapter.notifyDataSetChanged();
 								Log.d("time", "onclick finish Tid="
 										+ getTaskId());
 								photoadaptermap.put(nowalbumid, photoAdapter);
-								Message msg = new Message();
+								/*msg = new Message();
 								msg.what = 1;
-								mHandler.sendMessage(msg);
+								mHandler.sendMessage(msg);*/
 								// }
 								// });
 								Log.d("trace", "image onclick");
@@ -512,7 +553,14 @@ public class ChoosingPhoto extends FragmentActivity {
 			});
 			// holder.imageview.setImageBitmap(thumbnails[position]);
 			holder.imageview.setImageDrawable(drawablesFromUrl.get(position));
-			holder.mtextview.setText(albumNames.get(position));
+			try{
+				String s=albumNames.get(position);
+				holder.mtextview.setText(s);
+			}
+			catch(Exception e){
+				holder.mtextview.setText("");
+				e.printStackTrace();
+			}
 			// holder.imageview.setImageResource(R.drawable.ic_launcher);
 			// holder.imageview.setLayoutParams(new CoverFlow.LayoutParams(100,
 			// 100));
@@ -548,7 +596,9 @@ public class ChoosingPhoto extends FragmentActivity {
 		public long getItemId(int position) {
 			return position;
 		}
-
+		public void setItem(int index,Drawable item) {
+			drawablesFromUrl.set(index,item);
+		}
 		public void addItem(Drawable item) {
 			drawablesFromUrl.add(item);
 		}
@@ -682,6 +732,7 @@ public class ChoosingPhoto extends FragmentActivity {
 		Log.d("facebookURL", "myId is: " + myId);
 		myName = bundle.getString("myName");
 		friendId = bundle.getString("friendId");
+		friendName = bundle.getString("friendName");
 		friendIp = bundle.getString("friendIp");
 //		Integer count = Integer.valueOf(bundle.getString("numSelectedFriends"));
 //		friendIds = new String[count];
@@ -727,19 +778,40 @@ public class ChoosingPhoto extends FragmentActivity {
 				albumCoverUrls = new ArrayList<String>();
 				photos = new TreeMap<String, ArrayList<PhotoUnit>>();
 				Log.d("trace", "albumList.length=" + albumList.length());
+				Message msg;
+				for (int i = 0; i < albumList.length(); i++) {
+					if (ALBUMPRIVACY.contains(albumList.getJSONObject(i).getString("privacy"))) {
+						albumAdapter.addItem(getResources().getDrawable(R.drawable.question));	
+						
+					}
+				}
+				msg = new Message();
+				msg.what = 0;
+				mHandler.sendMessage(msg);
+				int j=0;
 				for (int i = 0; i < albumList.length(); i++) {
 					Log.d("facebookURL", "album " + i);
+					
 					if (ALBUMPRIVACY.contains(albumList.getJSONObject(i)
 							.getString("privacy"))) {
+						
 						String albumId = albumList.getJSONObject(i).getString(
 								"id");
 						String albumName = albumList.getJSONObject(i)
 								.getString("name");
 						albumIds.add(albumId);
 						albumNames.add(albumName);
+						
 						albumCoverUrls.add("https://graph.facebook.com/"
 								+ albumId + "/picture?type=small&access_token="
 								+ accessToken);
+						albumAdapter.setItem(j,LoadImageFromURL("https://graph.facebook.com/"	+ albumId + "/picture?type=small&access_token="	+ accessToken));
+						j++;
+						msg = new Message();
+						msg.what = 3;
+						mHandler.sendMessage(msg);
+						
+						
 						Log.d("trace_album", "https://graph.facebook.com/"
 								+ albumId + "/picture?type=small&access_token="
 								+ accessToken);
@@ -754,18 +826,18 @@ public class ChoosingPhoto extends FragmentActivity {
 				 * run() {
 				 */
 
-				for (String url : albumCoverUrls) {
+				/*for (String url : albumCoverUrls) {
 					albumAdapter.addItem(LoadImageFromURL(url));
 					Log.d("trace", "after addItem, url=" + url);
 					Log.d("trace", "after addItem");
 
-				}
+				}*/
 				// albumAdapter.notifyDataSetChanged();
 				// }
 				// });
-				Message msg = new Message();
+				/*Message msg = new Message();
 				msg.what = 0;
-				mHandler.sendMessage(msg);
+				mHandler.sendMessage(msg);*/
 				// album��?���?} catch (JSONException e) {
 				// TODO: handle exception
 				// e.printStackTrace();
@@ -926,5 +998,76 @@ public class ChoosingPhoto extends FragmentActivity {
 		invalidateOptionsMenu();
 		photogrid.invalidateViews();
 	}
+	
+	private void onFriendAbortAlert()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage( friendName+" aborted!").setCancelable(
+                false).setNeutralButton("Ok",
+                		new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								// TODO Auto-generated method stub
+								setResult(RESULT_OK);
+								finish();
+								dialog.cancel();
+							}
+						});
+                
+//                .setsetPositiveButton("Share",
+//                new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        dialog.cancel();
+//                    }
+//                }).setNegativeButton("Cancel",
+//                new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        dialog.cancel();
+//                    }
+//                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+	
+	public BroadcastReceiver receiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Bundle extras = intent.getExtras();
+			if (extras != null) {
+				JSONObject data = null;
+				String action = null;
+				String title = null;
+				String message = null;
+				try {
+					data = new JSONObject(extras.getString("com.parse.Data"));
+					action = data.getString("action");
+					title = data.getString("title");
+					message = data.getString("message");
+				} catch (Exception e) {
+					// TODO: handle exception
+					e.getStackTrace();
+				}
+				if( title.equals("cancel")){
+					onFriendAbortAlert();
+				}
+				if( title.equals("finish")){
+					try {
+						Integer count = data.getInt("count");
+						friendPhotosToShare = new ArrayList<String>();
+						if( count != null && count >0){
+							for( int i = 0; i < count; i++){
+								friendPhotosToShare.add(i, data.getString("photo"+i));
+							}
+						}
+					} catch (Exception e) {
+						// TODO: handle exception
+						e.getStackTrace();
+					}
+					
+				}
+			}
+		}
+	};
+	
 
 }

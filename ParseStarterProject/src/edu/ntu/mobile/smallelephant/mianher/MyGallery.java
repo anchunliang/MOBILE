@@ -1,27 +1,24 @@
 package edu.ntu.mobile.smallelephant.mianher;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 
-import com.facebook.android.AsyncFacebookRunner;
-import com.facebook.android.Facebook;
+import org.json.JSONObject;
 
-import edu.ntu.mobile.smallelephant.ader.R;
-import edu.ntu.mobile.smallelephant.ader.R.id;
-import edu.ntu.mobile.smallelephant.ader.R.layout;
+import com.parse.ParsePush;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.LinearGradient;
 import android.graphics.Matrix;
@@ -33,19 +30,22 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseAdapter;
 import android.widget.Gallery.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
+import edu.ntu.mobile.smallelephant.ader.CONSTANT;
+import edu.ntu.mobile.smallelephant.ader.R;
 
 public class MyGallery extends Activity {
 	/** Called when the activity is first created. */
@@ -57,8 +57,52 @@ public class MyGallery extends Activity {
 	ImageAdapter coverImageAdapter;
 	sImageAdapter scoverImageAdapter; 
 	private ProgressDialog progressDialog;
+	private String friendId = null;
+	private String friendName = null;
+	private String myId = null;
+	private String myName = null;
+	private ArrayList<String> friendPhotosToShare = null;
 	int selections;
+	int friend_selections;
 	ArrayList<Drawable> drawablesFromUrl;
+	
+
+	@Override
+	public void onResume(){
+		super.onResume();
+		IntentFilter filter = new IntentFilter( CONSTANT.ACTION_CHOOSING);
+		registerReceiver(photoReceiver, filter);
+		IntentFilter filter2 = new IntentFilter( CONSTANT.ACTION_SHARING);
+		registerReceiver(receiver, filter2);
+	}
+	
+	@Override
+	public void onPause(){
+		unregisterReceiver(photoReceiver);
+		unregisterReceiver(receiver);
+		super.onPause();
+	}
+	
+	
+	@Override
+	public void onDestroy(){
+		ParsePush push = new ParsePush();
+		push.setChannel(CONSTANT.PARSE_CHANNEL_TAG + friendId);
+		JSONObject data = new JSONObject();
+		try {
+			data.put("action", CONSTANT.ACTION_SHARING);
+			data.put("title", "cancel");
+			data.put("message", myId);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.getStackTrace();
+		}
+		push.setData(data);
+		push.sendInBackground();
+		super.onDestroy();
+	}
+	
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -68,8 +112,10 @@ public class MyGallery extends Activity {
 		scoverImageAdapter= new sImageAdapter(this);
 		coverFlow = (CoverFlow) findViewById(R.id.Gallery);
 		scoverFlow = (CoverFlow) findViewById(R.id.sGallery);
-		progressDialog = ProgressDialog.show(MyGallery.this, "正在生成Gallery", "請稍候...", true, false); 
+		progressDialog = ProgressDialog.show(MyGallery.this, "正在生成Gallery", "請稍後..", true, false); 
 		progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		coverFlow.setAdapter(coverImageAdapter);
+		scoverFlow.setAdapter(scoverImageAdapter);
        // mThread.start();  
         Thread mThread = new Thread(new Runnable() {  
             
@@ -81,6 +127,20 @@ public class MyGallery extends Activity {
         			public void onItemClick(AdapterView<?> parent, View v,
         					int position, long id) {
         				coverFlow.setSelection(position, true);
+        				
+        				ParsePush push = new ParsePush();
+            			push.setChannel(CONSTANT.PARSE_CHANNEL_TAG + friendId);
+            			JSONObject data = new JSONObject();
+            			try {
+            				data.put("action", CONSTANT.ACTION_SHARING);
+            				data.put("title", "coversetposition");
+            				data.put("message", position);
+            			} catch (Exception e) {
+            				// TODO: handle exception
+            				e.getStackTrace();
+            			}
+            			push.setData(data);
+            			push.sendInBackground();
         				//coverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT, null);
         			}
         		});
@@ -90,24 +150,18 @@ public class MyGallery extends Activity {
         		coverFlow.setOnItemSelectedListener(new OnItemSelectedListener() 
                 {
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long i){
-                    	//int diff=scoverFlow.getSelectedItemPosition()-position;
                     	if(scoverFlow.getSelectedItemPosition()>position){
                     		int diff=scoverFlow.getSelectedItemPosition()-position;
                     		for(int j=0;j<diff;j++){
                     			scoverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_LEFT, null);
-                    			/*Handler handler = new Handler(); 
-                    		    handler.postDelayed(new Runnable() { 
-                    		         public void run() { 
-                    		              //my_button.setBackgroundResource(R.drawable.defaultcard); 
-                    		         } 
-                    		    }, 1000); */
-                    		}
+                      		}
                     		
                     	}
                     	else if(scoverFlow.getSelectedItemPosition()<position){
                     		int diff=position-scoverFlow.getSelectedItemPosition();
                     		for(int j=0;j<diff;j++){
                     			scoverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT, null);
+                    			
                     			/*Handler handler = new Handler(); 
                     		    handler.postDelayed(new Runnable() { 
                     		         public void run() { 
@@ -117,6 +171,20 @@ public class MyGallery extends Activity {
                     		}
                     		
                     	}
+                    	ParsePush push = new ParsePush();
+            			push.setChannel(CONSTANT.PARSE_CHANNEL_TAG + friendId);
+            			JSONObject data = new JSONObject();
+            			try {
+            				data.put("action", CONSTANT.ACTION_SHARING);
+            				data.put("title", "coverflip");
+            				data.put("message", position);
+            			} catch (Exception e) {
+            				// TODO: handle exception
+            				e.getStackTrace();
+            			}
+            			push.setData(data);
+            			push.sendInBackground();
+                    	
                     	//scoverFlow.setSelection(position, true);
                     }
 
@@ -143,16 +211,38 @@ public class MyGallery extends Activity {
         		 * coverImageAdapter.notifyDataSetChanged();
         		 * scoverImageAdapter.notifyDataSetChanged(); } });
         		 */
+        		coverFlow.setSpacing(-25);
+        		scoverFlow.setSpacing(-25);
+        		coverFlow.setSelection(0, true);
+        		scoverFlow.setSelection(0, true);
+        		coverFlow.setAnimationDuration(1000);
+        		scoverFlow.setAnimationDuration(1000);
+                int i=0;
         		for (String url : PhotoURLS) {
+        			
         			Drawable d=LoadImageFromURL(url);
         			coverImageAdapter.addItem(d);
-        			//scoverImageAdapter.addItem(d);
+        			
+        			if(i%10==9){
+        				Message msg = new Message(); 
+        				msg.what = 1;  
+        				mHandler.sendMessage(msg);
+        			}
+                    if(i==4){
+                    	Message msg = new Message(); 
+        				msg.what = 1;  
+        				mHandler.sendMessage(msg);
+                    	msg = new Message(); 
+                		msg.what = 0;  
+                        mHandler.sendMessage(msg);
+                    }
+                    i++;
         		}
-        		coverImageAdapter.notifyDataSetChanged();
-        		scoverImageAdapter.notifyDataSetChanged();
-        		Message msg = new Message();  
-                msg.what = 0;  
-                mHandler.sendMessage(msg);
+        		Message msg = new Message(); 
+				msg.what = 1;  
+				mHandler.sendMessage(msg);
+        		
+        		
            }  
              
         });  
@@ -169,16 +259,12 @@ public class MyGallery extends Activity {
         public void handleMessage(Message msg){  
             switch (msg.what) {  
             case 0:  
-            	coverFlow.setAdapter(coverImageAdapter);
-        		scoverFlow.setAdapter(scoverImageAdapter);
-        		coverFlow.setSpacing(-25);
-        		scoverFlow.setSpacing(-25);
-        		coverFlow.setSelection(0, true);
-        		scoverFlow.setSelection(0, true);
-        		coverFlow.setAnimationDuration(1000);
-        		scoverFlow.setAnimationDuration(1000);
             	progressDialog.dismiss();   
                 break;    
+            case 1:
+            	coverImageAdapter.notifyDataSetChanged();
+    			scoverImageAdapter.notifyDataSetChanged();
+            	break;
             }  
         }
     };
@@ -374,10 +460,19 @@ public class MyGallery extends Activity {
 	}
 	private void getIntentData() {
 		Bundle bundle = this.getIntent().getExtras();
+		friendId = bundle.getString("friendId");
+		friendName = bundle.getString("friendName");
+		myId = bundle.getString("myId");
+		myName = bundle.getString("myName");
 		selections = Integer.parseInt(bundle.getString("selections"));
-		
+		friend_selections = Integer.parseInt(bundle.getString("friend_selections"));
 		for(int i=0;i<selections;i++){
 			String url=bundle.getString("photo"+i);
+			PhotoURLS.add(url);		
+		}
+		
+		for(int i=0;i<friend_selections;i++){
+			String url=bundle.getString("friend_photo"+i);
 			PhotoURLS.add(url);		
 		}
 	};
@@ -393,4 +488,154 @@ public class MyGallery extends Activity {
 
 		return super.onKeyDown(keyCode, event);
 	}*/
+	public BroadcastReceiver photoReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Bundle extras = intent.getExtras();
+			if (extras != null) {
+				JSONObject data = null;
+				String action = null;
+				String title = null;
+				String message = null;
+				try {
+					data = new JSONObject(extras.getString("com.parse.Data"));
+					action = data.getString("action");
+					title = data.getString("title");
+					message = data.getString("message");
+				} catch (Exception e) {
+					// TODO: handle exception
+					e.getStackTrace();
+				}
+				if( title.equals("cancel")){
+					onFriendAbortAlert();
+					finish();
+				}
+				if( title.equals("finish")){
+					try {
+						Integer count = data.getInt("count");
+//						friendPhotosToShare = new ArrayList<String>();
+						if( count != null && count >0){
+							for( int i = 0; i < count; i++){
+									PhotoURLS.add(data.getString("photo"+i));		
+//								friendPhotosToShare.add(i, data.getString("photo"+i));
+							}
+						}
+					} catch (Exception e) {
+						// TODO: handle exception
+						e.getStackTrace();
+					}
+					
+				}
+			}
+		}
+	};
+	
+	public BroadcastReceiver receiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Bundle extras = intent.getExtras();
+			if (extras != null) {
+				JSONObject data = null;
+				String action = null;
+				String title = null;
+				try {
+					data = new JSONObject(extras.getString("com.parse.Data"));
+					action = data.getString("action");
+					title = data.getString("title");
+				} catch (Exception e) {
+					// TODO: handle exception
+					e.getStackTrace();
+				}
+				if( title.equals("cancel")){
+					onFriendAbortAlert();					
+				}
+				else if ( title.equals("scover")){
+					String message = null;
+					try{
+						message = data.getString("message");
+					}catch( Exception e){
+						e.getStackTrace();
+					}
+					
+				}
+				else if ( title.equals("coverflip")){
+					int position = coverFlow.getSelectedItemPosition();
+					try{
+						position = data.getInt("message");
+					}catch( Exception e){
+						e.getStackTrace();
+					}
+					coverFlow.setSelection(position);
+				}
+				else if ( title.equals("coversetposition")){
+					int position = coverFlow.getSelectedItemPosition();
+					try{
+						position = data.getInt("message");
+					}catch( Exception e){
+						e.getStackTrace();
+					}
+					
+					if(coverFlow.getSelectedItemPosition()>position){
+                		int diff=coverFlow.getSelectedItemPosition()-position;
+                		for(int j=0;j<diff;j++){
+                			coverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_LEFT, null);
+                		}
+                	}
+					else if(coverFlow.getSelectedItemPosition()<position){
+                		int diff=position-coverFlow.getSelectedItemPosition();
+                		for(int j=0;j<diff;j++){
+                			coverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT, null);
+                		}
+                	}
+					
+					if(scoverFlow.getSelectedItemPosition()>position){
+                		int diff=scoverFlow.getSelectedItemPosition()-position;
+                		for(int j=0;j<diff;j++){
+                			scoverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_LEFT, null);
+                		}
+                	}
+					else if(scoverFlow.getSelectedItemPosition()<position){
+                		int diff=position-scoverFlow.getSelectedItemPosition();
+                		for(int j=0;j<diff;j++){
+                			scoverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT, null);
+                		}
+                	}
+					
+					
+				}
+			}
+		}
+	};
+	private void onFriendAbortAlert()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage( friendName+" aborted!").setCancelable(
+                false).setNeutralButton("Ok",
+                		new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								// TODO Auto-generated method stub
+								setResult(RESULT_OK);
+								finish();
+								dialog.cancel();
+							}
+						});
+                
+//                .setsetPositiveButton("Share",
+//                new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        dialog.cancel();
+//                    }
+//                }).setNegativeButton("Cancel",
+//                new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        dialog.cancel();
+//                    }
+//                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+
 }

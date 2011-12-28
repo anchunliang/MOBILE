@@ -22,10 +22,4 @@
 	    android:numColumns="auto_fit"
 	    android:stretchMode="columnWidth"
 	    android:verticalSpacing="10dp"/>
-	<ImageView
-	    android:id="@+id/arrow"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:src="@drawable/arrow_right" android:layout_alignParentRight="true" android:layout_alignParentBottom="true"/>
-
 </RelativeLayout>

@@ -4,26 +4,29 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="13" />
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="13" />
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:debuggable="true"
         android:icon="@drawable/icon"
         android:label="@string/app_name" >
-        <activity android:name="edu.ntu.mobile.smallelephant.mianher.MyGallery"
-                  android:theme="@style/Theme.Sherlock" >
+        <activity
+            android:name="edu.ntu.mobile.smallelephant.mianher.MyGallery"
+            android:theme="@style/Theme.Sherlock" >
         </activity>
         <activity
             android:label="@string/app_name"
             android:name="ParseStarterProjectActivity"
-            android:theme="@style/Theme.Sherlock">
+            android:theme="@style/Theme.Sherlock" >
         </activity>
-        <activity android:name="edu.ntu.mobile.smallelephant.mianher.ChoosingPhoto" 
-            	  android:theme="@style/Theme.Sherlock" >
-            
+        <activity
+            android:name="edu.ntu.mobile.smallelephant.mianher.ChoosingPhoto"
+            android:theme="@style/Theme.Sherlock" >
         </activity>
         <activity
             android:name="edu.ntu.mobile.smallelephant.mianher.beginner"
@@ -34,11 +37,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="edu.ntu.mobile.smallelephant.mianher.instruction" 
-             	  android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+        <activity
+            android:name="edu.ntu.mobile.smallelephant.mianher.instruction"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
         </activity>
+
+        <service android:name="com.parse.PushService" />
+        <receiver android:name="edu.ntu.mobile.smallelephant.ader.SharingCommunication" android:enabled="true">
+            <intent-filter>
+                <action android:name="edu.ntu.mobile.smallelephant.ader.communication"></action>
+            </intent-filter>
+        </receiver>
+
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
 </manifest>

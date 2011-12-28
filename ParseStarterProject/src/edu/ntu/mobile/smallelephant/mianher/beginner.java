@@ -1,44 +1,31 @@
 package edu.ntu.mobile.smallelephant.mianher;
 
+
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.HashMap;
-import java.util.List;
-
-import org.json.JSONObject;
-import org.json.JSONException;
-import org.json.JSONArray;
-
-import com.facebook.android.DialogError;
-import com.facebook.android.Facebook;
-import com.facebook.android.FacebookError;
-import com.facebook.android.AsyncFacebookRunner.RequestListener;
-import com.facebook.android.Facebook.DialogListener;
-import com.parse.GetCallback;
-import com.parse.FindCallback;
-import com.parse.Parse;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-
-import edu.ntu.mobile.smallelephant.ader.ParseStarterProjectActivity;
-import edu.ntu.mobile.smallelephant.ader.R;
-
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
+
+import com.facebook.android.AsyncFacebookRunner.RequestListener;
+import com.facebook.android.DialogError;
+import com.facebook.android.Facebook;
+import com.facebook.android.Facebook.DialogListener;
+import com.facebook.android.FacebookError;
+import com.parse.Parse;
+import com.parse.PushService;
+
+import edu.ntu.mobile.smallelephant.ader.CONSTANT;
+import edu.ntu.mobile.smallelephant.ader.ParseStarterProjectActivity;
+import edu.ntu.mobile.smallelephant.ader.R;
 
 public class beginner extends Activity {
 	ImageButton login;
@@ -48,13 +35,45 @@ public class beginner extends Activity {
 	public static final String PREF = "SMALL_ELEPHANT_PREF";
 	public static final String PREF_USER_ID = "PARSE_USER_id";
 
+	@Override
+	public void onResume(){
+		Log.e("beginner", "beginner_onResume");
+
+		beginner.this.runOnUiThread(new Runnable() {
+			public void run() {
+				// TODO Auto-generated method stub
+				if (ParseStarterProjectActivity.facebook.isSessionValid()) {
+					Log.e("beginner", "beginner_login");
+					login.setVisibility(View.INVISIBLE);
+					logout.setVisibility(View.VISIBLE);
+					start.setVisibility(View.VISIBLE);
+					//先load名單進來了!!!
+				}
+				else{
+					Log.e("beginner", "beginner_logout");
+					start.setVisibility(View.INVISIBLE);
+					login.setVisibility(View.VISIBLE);
+					logout.setVisibility(View.INVISIBLE);
+				}
+			}
+		});
+		super.onResume();
+	}
 
 	@Override
 	public void onStop() {
 		Log.d("fbSession", "beginner_onStop");
+		
 		super.onStop();
 	}
-
+	@Override
+	public void onPause() {
+		start.setImageResource(R.drawable.start);
+		login.setImageResource(R.drawable.login);
+		instruction.setImageResource(R.drawable.instruction);
+		//start.setImageResource(R.drawable.start_press);
+		super.onPause();
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -63,12 +82,13 @@ public class beginner extends Activity {
 		Log.d("trace","beginner");
 		Parse.initialize(this, "L6Qx3IQVB2zNv3bHrUzTwNbak0MF1xHQHqE2BVCc",
 				"ksAA2JMvQVhQwnWLV8ZanZIChJlpsGIRUfKo3GIX");
+		PushService.subscribe(this, "", ParseStarterProjectActivity.class);
 		login = (ImageButton)findViewById(R.id.begin_login);
 		logout = (ImageButton)findViewById(R.id.begin_logout);
 		instruction = (ImageButton)findViewById(R.id.begin_instruction);
 		start = (ImageButton)findViewById(R.id.begin_start);
 
-		Log.e("yaya", "yayaya");
+//		Log.e("yaya", "yayaya");
 
 		if (ParseStarterProjectActivity.facebook.isSessionValid()) {
 			Log.d("fbSession", "session valid 1");
@@ -88,6 +108,7 @@ public class beginner extends Activity {
 
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
+				start.setImageResource(R.drawable.start_press);
 				pass_to_ader();
 			}
 		});
@@ -104,6 +125,7 @@ public class beginner extends Activity {
 
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+				instruction.setImageResource(R.drawable.instruction_press);
 				Intent instru = new Intent(
 								beginner.this,
 								instruction.class);
@@ -111,13 +133,15 @@ public class beginner extends Activity {
 			}
 		});
 	}
-
+	
 	private OnClickListener loginListener = new OnClickListener() {
 
 		public void onClick(View v) {
 			// TODO Auto-generated method stub
+			login.setImageResource(R.drawable.login_press);
 			if (!ParseStarterProjectActivity.facebook.isSessionValid()) {
 				Log.d("fbSession", "session invalid");
+				
 				ParseStarterProjectActivity.facebook.authorize(beginner.this,
 						new String[] { "read_friendlists", "user_about_me",
 								"user_photos", "friends_photos" },
@@ -147,7 +171,7 @@ public class beginner extends Activity {
 							public void onCancel() {
 								// TODO Auto-generated method stub
 								Log.d("fbSession", "cancel ");
-
+								login.setImageResource(R.drawable.login);
 							}
 						});
 			} else {
@@ -201,7 +225,19 @@ public class beginner extends Activity {
 		Bundle bundle = new Bundle();
 		bundle.putString("accessToken", ParseStarterProjectActivity.facebook.getAccessToken());
 		intent.putExtras(bundle);
-		startActivity(intent);
+		startActivityForResult(intent, 0);
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == 0) {
+			if (resultCode == CONSTANT.RESULT_LOGOUT) {
+				// A contact was picked. Here we will just display it
+				// to the user.
+				ParseStarterProjectActivity.fbAsyncRunner.logout(beginner.this,
+						logoutListener);
+			}
+		}
 	}
 
 }
