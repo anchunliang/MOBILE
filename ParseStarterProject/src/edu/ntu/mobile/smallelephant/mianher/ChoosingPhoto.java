@@ -136,7 +136,7 @@ public class ChoosingPhoto extends FragmentActivity {
 		JSONObject data = new JSONObject();
 		try {
 			data.put("action", CONSTANT.ACTION_CHOOSING);
-			data.put("title", "cancel");
+			data.put("title1", "cancel");
 			data.put("message", myId);
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -266,11 +266,11 @@ public class ChoosingPhoto extends FragmentActivity {
 								JSONObject data = new JSONObject();
 								try {
 									data.put("action", CONSTANT.ACTION_CHOOSING);
-									data.put("title", "finish");
+									data.put("title1", "finish");
 									data.put("message", myId);
 									data.put("count", count);
 									for( int i = 0; i < count; i++){
-										data.put("photo" + count,
+										data.put("photo" + i,
 												chosenPhotos.get(i));
 									}
 								} catch (Exception e) {
@@ -287,7 +287,7 @@ public class ChoosingPhoto extends FragmentActivity {
 								
 								if( friendPhotosToShare!=null){
 									for( int i = 0; i < friendPhotosToShare.size(); i++){
-										bundle.putString("friend_photo" + count_friend,
+										bundle.putString("friend_photo" + i,
 												friendPhotosToShare.get(i));
 										count_friend++;
 									}
@@ -1046,7 +1046,7 @@ public class ChoosingPhoto extends FragmentActivity {
 				try {
 					data = new JSONObject(extras.getString("com.parse.Data"));
 					action = data.getString("action");
-					title = data.getString("title");
+					title = data.getString("title1");
 					message = data.getString("message");
 				} catch (Exception e) {
 					// TODO: handle exception

@@ -247,7 +247,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 					JSONObject data = new JSONObject();
 					try {
 						data.put("action", CONSTANT.ACTION_INVITE);
-						data.put("title", "invite");
+						data.put("title1", "invite");
 						data.put("message", myId);
 					} catch (Exception e) {
 						// TODO: handle exception
@@ -889,7 +889,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
     					JSONObject data = new JSONObject();
     					try {
     						data.put("action", CONSTANT.ACTION_INVITE);
-    						data.put("title", "accept");
+    						data.put("title1", "accept");
     						data.put("message", myId);
     					} catch (Exception e) {
     						// TODO: handle exception
@@ -912,7 +912,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
     					JSONObject data = new JSONObject();
     					try {
     						data.put("action", CONSTANT.ACTION_INVITE);
-    						data.put("title", "cancel");
+    						data.put("title1", "cancel");
     						data.put("message", myId);
     					} catch (Exception e) {
     						// TODO: handle exception
@@ -950,7 +950,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
                 		JSONObject data = new JSONObject();
                 		try {
                 			data.put("action", CONSTANT.ACTION_CHOOSING);
-                			data.put("title", "cancel");
+                			data.put("title1", "cancel");
                 			data.put("message", myId);
                 		} catch (Exception e) {
                 			// TODO: handle exception
@@ -998,29 +998,30 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 				String action = null;
 				String title = null;
 				String message = null;
+				String Channel = extras.getString("com.parse.Channel");
 				try {
 					data = new JSONObject(extras.getString("com.parse.Data"));
 					action = data.getString("action");
-					title = data.getString("title");
+					title = data.getString("title1");
 					message = data.getString("message");
 				} catch (Exception e) {
 					// TODO: handle exception
 					e.getStackTrace();
 				}
-				Log.d(CONSTANT.DEBUG_BROADCAST, "Listener >> action: "+ action+"\ttitle: "+title +"\tmessage: "+ message +" status: "+myStatus);
+				Log.d(CONSTANT.DEBUG_BROADCAST, "Listener >> title: "+title +" message: "+ message +" status: "+myStatus + " Channel :"+Channel);
 				
-				if( title.trim().equals("invite")&& myStatus == CONSTANT.STATE_FREE){
+				if( title.trim().equals("invite")&& myStatus == CONSTANT.STATE_FREE || myStatus == CONSTANT.STATE_WAITING){
 					String friendId = message;
 					if( friendsId.contains(friendId)){
 						Log.d(CONSTANT.DEBUG_BROADCAST,"My friend invites me and I am free ");
 						onInvitationAlert(friendId);
 					}
 				}
-				if( title.equals("accept")&& myStatus == CONSTANT.STATE_WAITING){
+				if( title.equals("accept")&& myStatus == CONSTANT.STATE_WAITING || myStatus == CONSTANT.STATE_FREE){
 					String friendId = message;
 					onInvitationAcceptedAlert(friendId);
 				}
-				if( title.equals("cancel")&& myStatus == CONSTANT.STATE_WAITING){
+				if( title.equals("cancel")&& myStatus == CONSTANT.STATE_WAITING || myStatus == CONSTANT.STATE_FREE){
 					myStatus = CONSTANT.STATE_FREE;
 				}
 				

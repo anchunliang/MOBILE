@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import org.json.JSONObject;
 
 import com.parse.ParsePush;
+import com.parse.PushService;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -91,7 +92,7 @@ public class MyGallery extends Activity {
 		JSONObject data = new JSONObject();
 		try {
 			data.put("action", CONSTANT.ACTION_SHARING);
-			data.put("title", "cancel");
+			data.put("title1", "cancel");
 			data.put("message", myId);
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -116,6 +117,7 @@ public class MyGallery extends Activity {
 		progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		coverFlow.setAdapter(coverImageAdapter);
 		scoverFlow.setAdapter(scoverImageAdapter);
+		Log.d(CONSTANT.DEBUG_BROADCAST, "gallery Listener >> subscripttions: " +  PushService.getSubscriptions(MyGallery.this).toString());
        // mThread.start();  
         Thread mThread = new Thread(new Runnable() {  
             
@@ -133,7 +135,7 @@ public class MyGallery extends Activity {
             			JSONObject data = new JSONObject();
             			try {
             				data.put("action", CONSTANT.ACTION_SHARING);
-            				data.put("title", "coversetposition");
+            				data.put("title1", "coversetposition");
             				data.put("message", position);
             			} catch (Exception e) {
             				// TODO: handle exception
@@ -176,7 +178,7 @@ public class MyGallery extends Activity {
             			JSONObject data = new JSONObject();
             			try {
             				data.put("action", CONSTANT.ACTION_SHARING);
-            				data.put("title", "coverflip");
+            				data.put("title1", "coverflip");
             				data.put("message", position);
             			} catch (Exception e) {
             				// TODO: handle exception
@@ -503,13 +505,13 @@ public class MyGallery extends Activity {
 				try {
 					data = new JSONObject(extras.getString("com.parse.Data"));
 					action = data.getString("action");
-					title = data.getString("title");
+					title = data.getString("title1");
 					message = data.getString("message");
 				} catch (Exception e) {
 					// TODO: handle exception
 					e.getStackTrace();
 				}
-				Log.d(CONSTANT.DEBUG_BROADCAST, "choosing Listener >>" +  data.toString());
+				Log.d(CONSTANT.DEBUG_BROADCAST, "gallery Listener >>" +  data.toString());
 				if( title.equals("cancel")){
 					Toast.makeText(MyGallery.this, friendName+ "離開",
 							Toast.LENGTH_SHORT).show();
@@ -555,12 +557,12 @@ public class MyGallery extends Activity {
 				try {
 					data = new JSONObject(extras.getString("com.parse.Data"));
 					action = data.getString("action");
-					title = data.getString("title");
+					title = data.getString("title1");
 				} catch (Exception e) {
 					// TODO: handle exception
 					e.getStackTrace();
 				}
-				Log.d(CONSTANT.DEBUG_BROADCAST, "choosing Listener >>" +  data.toString());
+				Log.d(CONSTANT.DEBUG_BROADCAST, "gallery Listener >>" +  data.toString());
 				if( title.equals("cancel")){
 					onFriendAbortAlert();
 					Toast.makeText(MyGallery.this, friendName+ "離開",

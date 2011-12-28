@@ -43,12 +43,13 @@
         </activity>
 
         <service android:name="com.parse.PushService" />
-        <receiver android:name="edu.ntu.mobile.smallelephant.ader.SharingCommunication" android:enabled="true">
-            <intent-filter>
-                <action android:name="edu.ntu.mobile.smallelephant.ader.communication"></action>
+
+        <receiver android:name="com.parse.ParseBroadcastReceiver" >
+            <intent-filter >
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
-
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
