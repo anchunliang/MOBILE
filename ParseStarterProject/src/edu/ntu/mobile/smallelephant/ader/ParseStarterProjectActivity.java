@@ -7,9 +7,9 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.SocketException;
+
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -93,9 +93,6 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 	private static final int CHOOSING_PHOTO = 0;
 	private String parse_user_id = null;
 	ImageAndTextListAdapter adapter = null;
-	private static int serverport = 5050;
-	private static ServerSocket serverSocket;
-	private static Socket remoteSocket;
 
 	// broadcast receiver
 	
@@ -214,7 +211,6 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 		// getContactsName();
 		super.onCreate(savedInstanceState);	
 		setContentView(R.layout.login);
-		threadforaccept();
 		setProgressBarIndeterminateVisibility(Boolean.FALSE);
 		findViews();
 		// Add your initialization code here
@@ -229,48 +225,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 		}
 	}
 
-	private void threadforaccept() {
-		try{
-			serverSocket = new ServerSocket(serverport);
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		Thread t = new Thread(new Runnable() {
-			public void run() {
-				//while(true){
-					int count=0;
-					try {
-						Log.d("network",""+InetAddress.getLocalHost().getHostAddress());
-						
-						Log.d("network","wait for accept");
-						remoteSocket = serverSocket.accept();
-						Log.d("network","acceptted");
-						BufferedReader br = new BufferedReader(new InputStreamReader(remoteSocket.getInputStream()));
-						Intent intent = new Intent(ParseStarterProjectActivity.this,MyGallery.class);
-						Bundle bundle = new Bundle();
-						while (remoteSocket.isConnected()) {
-							String msg= br.readLine();
-							if (msg=="end")
-								break;
-							bundle.putString("photo"+count,msg);
-							Log.d("network",msg);
-							count++;
-						}
-						bundle.putString("selections", ""+count);
-						intent.putExtras(bundle);
-						startActivity(intent);
-					}	
-					catch (IOException e) {
-						e.printStackTrace();
-					}
-				//}
-			}
-		});
-		
-		t.start();
-		
-	}
+	
 
 	// private void setVisibilities() {
 	// btnRefresh.setVisibility(View.INVISIBLE);
@@ -349,12 +304,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 		bundle.putString("friendIp", "");
 		bundle.putString("friendName", friendsNameById.get(id));
 		intent.putExtras(bundle);
-		try {
-			serverSocket.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 		startActivityForResult(intent, CHOOSING_PHOTO);
 	}
 

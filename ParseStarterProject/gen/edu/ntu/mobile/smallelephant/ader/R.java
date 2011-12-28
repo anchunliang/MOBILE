@@ -399,7 +399,7 @@ containing a value of this type.
     }
     public static final class id {
         public static final int AlbumGrid=0x7f040023;
-        public static final int Gallery=0x7f04002d;
+        public static final int Gallery=0x7f04002c;
         public static final int MyAdapter_CheckBox_checkBox=0x7f04001f;
         public static final int MyAdapter_ImageView_icon=0x7f04001d;
         public static final int MyAdapter_TextView_title=0x7f04001e;
@@ -424,23 +424,22 @@ containing a value of this type.
         public static final int abs__tab_icon=0x7f040013;
         public static final int abs__textButton=0x7f040019;
         public static final int abs__up=0x7f040010;
-        public static final int arrow=0x7f040025;
-        public static final int begin_image=0x7f040026;
-        public static final int begin_instruction=0x7f040028;
-        public static final int begin_login=0x7f04002a;
-        public static final int begin_logout=0x7f040027;
-        public static final int begin_start=0x7f040029;
-        public static final int edtName=0x7f04002b;
-        public static final int edtNum=0x7f04002c;
+        public static final int begin_image=0x7f040025;
+        public static final int begin_instruction=0x7f040027;
+        public static final int begin_login=0x7f040029;
+        public static final int begin_logout=0x7f040026;
+        public static final int begin_start=0x7f040028;
+        public static final int edtName=0x7f04002a;
+        public static final int edtNum=0x7f04002b;
         public static final int homeAsUp=0x7f040006;
-        public static final int instruction_back=0x7f040030;
+        public static final int instruction_back=0x7f04002f;
         public static final int itemCheckBox=0x7f040021;
-        public static final int linearLayout1=0x7f040031;
+        public static final int linearLayout1=0x7f040030;
         public static final int listMode=0x7f040002;
-        public static final int listView1=0x7f040032;
+        public static final int listView1=0x7f040031;
         public static final int normal=0x7f040001;
-        public static final int relativeLayout1=0x7f04002f;
-        public static final int sGallery=0x7f04002e;
+        public static final int relativeLayout1=0x7f04002e;
+        public static final int sGallery=0x7f04002d;
         public static final int showCustom=0x7f040008;
         public static final int showHome=0x7f040005;
         public static final int showTitle=0x7f040007;

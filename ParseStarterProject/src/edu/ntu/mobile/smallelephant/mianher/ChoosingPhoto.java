@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.Socket;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -99,7 +99,6 @@ public class ChoosingPhoto extends FragmentActivity {
 	private ProgressDialog PhotoprogressDialog;
 	int flag=0;
 	int selections=0; 
-	Socket clientSocket;
 	Intent intent1;
 	Bundle bundle1;
 	//private ArrayList<String> PhotoURLS = new ArrayList<String>();
@@ -249,84 +248,16 @@ public class ChoosingPhoto extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.album_main);
 		AlbumprogressDialog = ProgressDialog.show(ChoosingPhoto.this,
-				"=(", "=(", true, false);
+				"讀取相簿列表中", "請稍候...", true, false);
 		AlbumprogressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		intent1 = new Intent(ChoosingPhoto.this,MyGallery.class);
 		bundle1 = new Bundle();
 		photoadaptermap = new HashMap<String,PhotoAdapter>();
-		getSupportActionBar().setTitle("?�簿?�表");
-		mimage = (ImageView) findViewById(R.id.arrow);
-		mimage.setVisibility(View.GONE);
+		getSupportActionBar().setTitle("相簿列表");
+		
 		albumgrid = (GridView) findViewById(R.id.AlbumGrid);
 		photogrid = (GridView) findViewById(R.id.PhotoGrid);
-		mimage.setOnClickListener(new OnClickListener() {
-			public void onClick(View arg0) {
-				
-				
-				if(selections==0)
-					Toast.makeText(ChoosingPhoto.this,"Please select some photos.",Toast.LENGTH_SHORT).show();
-				else{
-					Thread t = new Thread(new Runnable() {
-						public void run() {
-					try{
-						
-						InetAddress serverIp;
-						int count=0;
-						serverIp = InetAddress.getByName(friendIp);
-						int serverPort = 5055;
-						clientSocket = new Socket(serverIp, serverPort);
-						BufferedWriter bw;
-						bw = new BufferedWriter( new OutputStreamWriter(clientSocket.getOutputStream()));
-						
-						// �g�J�T��
-						//bw.write(EditText01.getText()+":"+EditText02.getText()+"\n");
-						
-						// �ߧY�o�e
-						//bw.flush();
-						for(String albumid: albumIds){
-							ArrayList<PhotoUnit> photounits =photos.get(albumid);
-							for(PhotoUnit p:photounits){
-								if(p.photoselection){
-									bundle1.putString("photo"+count,p.photourllarge);
-									bw.write(p.photourllarge+"\n");
-									bw.flush();
-									Log.d("network","write: "+p.photourllarge+"\n");
-									count++;
-								}						
-							}
-							
-						}
-						bw.write("end\n");
-						bw.flush();
-						Log.d("network","end"+"\n");
-						Message msg = new Message();  
-		                msg.what = 2;  
-		                mHandler.sendMessage(msg);  
-					}
-					
-					catch (IOException e) {
-						e.printStackTrace();
-					}
-					}
-					});
-					t.start();
-					/*if(count==selections){
-						bundle.putString("selections", ""+selections);
-						intent.putExtras(bundle);
-						startActivity(intent);
-						
-					}
-					else{
-						Log.d("trace","selection count not match!");
-						
-					}*/
-					
-				}
-					
-				
-
-			}
-		});
+		
 		photogrid.setVisibility(View.GONE);
 		albumAdapter = new AlbumAdapter();
 		albumgrid.setAdapter(albumAdapter);
@@ -359,7 +290,7 @@ public class ChoosingPhoto extends FragmentActivity {
 			case 1:
 				Log.d("time", "handler begin Tid=" + getTaskId());
 				albumgrid.setVisibility(View.GONE);
-				getSupportActionBar().setTitle("?�選?�享?��?");
+				getSupportActionBar().setTitle("勾選分享相片");
 				photogrid.setVisibility(View.VISIBLE);
             	photogrid.setAdapter(photoAdapter);
             	PhotoprogressDialog.dismiss();
@@ -387,7 +318,7 @@ public class ChoosingPhoto extends FragmentActivity {
 			ChoosingPhoto.this.runOnUiThread(new Runnable() {
 				public void run() {
 					albumgrid.setVisibility(View.VISIBLE);
-					getSupportActionBar().setTitle("?�簿?�表");
+					getSupportActionBar().setTitle("相簿列表");
 					photogrid.setVisibility(View.GONE);
 					invalidateOptionsMenu();
 
@@ -470,13 +401,13 @@ public class ChoosingPhoto extends FragmentActivity {
 						nowalbumid = albumIds.get(id);
 						photoAdapter = photoadaptermap.get(albumIds.get(id));
 						albumgrid.setVisibility(View.GONE);
-						getSupportActionBar().setTitle("?�選?�享?��?");
+						getSupportActionBar().setTitle("勾選分享相片");
 						photogrid.setVisibility(View.VISIBLE);
 						photogrid.setAdapter(photoAdapter);
 					} else {
 						photoAdapter = new PhotoAdapter();
 						PhotoprogressDialog = ProgressDialog.show(
-								ChoosingPhoto.this, " =((", "=(((", true,
+								ChoosingPhoto.this, "讀取相片中", "請稍候...", true,
 								false);
 						PhotoprogressDialog
 								.setProgressStyle(ProgressDialog.STYLE_SPINNER);
