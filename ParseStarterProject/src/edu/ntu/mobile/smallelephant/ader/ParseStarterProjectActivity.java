@@ -254,7 +254,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 						e.getStackTrace();
 					}
 					Toast.makeText(ParseStarterProjectActivity.this,
-							"invites "+vc.getTextView(),
+							"invites "+vc.getTextView().getText(),
 							Toast.LENGTH_SHORT).show();
 					push.setData(data);
 					push.sendInBackground();
