@@ -107,6 +107,7 @@ public class ChoosingPhoto extends FragmentActivity {
 	int selections=0; 
 	Intent intent1;
 	Bundle bundle1;
+	ArrayList<Boolean> album_OK;
 	//private ArrayList<String> PhotoURLS = new ArrayList<String>();
 	
 	@Override
@@ -394,6 +395,12 @@ public class ChoosingPhoto extends FragmentActivity {
             case 4:
             	photoAdapter.notifyDataSetChanged();
 				break;
+            case 5:
+            	album_OK.set(msg.arg1,true);
+				break;
+            case 6:
+            	PhotoprogressDialog.dismiss();
+            	break;
             }  
         }  
     };  
@@ -484,10 +491,8 @@ public class ChoosingPhoto extends FragmentActivity {
 					final int id = ((ImageView) v).getId();
 					try{
 						nowalbumid = albumIds.get(id);
-					}
-					catch(Exception e){
-						e.printStackTrace();
-					}
+						ArrayList<PhotoUnit> photo = photos.get(albumIds.get(id));
+						photo.size();
 						invalidateOptionsMenu();
 					if (photoadaptermap.containsKey(albumIds.get(id))) {
 						nowalbumid = albumIds.get(id);
@@ -516,12 +521,14 @@ public class ChoosingPhoto extends FragmentActivity {
 								 * ChoosingPhoto.this.runOnUiThread(new
 								 * Runnable() { public void run() {
 								 */
-
+								try{
 								ArrayList<PhotoUnit> photo = photos
 										.get(albumIds.get(id));
-								for(int i=0;i<photo.size();i++){
-									photoAdapter.addItem(getResources().getDrawable(R.drawable.question));	
-								}
+								
+									for(int i=0;i<photo.size();i++){
+										photoAdapter.addItem(getResources().getDrawable(R.drawable.question));	
+									}
+								
 								Message msg = new Message();
 								msg.what = 1;
 								mHandler.sendMessage(msg);
@@ -549,11 +556,30 @@ public class ChoosingPhoto extends FragmentActivity {
 								// }
 								// });
 								Log.d("trace", "image onclick");
+								}
+								catch(Exception e){
+									ChoosingPhoto.this.runOnUiThread(new Runnable() {
+										public void run() {
+											Message msg = new Message();
+											msg.what = 6;
+											mHandler.sendMessage(msg);
+											Toast.makeText(ChoosingPhoto.this, "此相簿尚未讀取完成",Toast.LENGTH_SHORT).show();
+											return;
+										}
+									});
+								}
 							}
 						});
 						mThread.start();
 						// photoAdapter = new PhotoAdapter();
+					}}
+					catch(Exception e){
+						Toast.makeText(ChoosingPhoto.this, "此相簿尚未讀取完成",Toast.LENGTH_SHORT).show();
+						
+						e.printStackTrace();
+						return;
 					}
+					
 
 				}
 			});
@@ -782,13 +808,14 @@ public class ChoosingPhoto extends FragmentActivity {
 				albumIds = new ArrayList<String>();
 				albumNames = new ArrayList<String>();
 				albumCoverUrls = new ArrayList<String>();
+				album_OK = new ArrayList<Boolean>();
 				photos = new TreeMap<String, ArrayList<PhotoUnit>>();
 				Log.d("trace", "albumList.length=" + albumList.length());
 				Message msg;
 				for (int i = 0; i < albumList.length(); i++) {
 					if (ALBUMPRIVACY.contains(albumList.getJSONObject(i).getString("privacy"))) {
 						albumAdapter.addItem(getResources().getDrawable(R.drawable.question));	
-						
+						album_OK.add(false);
 					}
 				}
 				msg = new Message();
@@ -807,7 +834,10 @@ public class ChoosingPhoto extends FragmentActivity {
 								.getString("name");
 						albumIds.add(albumId);
 						albumNames.add(albumName);
-						
+						Message msg1 = new Message();
+						msg1.what = 5;
+						msg1.arg1 = j;
+						mHandler.sendMessage(msg1);
 						albumCoverUrls.add("https://graph.facebook.com/"
 								+ albumId + "/picture?type=small&access_token="
 								+ accessToken);
@@ -938,7 +968,7 @@ public class ChoosingPhoto extends FragmentActivity {
 		try {
 			for (int i = 0; i < images.length(); i++) {
 				JSONObject image = images.getJSONObject(i);
-				if (image.getInt("width") <= 180) {
+				if (image.getInt("width") <= 720) {
 					return image.getString("source");
 				}
 			}
