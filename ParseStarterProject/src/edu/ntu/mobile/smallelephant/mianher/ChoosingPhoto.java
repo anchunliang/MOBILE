@@ -215,22 +215,22 @@ public class ChoosingPhoto extends FragmentActivity {
 					}
 				}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-		menu.add("Logout").setIcon(R.drawable.ic_menu_set_as)
-				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-
-					@Override
-					public boolean onMenuItemClick(MenuItem item) {
-						// TODO Auto-generated method stub
-						// item.setActionView(R.layout.indeterminate_progress_action);
-						Toast.makeText(getApplicationContext(),
-								"logout button clicked!", Toast.LENGTH_SHORT)
-								.show();
-						setResult(CONSTANT.RESULT_LOGOUT);
-						finish();
-						return false;
-					}
-				}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		//
+//		menu.add("Logout").setIcon(R.drawable.ic_menu_set_as)
+//				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+//
+//					@Override
+//					public boolean onMenuItemClick(MenuItem item) {
+//						// TODO Auto-generated method stub
+//						// item.setActionView(R.layout.indeterminate_progress_action);
+//						Toast.makeText(getApplicationContext(),
+//								"logout button clicked!", Toast.LENGTH_SHORT)
+//								.show();
+//						setResult(CONSTANT.RESULT_LOGOUT);
+//						finish();
+//						return false;
+//					}
+//				}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+//		//
 		menu.add("Start").setIcon(R.drawable.ic_menu_forward)
 				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 

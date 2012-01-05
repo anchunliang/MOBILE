@@ -14,23 +14,28 @@
     <application
         android:debuggable="true"
         android:icon="@drawable/icon"
-        android:label="@string/app_name" >
+        android:label="@string/app_name"
+        >
         <activity
             android:name="edu.ntu.mobile.smallelephant.mianher.MyGallery"
-            android:theme="@style/Theme.Sherlock" >
+            android:theme="@style/Theme.Sherlock"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:label="@string/app_name"
             android:name="ParseStarterProjectActivity"
-            android:theme="@style/Theme.Sherlock" >
+            android:theme="@style/Theme.Sherlock"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="edu.ntu.mobile.smallelephant.mianher.ChoosingPhoto"
-            android:theme="@style/Theme.Sherlock" >
+            android:theme="@style/Theme.Sherlock" 
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name="edu.ntu.mobile.smallelephant.mianher.beginner"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" 
+            android:screenOrientation="portrait">
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
 
@@ -39,7 +44,8 @@
         </activity>
         <activity
             android:name="edu.ntu.mobile.smallelephant.mianher.instruction"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" 
+            android:screenOrientation="portrait">
         </activity>
 
         <service android:name="com.parse.PushService" />
