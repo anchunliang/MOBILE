@@ -66,6 +66,9 @@ public CoverFlow(Context context, AttributeSet attrs) {
 	  	  
 	  return super.onScroll(e1,e2,distanceX,distanceY);
   }
+  public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {        
+	  return false;
+  }
     /**
      * Get the max rotational angle of the image
   * @return the mMaxRotationAngle

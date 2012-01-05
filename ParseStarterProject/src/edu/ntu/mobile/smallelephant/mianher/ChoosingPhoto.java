@@ -237,6 +237,8 @@ public class ChoosingPhoto extends FragmentActivity {
 					@Override
 					public boolean onMenuItemClick(MenuItem item) {
 						// TODO Auto-generated method stub
+						
+						try{
 						Intent intent = new Intent(ChoosingPhoto.this,
 								MyGallery.class);
 						Bundle bundle = new Bundle();
@@ -308,6 +310,12 @@ public class ChoosingPhoto extends FragmentActivity {
 
 							}
 
+						}
+						}
+						catch(Exception e){
+							Toast.makeText(ChoosingPhoto.this, "尚有相片未讀取完成",Toast.LENGTH_SHORT).show();
+							
+							e.printStackTrace();
 						}
 						return false;
 					}
