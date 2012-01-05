@@ -1,15 +1,11 @@
 package edu.ntu.mobile.smallelephant.ader;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -34,6 +30,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.Menu;
 import android.support.v4.view.MenuItem;
@@ -64,7 +61,6 @@ import com.parse.ParseQuery;
 import com.parse.PushService;
 
 import edu.ntu.mobile.smallelephant.mianher.ChoosingPhoto;
-import edu.ntu.mobile.smallelephant.mianher.MyGallery;
 
 public class ParseStarterProjectActivity extends FragmentActivity {
 	/** Called when the activity is first created. */
@@ -93,6 +89,23 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 	private String parse_user_id = null;
 	ImageAndTextListAdapter adapter = null;
 
+	
+	private Handler myHandler = new Handler(); 
+	
+	// runnable to refresh state
+	private Runnable refreshState = new Runnable() {
+		
+		public void run() {
+			// TODO Auto-generated method stub
+			refreshFriendStatus();
+			changeStateOnline();
+			myHandler.removeCallbacks(refreshState);
+			//設定Delay的時間
+			myHandler.postDelayed(refreshState, 5000);
+		}
+	};
+	
+	
 	// broadcast receiver
 	
 	@Override
@@ -103,11 +116,13 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 		myStatus = CONSTANT.STATE_FREE;
 		IntentFilter filter = new IntentFilter( CONSTANT.ACTION_INVITE);
 		registerReceiver(receiver, filter);
+		myHandler.removeCallbacks(refreshState);
+		myHandler.postDelayed(refreshState, 5000);
 	}
 	
 	@Override
 	public void onPause(){
-		unregisterReceiver(receiver);
+//		unregisterReceiver(receiver);
 		super.onPause();
 	}
 	
@@ -168,24 +183,24 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 				}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 		
-		menu.add("Logout")
-				.setIcon(R.drawable.ic_menu_set_as)
-				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-
-					@Override
-					public boolean onMenuItemClick(MenuItem item) {
-						// TODO Auto-generated method stub
-						// item.setActionView(R.layout.indeterminate_progress_action);
-						Toast.makeText(getApplicationContext(),
-								"logout button clicked!", Toast.LENGTH_SHORT)
-								.show();
-						logoutReset();
-						return false;
-					}
-				})
-				.setShowAsAction(
-						MenuItem.SHOW_AS_ACTION_ALWAYS
-								);
+//		menu.add("Logout")
+//				.setIcon(R.drawable.ic_menu_set_as)
+//				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+//
+//					@Override
+//					public boolean onMenuItemClick(MenuItem item) {
+//						// TODO Auto-generated method stub
+//						// item.setActionView(R.layout.indeterminate_progress_action);
+//						Toast.makeText(getApplicationContext(),
+//								"logout button clicked!", Toast.LENGTH_SHORT)
+//								.show();
+//						logoutReset();
+//						return false;
+//					}
+//				})
+//				.setShowAsAction(
+//						MenuItem.SHOW_AS_ACTION_ALWAYS
+//								);
 
 		
 		return super.onCreateOptionsMenu(menu);
@@ -194,7 +209,8 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 	@Override
 	public void onStop() {
 		Log.d(CONSTANT.DEBUG_TAG, "onStop");
-		logoutParse();
+//		logoutParse();
+		myHandler.removeCallbacks(refreshState);
 		super.onStop();
 	}
 
@@ -202,6 +218,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 	public void onDestroy() {
 		Log.d(CONSTANT.DEBUG_TAG, "onDestroy");
 		logoutParse();
+		unregisterReceiver(receiver);
 		super.onDestroy();
 	}
 
@@ -416,6 +433,8 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 					public void run() {
 						// TODO Auto-generated method stub
 						changeStateOnline();
+						myHandler.removeCallbacks(refreshState);
+						myHandler.postDelayed(refreshState, 5000);
 						
 					}
 				});
