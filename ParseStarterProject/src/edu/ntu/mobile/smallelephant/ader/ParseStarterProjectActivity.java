@@ -89,7 +89,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 	private String parse_user_id = null;
 	ImageAndTextListAdapter adapter = null;
 
-	
+	private String friendId;
 	private Handler myHandler = new Handler(); 
 	
 	// runnable to refresh state
@@ -118,6 +118,10 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 		registerReceiver(receiver, filter);
 		myHandler.removeCallbacks(refreshState);
 		myHandler.postDelayed(refreshState, 5000);
+		Log.d(CONSTANT.DEBUG_BROADCAST, "onResume myId is "+myId+" friendId is "+(friendId == null? "null": friendId));
+		if( friendId !=null){
+			onInvitationAlert(friendId);
+		}
 	}
 	
 	@Override
@@ -423,9 +427,11 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 				myProfile = new JSONObject(response);
 				myId = myProfile.getString("id");
 				myName = myProfile.getString("name");
-				
+				for( String subscribed : PushService.getSubscriptions(getApplicationContext())){
+					PushService.unsubscribe(getApplicationContext(), subscribed);
+				}
 				PushService.subscribe(ParseStarterProjectActivity.this, CONSTANT.PARSE_CHANNEL_TAG+myId, ParseStarterProjectActivity.class);
-				
+				Log.d(CONSTANT.DEBUG_BROADCAST, "subscriptions: "+PushService.getSubscriptions(getApplicationContext()).toString());
 				final String queryId = myId;
 				final String queryName = myName;
 				ParseStarterProjectActivity.this.runOnUiThread(new Runnable() {
@@ -922,6 +928,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
     					push.setData(data);
     					push.sendInBackground();
                     	goChoosingPhoto(friendId);
+                    	ParseStarterProjectActivity.this.friendId = null;
                         dialog.cancel();
                     }
                 }).setNegativeButton("Cancel",
@@ -944,11 +951,13 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 //    							Toast.LENGTH_SHORT).show();
     					push.setData(data);
     					push.sendInBackground();
+    					ParseStarterProjectActivity.this.friendId = null;
                         dialog.cancel();
                     }
                 });
         AlertDialog alert = builder.create();
         alert.show();
+        
     }
 	
 	private void onInvitationAcceptedAlert(final String friendId)
@@ -1032,6 +1041,8 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 				Log.d(CONSTANT.DEBUG_BROADCAST, "Listener >> title: "+title +" message: "+ message +" status: "+myStatus + " Channel :"+Channel);
 				
 				if( title.trim().equals("invite")&& (myStatus == CONSTANT.STATE_FREE || myStatus == CONSTANT.STATE_WAITING)){
+					ParseStarterProjectActivity.this.friendId = message;
+					Log.d(CONSTANT.DEBUG_BROADCAST, "subscriptions: "+PushService.getSubscriptions(getApplicationContext()).toString()+" onInvite myId is "+myId+" friendId is "+(friendId == null? "null": friendId));
 					String friendId = message;
 					if( friendsId.contains(friendId)){
 						Log.d(CONSTANT.DEBUG_BROADCAST,"My friend invites me and I am free ");

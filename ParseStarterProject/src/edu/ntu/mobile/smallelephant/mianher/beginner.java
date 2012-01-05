@@ -82,7 +82,7 @@ public class beginner extends Activity {
 		Log.d("trace","beginner");
 		Parse.initialize(this, "L6Qx3IQVB2zNv3bHrUzTwNbak0MF1xHQHqE2BVCc",
 				"ksAA2JMvQVhQwnWLV8ZanZIChJlpsGIRUfKo3GIX");
-		PushService.subscribe(this, "", ParseStarterProjectActivity.class);
+//		PushService.subscribe(this, "", ParseStarterProjectActivity.class);
 		login = (ImageButton)findViewById(R.id.begin_login);
 		logout = (ImageButton)findViewById(R.id.begin_logout);
 		instruction = (ImageButton)findViewById(R.id.begin_instruction);
