@@ -68,7 +68,7 @@ public class MyGallery extends Activity {
 	int selections;
 	int friend_selections;
 	ArrayList<Drawable> drawablesFromUrl;
-	
+	int flag=0;
 
 	@Override
 	public void onResume(){
@@ -151,6 +151,7 @@ public class MyGallery extends Activity {
         		scoverFlow.setOnItemClickListener(new OnItemClickListener() {
         			public void onItemClick(AdapterView<?> parent, View v,
         					int position, long id) {
+        				
         				coverFlow.setSelection(position, true);
         				
         				ParsePush push = new ParsePush();
@@ -175,17 +176,18 @@ public class MyGallery extends Activity {
         		coverFlow.setOnItemSelectedListener(new OnItemSelectedListener() 
                 {
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long i){
-                    	if(scoverFlow.getSelectedItemPosition()>position){
-                    		int diff=scoverFlow.getSelectedItemPosition()-position;
-                    		for(int j=0;j<diff;j++){
-                    			scoverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_LEFT, null);
-                      		}
+                    	if(flag==0){
+                    		if(scoverFlow.getSelectedItemPosition()>position){
+                    			int diff=scoverFlow.getSelectedItemPosition()-position;
+                    			for(int j=0;j<diff;j++){
+                    				scoverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_LEFT, null);
+                    			}
                     		
-                    	}
-                    	else if(scoverFlow.getSelectedItemPosition()<position){
-                    		int diff=position-scoverFlow.getSelectedItemPosition();
-                    		for(int j=0;j<diff;j++){
-                    			scoverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT, null);
+                    		}
+                    		else if(scoverFlow.getSelectedItemPosition()<position){
+                    			int diff=position-scoverFlow.getSelectedItemPosition();
+                    			for(int j=0;j<diff;j++){
+                    				scoverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT, null);
                     			
                     			/*Handler handler = new Handler(); 
                     		    handler.postDelayed(new Runnable() { 
@@ -193,23 +195,28 @@ public class MyGallery extends Activity {
                     		              //my_button.setBackgroundResource(R.drawable.defaultcard); 
                     		         } 
                     		    }, 1000); */
+                    			}
+                    		
                     		}
+                    		ParsePush push = new ParsePush();
+                    		push.setChannel(CONSTANT.PARSE_CHANNEL_TAG + friendId);
+                    		JSONObject data = new JSONObject();
+                    		try {
+                    			data.put("action", CONSTANT.ACTION_SHARING);
+                    			data.put("title1", "coverflip");
+                    			data.put("message", position);
+                    		} catch (Exception e) {
+            				// TODO: handle exception
+                    			e.getStackTrace();
+                    		}
+                    		push.setData(data);
+                    		push.sendInBackground();
+                    	}
+                    	else{
+                    		scoverFlow.setSelection(position);
+                    		flag=0;
                     		
                     	}
-                    	ParsePush push = new ParsePush();
-            			push.setChannel(CONSTANT.PARSE_CHANNEL_TAG + friendId);
-            			JSONObject data = new JSONObject();
-            			try {
-            				data.put("action", CONSTANT.ACTION_SHARING);
-            				data.put("title1", "coverflip");
-            				data.put("message", position);
-            			} catch (Exception e) {
-            				// TODO: handle exception
-            				e.getStackTrace();
-            			}
-            			push.setData(data);
-            			push.sendInBackground();
-                    	
                     	//scoverFlow.setSelection(position, true);
                     }
 
@@ -613,7 +620,9 @@ public class MyGallery extends Activity {
 					}catch( Exception e){
 						e.getStackTrace();
 					}
+					flag=1;
 					coverFlow.setSelection(position);
+					//coverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_LEFT, null);
 				}
 				else if ( title.equals("coverflip")){
 					int position = coverFlow.getSelectedItemPosition();
@@ -622,21 +631,32 @@ public class MyGallery extends Activity {
 					}catch( Exception e){
 						e.getStackTrace();
 					}
-					
+					/*
 					if(coverFlow.getSelectedItemPosition()>position){
                 		int diff=coverFlow.getSelectedItemPosition()-position;
                 		for(int j=0;j<diff;j++){
+                			
                 			coverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_LEFT, null);
+                			
                 		}
                 	}
 					else if(coverFlow.getSelectedItemPosition()<position){
                 		int diff=position-coverFlow.getSelectedItemPosition();
                 		for(int j=0;j<diff;j++){
+                			
                 			coverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT, null);
+                			
                 		}
-                	}
-					
-					if(scoverFlow.getSelectedItemPosition()>position){
+                	}*/
+					int diff=coverFlow.getSelectedItemPosition()-position;
+					flag=1;
+            		if(diff>0){
+            			coverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_LEFT, null);
+            		}
+            		else if(diff<0)	{
+            			coverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT, null);
+            		}
+					/*if(scoverFlow.getSelectedItemPosition()>position){
                 		int diff=scoverFlow.getSelectedItemPosition()-position;
                 		for(int j=0;j<diff;j++){
                 			scoverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_LEFT, null);
@@ -648,7 +668,7 @@ public class MyGallery extends Activity {
                 			scoverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT, null);
                 		}
                 	}
-					
+					*/
 					
 				}
 			}
