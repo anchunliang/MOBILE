@@ -98,7 +98,8 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 	@Override
 	public void onResume(){
 		super.onResume();
-		changeStateOnline();
+		if( myId !=null && myName != null)
+			changeStateOnline();
 		myStatus = CONSTANT.STATE_FREE;
 		IntentFilter filter = new IntentFilter( CONSTANT.ACTION_INVITE);
 		registerReceiver(receiver, filter);
@@ -222,6 +223,10 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 			Log.d(CONSTANT.DEBUG_FACEBOOK, "oncreate: session valid");
 			changeToFriendSelectPage();
 		}
+		else{
+			setResult(CONSTANT.RESULT_LOGOUT);
+			finish();
+		}
 	}
 
 	
@@ -249,6 +254,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 						data.put("action", CONSTANT.ACTION_INVITE);
 						data.put("title1", "invite");
 						data.put("message", myId);
+						data.put("alert", myName + "在pPhoShare中邀請了您。");
 					} catch (Exception e) {
 						// TODO: handle exception
 						e.getStackTrace();
@@ -649,12 +655,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 	}
 
 	private void changeToFriendSelectPage() {
-		Toast.makeText(getApplicationContext(), "complete!", Toast.LENGTH_SHORT);
-		// //Parse.initialize(ParseStarterProjectActivity.this,
-		// "L6Qx3IQVB2zNv3bHrUzTwNbak0MF1xHQHqE2BVCc",
-		// "ksAA2JMvQVhQwnWLV8ZanZIChJlpsGIRUfKo3GIX");
 		listViewFriends.setVisibility(View.VISIBLE);
-		// btnInvite.setVisibility(View.VISIBLE);
 		if( myId == null || myName == null){
 			fbAsyncRunner.request("me", myProfileListener);
 		}else{
@@ -1011,18 +1012,18 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 				}
 				Log.d(CONSTANT.DEBUG_BROADCAST, "Listener >> title: "+title +" message: "+ message +" status: "+myStatus + " Channel :"+Channel);
 				
-				if( title.trim().equals("invite")&& myStatus == CONSTANT.STATE_FREE || myStatus == CONSTANT.STATE_WAITING){
+				if( title.trim().equals("invite")&& (myStatus == CONSTANT.STATE_FREE || myStatus == CONSTANT.STATE_WAITING)){
 					String friendId = message;
 					if( friendsId.contains(friendId)){
 						Log.d(CONSTANT.DEBUG_BROADCAST,"My friend invites me and I am free ");
 						onInvitationAlert(friendId);
 					}
 				}
-				if( title.equals("accept")&& myStatus == CONSTANT.STATE_WAITING || myStatus == CONSTANT.STATE_FREE){
+				if( title.equals("accept")&& (myStatus == CONSTANT.STATE_WAITING || myStatus == CONSTANT.STATE_FREE)){
 					String friendId = message;
 					onInvitationAcceptedAlert(friendId);
 				}
-				if( title.equals("cancel")&& myStatus == CONSTANT.STATE_WAITING || myStatus == CONSTANT.STATE_FREE){
+				if( title.equals("cancel")&& (myStatus == CONSTANT.STATE_WAITING || myStatus == CONSTANT.STATE_FREE)  ){
 					myStatus = CONSTANT.STATE_FREE;
 				}
 				

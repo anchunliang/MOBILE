@@ -7,9 +7,6 @@ import java.util.ArrayList;
 
 import org.json.JSONObject;
 
-import com.parse.ParsePush;
-import com.parse.PushService;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -32,19 +29,24 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.Gallery.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
+import android.widget.Toast;
+
+import com.parse.ParsePush;
+import com.parse.PushService;
+
 import edu.ntu.mobile.smallelephant.ader.CONSTANT;
 import edu.ntu.mobile.smallelephant.ader.R;
 
@@ -103,6 +105,23 @@ public class MyGallery extends Activity {
 		super.onDestroy();
 	}
 	
+	private Handler handler = new Handler();
+	private Runnable updateTimer = new Runnable() {
+		public void run() {
+			coverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT, null);
+		}
+	};
+	
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_VOLUME_UP && event.getRepeatCount() == 0
+				) {
+			// do something on back.
+			coverFlow.onKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT, null);
+			return true;
+		}
+
+		return super.onKeyDown(keyCode, event);
+	}
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -118,7 +137,11 @@ public class MyGallery extends Activity {
 		coverFlow.setAdapter(coverImageAdapter);
 		scoverFlow.setAdapter(scoverImageAdapter);
 		Log.d(CONSTANT.DEBUG_BROADCAST, "gallery Listener >> subscripttions: " +  PushService.getSubscriptions(MyGallery.this).toString());
-       // mThread.start();  
+       // mThread.start();
+		
+		
+		
+		
         Thread mThread = new Thread(new Runnable() {  
             
             public void run() {  
