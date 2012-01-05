@@ -644,7 +644,7 @@ public class ChoosingPhoto extends FragmentActivity {
 		}
 
 		public View getView(int position, View convertView, ViewGroup parent) {
-			ViewHolder holder;
+			final ViewHolder holder;
 			if (convertView == null) {
 				holder = new ViewHolder();
 				convertView = mInflater.inflate(R.layout.album_item, null);
@@ -686,6 +686,27 @@ public class ChoosingPhoto extends FragmentActivity {
 						// Toast.LENGTH_SHORT).show();
 					} else {
 						cb.setChecked(true);
+						setselectionbyalbumandposition(nowalbumid, id, true);
+						selections++;
+						// Toast.makeText(MyCustomActivity.this, "onClick",
+						// Toast.LENGTH_SHORT).show();
+					}
+				}
+			});
+			holder.imageview.setOnClickListener(new OnClickListener() {
+
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					ImageView cb = (ImageView) v;
+					int id = cb.getId();
+					if (getselectionbyalbumandposition(nowalbumid, id)) {
+						holder.checkbox.setChecked(false);
+						setselectionbyalbumandposition(nowalbumid, id, false);
+						selections--;
+						// Toast.makeText(MyCustomActivity.this, "onClick",
+						// Toast.LENGTH_SHORT).show();
+					} else {
+						holder.checkbox.setChecked(true);
 						setselectionbyalbumandposition(nowalbumid, id, true);
 						selections++;
 						// Toast.makeText(MyCustomActivity.this, "onClick",
