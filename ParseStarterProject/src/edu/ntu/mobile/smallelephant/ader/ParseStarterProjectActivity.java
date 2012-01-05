@@ -254,7 +254,7 @@ public class ParseStarterProjectActivity extends FragmentActivity {
 						data.put("action", CONSTANT.ACTION_INVITE);
 						data.put("title1", "invite");
 						data.put("message", myId);
-						data.put("alert", myName + "在pPhoShare中邀請了您。");
+						data.put("alert", myName + "在PhoShare中邀請了您。");
 					} catch (Exception e) {
 						// TODO: handle exception
 						e.getStackTrace();
