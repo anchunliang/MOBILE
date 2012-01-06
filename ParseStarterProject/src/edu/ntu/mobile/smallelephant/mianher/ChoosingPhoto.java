@@ -1067,7 +1067,7 @@ public class ChoosingPhoto extends FragmentActivity {
 	private void onFriendAbortAlert()
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage( friendName+" aborted!").setCancelable(
+        builder.setMessage( friendName+" 已離開").setCancelable(
                 false).setNeutralButton("Ok",
                 		new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int which) {
@@ -1114,7 +1114,7 @@ public class ChoosingPhoto extends FragmentActivity {
 				}
 				Log.d(CONSTANT.DEBUG_BROADCAST, "choosing Listener >>" +  data.toString()); 
 				if( title.equals("cancel")){
-					Toast.makeText(ChoosingPhoto.this, friendName+ "離開!",
+					Toast.makeText(ChoosingPhoto.this, friendName+ " 已離開",
 							Toast.LENGTH_SHORT).show();
 					onFriendAbortAlert();
 				}

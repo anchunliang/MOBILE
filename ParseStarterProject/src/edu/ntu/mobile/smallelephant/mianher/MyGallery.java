@@ -125,6 +125,7 @@ public class MyGallery extends FragmentActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.gallery);
+		flag=0;
 		drawablesFromUrl = new ArrayList<Drawable>();	
 		coverImageAdapter = new ImageAdapter(this);
 		scoverImageAdapter= new sImageAdapter(this);
@@ -506,8 +507,18 @@ public class MyGallery extends FragmentActivity {
 			String url=bundle.getString("photo"+i);
 			PhotoURLS.add(url);		
 		}
-		getSupportActionBar().setTitle("正在與"+friendName+"分享相片");
-//		
+		try{
+			if(friendName.equals("null"))
+				getSupportActionBar().setTitle("正在獨自瀏覽相片");
+			
+			else
+				getSupportActionBar().setTitle("正在與"+friendName+"分享相片");
+		}
+		catch(Exception e){
+			getSupportActionBar().setTitle("正在獨自瀏覽相片");
+			e.printStackTrace();
+		}
+//			
 //		for(int i=0;i<friend_selections;i++){
 //			String url=bundle.getString("friend_photo"+i);
 //			PhotoURLS.add(url);		
@@ -546,7 +557,7 @@ public class MyGallery extends FragmentActivity {
 				}
 				Log.d(CONSTANT.DEBUG_BROADCAST, "gallery Listener >>" +  data.toString());
 				if( title.equals("cancel")){
-					Toast.makeText(MyGallery.this, friendName+ "abort!",
+					Toast.makeText(MyGallery.this, friendName+ " 已離開",
 							Toast.LENGTH_SHORT).show();
 					onFriendAbortAlert();
 					finish();
@@ -601,7 +612,7 @@ public class MyGallery extends FragmentActivity {
 				Log.d(CONSTANT.DEBUG_BROADCAST, "gallery Listener >>" +  data.toString());
 				if( title.equals("cancel")){
 					onFriendAbortAlert();
-					Toast.makeText(MyGallery.this, friendName+ "abort",
+					Toast.makeText(MyGallery.this, friendName+ " 已離開",
 							Toast.LENGTH_SHORT).show();
 				}
 				else if ( title.equals("scover")){
@@ -678,7 +689,7 @@ public class MyGallery extends FragmentActivity {
 	private void onFriendAbortAlert()
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage( friendName+" aborted!").setCancelable(
+        builder.setMessage( friendName+" 已離開").setCancelable(
                 false).setNeutralButton("Ok",
                 		new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int which) {
