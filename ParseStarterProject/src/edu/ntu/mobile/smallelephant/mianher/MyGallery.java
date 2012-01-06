@@ -7,7 +7,6 @@ import java.util.ArrayList;
 
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -29,16 +28,15 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.Gallery.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -50,7 +48,7 @@ import com.parse.PushService;
 import edu.ntu.mobile.smallelephant.ader.CONSTANT;
 import edu.ntu.mobile.smallelephant.ader.R;
 
-public class MyGallery extends Activity {
+public class MyGallery extends FragmentActivity {
 	/** Called when the activity is first created. */
 	//public static Facebook facebook = new Facebook("255313284527691");
 	//public static AsyncFacebookRunner fbAsyncRunner = new AsyncFacebookRunner(facebook);
@@ -508,6 +506,7 @@ public class MyGallery extends Activity {
 			String url=bundle.getString("photo"+i);
 			PhotoURLS.add(url);		
 		}
+		getSupportActionBar().setTitle("正在與"+friendName+"分享相片");
 //		
 //		for(int i=0;i<friend_selections;i++){
 //			String url=bundle.getString("friend_photo"+i);
@@ -558,11 +557,13 @@ public class MyGallery extends Activity {
 //						friendPhotosToShare = new ArrayList<String>();
 						if( count != null && count >0){
 							for( int i = 0; i < count; i++){
-								Drawable d=LoadImageFromURL(data.getString("photo"+i));
-			        			coverImageAdapter.addItem(d);
-			        			Message msg = new Message(); 
-			    				msg.what = 1;  
-			    				mHandler.sendMessage(msg);
+								if( !PhotoURLS.contains(data.getString("photo"+i))){
+									Drawable d=LoadImageFromURL(data.getString("photo"+i));
+				        			coverImageAdapter.addItem(d);
+				        			Message msg = new Message(); 
+				    				msg.what = 1;  
+				    				mHandler.sendMessage(msg);
+								}
 									//PhotoURLS.add(data.getString("photo"+i));		
 //								friendPhotosToShare.add(i, data.getString("photo"+i));
 							}

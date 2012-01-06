@@ -29,7 +29,7 @@
         </activity>
         <activity
             android:name="edu.ntu.mobile.smallelephant.mianher.ChoosingPhoto"
-            android:theme="@style/Theme.Sherlock" 
+            android:theme="@style/Theme.Sherlock"
             android:screenOrientation="portrait">
         </activity>
         <activity
